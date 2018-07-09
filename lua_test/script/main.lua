@@ -1,0 +1,17 @@
+--require('script/Student')
+-- function NativeExtend(native,extendName)
+--     local _meta = _G[extendName .. 'Ext'];
+--     if (_meta == nil) then
+--         return nil
+--     end
+    
+--     if (native.handle ~= nil)
+--     then
+--         return native.handle
+--     end
+--     o = {}
+--     setmetatable(o,{__index = _meta})
+--     o.native=native
+--     native.handle = o
+--     return o
+-- end

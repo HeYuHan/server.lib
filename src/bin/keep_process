@@ -1,0 +1,68 @@
+#! /bin/sh
+
+# if [ $# != 1 ] ; then 
+# echo "please input keep process args"
+# exit 1; 
+process=""
+process_check=0
+for arg in $*  
+do  
+    if [ -n "$process" ]; then
+        process+=" "
+    fi
+    
+    process+=$arg  
+    
+done
+
+function check_process()
+{
+	count=`pgrep -lf "$process" | grep -v "keep_process" | wc -l | awk '{print $1}'`
+    if [[ $count == 0 ]]; then
+		process_check=0;
+	else
+		process_check=1
+	fi
+}
+check_process
+if [[ $process_check == 1 ]]; then
+
+    while true ; do  
+        
+        if [[ $process_check == 1 ]]; then
+            #normal
+            #echo normal
+            sleep 5s
+            check_process
+		else
+            #restart
+		cur_dateTime="`date +%Y-%m-%d,%H:%M:%S`:\c"
+		#cur_dateTime="`date +%Y-%m-%d,%r`:\c"
+		echo -e $cur_dateTime >> keep_process.log
+		echo "$process" | awk '{print $1}' | xargs basename | xargs -I{} printf "Starting % -50s" "{} ..." >> keep_process.log
+		    $process
+            sleep 1s
+            check_process
+            if [[ $process_check == 1 ]]; then
+                echo -ne "[  OK  ]\n" >> keep_process.log
+			
+            else
+                echo -ne "[FAILED]\n" >> keep_process.log
+            fi
+		fi 
+        
+    done
+    
+else
+    echo -ne "\nprocess is not runing $process \n"
+fi
+# fi 
+# keep_pid=$1;
+# if ps -p $keep_pid > /dev/null 
+# then
+#    echo "$keep_pid is running"
+#    # Do something knowing the pid exists, i.e. the process with $PID is running
+# else
+#    echo "$keep_pid is not running"
+#    exit 1;
+# fi

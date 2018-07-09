@@ -1,0 +1,17 @@
+#pragma once
+typedef enum
+{
+	CM_LOGIN,
+	CM_RPC_REQUEST
+}CLIENT_MESSAGE;
+
+typedef enum
+{
+	SM_LOGIN,
+	SM_RPC_RESOPONSE
+}SERVER_MESSAGE;
+typedef enum
+{
+	ERROR_NONE,
+	ERROR_NOT_LOGIN,
+}SERVER_ERROR;

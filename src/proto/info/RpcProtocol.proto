@@ -1,0 +1,35 @@
+
+syntax = "proto3";
+package Proto.Protocol;
+option java_package = "com.pearl.srs.proto";
+option optimize_for = LITE_RUNTIME;
+
+enum PacketType {
+	NONE = 0;
+	REQUEST = 1;
+	RESPONSE = 2;
+	CANCEL = 3;
+	LOGIN = 4;
+	LOGOUT = 5;
+	COMMAND = 6;
+	SERVER = 7;
+}
+
+enum BattlePacketType {
+	POSITION = 0;
+	HIT = 1;
+	HEAL = 2;
+	JOIN_GAME = 3;
+	LEAVE_GAME = 4;
+}
+
+message Header {
+	PacketType type = 1;
+	string methodName = 2;
+//	string token = 3;
+	sint64 uid = 4; // 用户ID
+	sint64 pid = 5; // 角色ID
+	sint32 code = 6;
+	uint32 rpcId = 7;
+	uint32 packetId = 8;  // 请求包 ID
+}

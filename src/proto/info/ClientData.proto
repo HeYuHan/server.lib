@@ -1,0 +1,219 @@
+syntax = "proto3";
+package Proto.Message;
+option java_package = "com.pearl.srs.proto";
+option optimize_for = LITE_RUNTIME;
+
+enum ResponseCode{
+	SUCCESS = 0;
+	UNKNOWN = -1;						// 未知错误
+	INVALID_PROTOCOL = -2;				// 协议错误
+	INVALID_ARG = -3;					// 非法参数
+	TIMEOUT = -4;						// 网络请求超时
+	SERVER_BUSY = -5;					// 服务器忙碌
+	SERVER_ERROR = -6;					// 服务器错误
+	MISSING_LOGIN = -7; 				// 请登录后再操作
+	REPEATED_LOGIN = -8; 				// 帐号已在其它设备登录
+	DATA_READ_ERROR = -9;				// 数据读取错误
+	DISCONNECT = -10;					// 连接中断，请重新登录
+
+	COMMON_ILLEGAL_ARGUMENT = 100;		// 非法参数
+	COMMON_UNSUPPORTED_ITEM_TYPE = 101; // 不支持的物品类型
+	COMMON_IS_CHEATING = 102;			// 验证为作弊
+	COMMON_FAIL_OPERATION = 103;		// 操作失败
+	COMMON_MAX_LEVEL = 104;				// 现在已经达到最高等级，可以通过提升角色升级来升级。
+
+	STORAGE_FULL = 150;					// 背包已满
+	ITEM_NOT_EXIST = 151;				// 指定物品不存在
+	ITEM_NOT_ENOUGH = 152;				// 物品不足
+	ITEM_COMPOUND_ERROR = 153;			// 不能合成该物品
+	ITEM_SELL_ERROR = 154;				// 该物品不能出售
+	ITEM_EXIST = 155;					// 该物品已经存在
+	ITEM_TYPE_ERROR = 156;				// 物品类型错误
+	ITEM_LEVEL_FULL = 157;				// 物品已经满级，请升阶后再升级。
+	ITEM_STAR_NOT_ENOUGH = 158;			// 物品星级不足
+	ITEM_LEVEL_ERROR = 159;				// 该物品不能升级
+	ITEM_RANK_ERROR = 160;				// 该物品不能升阶
+	ITEM_RANK_FULL = 161;				// 物品已经满阶。
+	STORAGE_DEFAULT_ITEM = 162;			// 默认物品不能被消耗
+	STORAGE_EQUIPPED_ITEM = 163;		// 已装备的物品不能被消耗
+	ITEM_MOP_UP_NOT_ENOUGH = 164;		// 扫荡券不足
+	STORAGE_EXPAND_COUNT_MAX = 165;		// 背包可扩展次数已达到上限
+
+	USER_NOT_EXIST = 200;				// 指定用户不存在
+	PLAYER_NOT_EXIST = 201;				// 指定角色不存在
+	PLAYER_NAME_WITH_ILLEGAL_CHARACTER = 202;	// 名称中包含非法字符
+	PLAYER_NAME_EXIST = 203;			// 名称已被使用
+	PLAYER_NAME_EMPTY = 204;			// 角色名字不能为空
+	PLAYER_ENEGY_NOT_ENOUGH = 205;		// 角色体力不足
+	PLAYER_RESET_ENEGY_COUNT_NOT_ENOUGH = 206; // 购买体力的次数已用完
+	PLAYER_VIP_LEVEL_SCANTY = 208; 		// 角色VIP等级不足
+	USER_NAME_EMPTY = 209;				// 用户名不能为空
+	PLAYER_EXCEED_MAX_NUM = 210; 		// 已达到角色数量上限
+	PLAYER_NAME_MIN_NUM = 211;			// 角色名称最少为3个字符
+	PLAYER_NAME_TO_LONG = 212;			// 角色名称最多为9个汉字或18个英文
+	PLAYER_BANNED = 213;				// 角色已经被封停
+	PLAYER_LEVEL_NOT_ENOUGH = 214 ;		//角色等级不足
+	PLAYER_IS_ONLINE = 215;				//角色在线
+	PLAYER_IN_OTHER_GUILD = 216;		//该玩家已加入其它公会
+	PLAYER_STAMINA_NOT_ENOUGH = 217;	//玩家体力不足
+	PLAYER_STAMINA_CAN_NOT_BUY = 219;	//玩家不能购买体力
+
+	CURRENCY_GOLD_NOT_ENOUGH = 250;		// 金币数量不足
+	CURRENCY_DIMOND_NOT_ENOUGH = 251;	// 钻石数量不足
+	CURRENCY_FAILD = 255;				// 交易失败
+	CURRENCY_OVERFLOW = 256;			// Currency overflow
+	CURRENCY_UNSUPPORTED = 260;		// 不支持的货币类型
+
+	CHECKIN_TODAY_EXIST = 650;//今日已签到
+
+	QUEST_NOT_COMPLETED = 700;		// 当前任务尚未完成
+	QUEST_EXPIRED = 701;		// 当前任务尚未完成
+
+	FRIEND_FULL = 850;	// 好友数量已经达到上限
+	FRIEND_APPLY_EXIST = 851;	// 已向该玩家发送好友申请
+	FRIEND_EXIST = 852;	// 你们已经是好友了
+	FRIEND_APPLY_ERROR = 853; // 不能添加自己为好友
+
+	GIFT_EXPIRE = 900; // 该活动已过期
+	GIFT_EXIST = 901; // 你已经领取过该活动奖励
+	GIFT_RECHARGE_NOT_ENOUGH = 902; // 充值金额不足
+
+	INSTANCE_STRATEGY_USE_COUNT_MAX = 1100;//策略已用完
+
+	BATTLE_MATCH_EXIST = 1200; // 已经在匹配中
+}
+enum AccountType{
+	NONE = 0;
+	NOR	= 1;//普通玩家
+	DEV	= 2;//开发者
+	GM	= 3;//GM
+}
+
+// 用户登录
+message UserLoginRequest{
+	string userName = 1; //用户名
+	string userPwd = 2; //用户密码
+	string sdk_uid = 3; //平台账户唯一ID
+	string sdk_token = 4; //平台登录令牌
+	string ip = 5; // 登录IP
+}
+message UserLoginResponse {
+	sint64 id = 1;			// 玩家唯一ID
+	string userName = 2;		// 用户名字
+	repeated ProtoPlayer players = 3;	// 角色列表
+	string sdkUid = 4; // 平台账户唯一ID
+	string sdkToken = 5; // 平台登录令牌
+	bool isActivate = 6; // 用户是否激活
+}
+
+// 用户激活
+message UserActivateRequest{
+	sint64 id = 1; // 玩家唯一ID
+	string userName = 2; // 用户名字
+	string code = 3; // 激活码
+}
+message UserActivateResponse {
+	sint64 id = 1; // 玩家唯一ID
+	string userName = 2; // 用户名字
+	repeated ProtoPlayer players = 3; // 角色列表
+}
+
+// 角色登录
+message PlayerLoginRequest{
+	sint64 id = 1;			// 角色唯一ID
+	string clientVersion = 2; // 客户端版本号
+	string appStore = 3; // 渠道
+	string device = 4; // 登录设备(10901：安卓、10903：ios正版、10905：ios越狱、10906：PC)
+}
+message PlayerLoginResponse {
+	ProtoPlayerInfo playerInfo = 1;
+}
+
+// 角色退出
+message PlayerLogoutRequest{
+	sint64 id = 1; // 角色唯一ID
+}
+message PlayerLogoutResponse {}
+
+// 创建角色
+message PlayerCreateRequest{
+	sint64 userId = 1;	 // 用户ID
+	string name = 3; // 角色名
+	uint32 sysCharacterId = 4;
+	int32 zoneId = 5; // 大区ID
+	string clientVersion = 6; // 客户端版本号
+	string appStore = 7; // 渠道
+	string device = 8; // 登录设备(10901：安卓、10903：ios正版、10905：ios越狱、10906：PC)
+}
+message PlayerCreateResponse {
+	ProtoPlayerInfo playerInfo = 1;
+}
+
+message ProtoPlayer {
+ sint64 id = 1; // 角色唯一ID
+ string name = 2; // 角色名字
+ bool isBanned = 3; // 当前是否被封停
+ string bannedStartTime = 4; // 封停开始时间 格式：2010-01-01 00:00:00
+ string bannedEndTime = 5; // 封停结束时间 格式：2010-01-01 00:00:00
+ string bannedReason = 6; // 封停原因
+}
+
+message ProtoPlayerGarage {
+	sint64 id = 1; // 角色唯一ID
+	string name = 2; // 角色名字
+	string garageInfo = 3; //角色车库数据
+}
+
+message ProtoPlayerItem {
+	sint64 id = 1; // 角色道具唯一ID
+	uint32 sysItemId = 2; // 系统物品ID
+	uint32 itemType = 3; // 系统物品类型
+	uint32 count = 4; // 数量
+	uint32 level = 5; // 升级
+	uint32 rank = 6; // 升阶
+	bool isEquipped = 7; // 是否正被装备
+	uint32 exp = 8; // 经验
+	bool isDefault = 10; // 角色默认车，不能分解，买卖，消耗
+}
+
+message ProtoPlayerInfo {
+	sint64 id = 1; //玩家唯一ID
+	string name = 2; // 角色名字
+	string userName = 3; // 用户名字
+	uint32 gold = 4; //金币
+	uint32 diamond = 5; //钻石
+	uint32 point = 6; //积分赛货币
+	uint32 power = 8; //能量
+	uint32 exp = 9; // 经验
+	uint32 level = 10; //等级
+	string avatar = 12; // 头像
+	uint32 nextLevelExp = 13; // 玩家升级所需要的经验
+	uint32 skillPoint = 14; // 技能点
+	repeated ProtoPlayerItem playerItems = 15; // 玩家所有的道具
+	repeated ProtoPlayerGarage playerGarages = 16; //玩家车库信息
+	uint32 sysCharacterId = 17; // 系统角色ID
+	string lastLoginTime = 26; // 最后登入时间
+	uint32 flag = 31; //标签
+	float battleFire = 32; //战斗力
+	uint32 newbieProgress = 37; // 新手引导进度
+	bool haveNewMail = 39; // 是否有新邮件
+	uint32 questScore = 40; // 任务积分
+	string nextPvpTime = 41; //下次可PVP对战的时间
+	string lastPvpTime = 42; //上次PVP结算的时间
+	uint32 reviveCount = 43; //当天复活次数
+	string activateTime = 45; // 激活日期
+	uint32 armorSuitLevel = 49; // 套装效果等级
+	uint32 stamina = 50; // 体力
+	uint32 vipLevel = 52; //玩家VIP等级
+	uint32 buyStaminaCount = 54; // 当天已经购买体力次数
+	uint32 buyGoldCount = 55; // 当天已经购买金币次数
+	uint32 refreshShopCount = 56; // 当天已经刷新商店次数
+	uint32 buyTrialCount = 57; // 当天已经购买历练次数
+	uint32 buyPowerCount = 58; // 当天已经购买能量次数
+	uint32 eliteCount = 59; // 当天已经打的精英副本次数
+	AccountType accountType = 60;
+	string staminaIds = 63; // 赠送体力的角色ID，最多10个， 例如：1;2;3
+	uint32 storageSlots = 65; // 背包格子总数
+
+	string serverZoneId = 100; // 服务器大区ID
+}
