@@ -154,7 +154,7 @@ void Server::Login(Client * c)
 //rpc set
 BEGIN_RPC_CALLBACK(UserLogin)
 {
-	log_info("login response:%s", response->m_RequestHeader.methodname().c_str());
+	log_info("rpc response:%s", response->m_RequestHeader.methodname().c_str());
 	if (response->m_UserDataLen == 0)return;
 	Client* client = static_cast<Client*>(response->m_UserData[0]);
 	int error_code = response->m_ResponseHeader.code();
@@ -173,6 +173,7 @@ END_RPC_CALLBACK()
 
 BEGIN_PROXY_RPC_CALLBACK(ClientProxy)
 {
+	log_info("rpc response:%s", response->m_RequestHeader.methodname().c_str());
 	Client* client = static_cast<Client*>(response->m_UserData[0]);
 	int sig = *((int*)response->m_UserData[1]);
 	int error_code = response->m_ResponseHeader.code();

@@ -48,13 +48,13 @@ void RPCClient::OnDisconnect()
 void RPCClient::OnConnected()
 {
 	NetworkStream::Reset();
-	Proto::Protocol::Header header;
-	Proto::Message::PlayerCreateRequest request;
-	request.set_userid(8);
-	request.set_name("1457");
-	char msg[256] = {0};
-	request.SerializeToArray(msg, 256);
-	gServer.ClientRpcProxy(NULL, "PlayerCreate", 1, msg, request.ByteSize());
+	//Proto::Protocol::Header header;
+	//Proto::Message::PlayerCreateRequest request;
+	//request.set_userid(8);
+	//request.set_name("1457");
+	//char msg[256] = {0};
+	//request.SerializeToArray(msg, 256);
+	//gServer.ClientRpcProxy(NULL, "PlayerCreate", 1, msg, request.ByteSize());
 	//RPC_CALL(Proto::Message::PlayerCreate, RPC_SIG_CLIENT_PROXY, header, request, NULL, 0);
 }
 
@@ -309,7 +309,7 @@ void RPCConection::Update(float t)
 			ConnectResult *result = &m_AllInfoServerAddr[i];
 			if (result->Connected()&&!result->user_set)
 			{
-				log_error("connected rpc server:%s", result->addr_ip_port);
+				log_info("connected rpc server:%s", result->addr_ip_port);
 				result->user_set = 1;
 				m_SocketPool.AcceptClient(result->result_fd, (sockaddr*)&result->addr_sock);
 			}
