@@ -1,15 +1,20 @@
 #include <stdio.h>
 #include <Windows.h>
-extern "C"
-{
-#include <lua.h>  
-#include <lualib.h>  
-#include <lauxlib.h>  
-}
-#include "lua_mytestclass.hpp"
 #include "Student.h"
 #include <LuaEngine.h>
-
+#include "ScriptBind/ExportHelp.h"
+#include "ScriptBind/Script.h"
+#include "ScriptBind/Lua/LuaBind.h"
+USING_NS_CORE;
+int reg_student(lua_State* L)
+{
+	BEGIN_BASE_CLASS(Student)
+		CONSTRUCTOR()
+		METHOD(Run)
+		METHOD(PrintArg)
+		END_CLASS()
+		return 0;
+}
 int main(int argc, char **args)
 {
 	//lua_State *L = lua_open();
@@ -68,16 +73,16 @@ int main(int argc, char **args)
 	//system("pause");
 	//return 0;
 
-	LuaEngine::GetInstance()->RegisterModel(register_all_lua_mytestclass);
-	LuaEngine::GetInstance()->Start("script/main.lua");
+	LuaEngine::GetInstance()->RegisterModel(reg_student);
+	
+	LuaEngine::GetInstance()->Start();
+	
 	Student s;
-	s.t = 10;
 	LuaEngine::GetInstance()->CreateScriptHandle(&s);
-	s.t = 20;
-	s.EnterScript();
+	s.EnterScript(&s);
 	Student s2;
-	s2.t = 30;
 	LuaEngine::GetInstance()->CreateScriptHandle(&s2);
+	s2.EnterScript(&s2);
 	system("pause");
 	return 0;
 }

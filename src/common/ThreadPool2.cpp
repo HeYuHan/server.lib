@@ -23,7 +23,14 @@ namespace Core
 
 	void Thread::Join()
 	{
+		
 		pthread_join(m_ThreadID, NULL);
+		m_IsRunning = false;
+	}
+
+	void Thread::Deatch()
+	{
+		pthread_detach(m_ThreadID);
 		m_IsRunning = false;
 	}
 
@@ -226,6 +233,17 @@ namespace Core
 	void ThreadCondition::NotifyAll()
 	{
 		pthread_cond_broadcast(&cond);
+	}
+	ThreadObject::ThreadObject():m_Locked(false)
+	{
+	}
+	void ThreadObject::Lock()
+	{
+		m_Lock.Lock();
+	}
+	void ThreadObject::UnLock()
+	{
+		m_Lock.Unlock();
 	}
 }
 

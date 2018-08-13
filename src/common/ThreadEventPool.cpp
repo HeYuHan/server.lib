@@ -18,7 +18,11 @@ class EventTask:public ThreadTask
 	}
 	~EventTask()
 	{
-		if (NULL != m_EventBase)event_base_loopexit(m_EventBase, NULL);
+		if (NULL != m_EventBase)
+		{
+			m_LoopTimer.Stop();
+			event_base_loopexit(m_EventBase, NULL);
+		}
 	}
 	//static void ReadEvent(bufferevent * bev, void * arg)
 	//{
@@ -45,7 +49,7 @@ class EventTask:public ThreadTask
 	}
 	virtual void Process()
 	{
-		if (m_EventBase == NULL)m_EventBase = event_base_new();
+		
 		if (m_EventBase == NULL)return;
 		m_LoopTimer.Init(60 * 60 * 24, Update, this, true);
 		m_LoopTimer.Begin(m_EventBase);
@@ -56,8 +60,12 @@ class EventTask:public ThreadTask
 		m_Pool->m_Lock.Unlock();
 #endif
 		int ret = event_base_dispatch(m_EventBase);
-		event_base_free(m_EventBase);
-		m_EventBase = NULL;
+		/*if (m_EventBase)
+		{
+			event_base_free(m_EventBase);
+			m_EventBase = NULL;
+		}*/
+		
 		log_info("eventpool exit tid:%lu ret:%d", PthreadSelf(), ret);
 		
 	}
@@ -68,14 +76,14 @@ class EventTask:public ThreadTask
 			event_base_loopexit(m_EventBase, NULL);
 		}
 		m_Pool = pool;
-		m_EventBase = NULL;
+		m_EventBase = event_base_new();
 		
 
 		/*evutil_socketpair(AF_INET, SOCK_STREAM, 0, fd);
 		m_BufferEvent = bufferevent_socket_new(m_EventBase, fd[0], BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE);
 		bufferevent_setcb(m_BufferEvent, ReadEvent, WriteEvent, SocketEvent, this);
 		bufferevent_enable(m_BufferEvent, EV_READ | EV_WRITE | EV_PERSIST);*/
-		return true;
+		return m_EventBase != NULL;
 	}
 
 private:
@@ -93,9 +101,7 @@ ThreadEventPool::ThreadEventPool():m_Size(0), m_AllTask(NULL),m_InitedThredCount
 
 ThreadEventPool::~ThreadEventPool()
 {
-	m_Threads.Stop();
-	if (m_AllTask)delete[] m_AllTask;
-	m_AllTask = NULL;
+	Destory();
 }
 
 bool ThreadEventPool::Init(unsigned int size)
@@ -116,12 +122,19 @@ bool ThreadEventPool::Init(unsigned int size)
 	}
 	while (m_InitedThredCount < m_Size)
 	{
-		ThreadSleep(1);
+		//ThreadSleep(1);
 	}
 	log_info("event pool inited thread count %d", m_InitedThredCount);
 	return ret;
 }
 
+void ThreadEventPool::Destory()
+{
+	
+	if (m_AllTask)delete[] m_AllTask;
+	m_AllTask = NULL;
+	m_Threads.Stop();
+}
 struct event_base * ThreadEventPool::Get()
 {
 	EasyMutexLock l(m_Lock);
@@ -129,6 +142,9 @@ struct event_base * ThreadEventPool::Get()
 	{
 		this->Init(5);
 	}
+	/*int index = t%m_Size;
+	t++;
+	return m_AllTask[index].m_EventBase;*/
 	int number = event_base_get_num_events(m_AllTask[0].m_EventBase, EVENT_BASE_COUNT_ADDED);
 	event_base *result = m_AllTask[0].m_EventBase;
 	for (int i = 1; i < m_Size; i++)

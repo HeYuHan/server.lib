@@ -32,6 +32,12 @@ void protobuf_ShutdownFile_ClientData_2eproto() {
   delete ProtoPlayerGarage::default_instance_;
   delete ProtoPlayerItem::default_instance_;
   delete ProtoPlayerInfo::default_instance_;
+  delete ProtoPlayerSimpleInfo::default_instance_;
+  delete PlayerListRequest::default_instance_;
+  delete PlayerListResponse::default_instance_;
+  delete ProtoPlayerStageQuitInfo::default_instance_;
+  delete PlayerStageQuitRequest::default_instance_;
+  delete PlayerStageQuitResponse::default_instance_;
 }
 
 #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
@@ -61,6 +67,12 @@ void protobuf_AddDesc_ClientData_2eproto() {
   ProtoPlayerGarage::default_instance_ = new ProtoPlayerGarage();
   ProtoPlayerItem::default_instance_ = new ProtoPlayerItem();
   ProtoPlayerInfo::default_instance_ = new ProtoPlayerInfo();
+  ProtoPlayerSimpleInfo::default_instance_ = new ProtoPlayerSimpleInfo();
+  PlayerListRequest::default_instance_ = new PlayerListRequest();
+  PlayerListResponse::default_instance_ = new PlayerListResponse();
+  ProtoPlayerStageQuitInfo::default_instance_ = new ProtoPlayerStageQuitInfo();
+  PlayerStageQuitRequest::default_instance_ = new PlayerStageQuitRequest();
+  PlayerStageQuitResponse::default_instance_ = new PlayerStageQuitResponse();
   UserLoginRequest::default_instance_->InitAsDefaultInstance();
   UserLoginResponse::default_instance_->InitAsDefaultInstance();
   UserActivateRequest::default_instance_->InitAsDefaultInstance();
@@ -75,6 +87,12 @@ void protobuf_AddDesc_ClientData_2eproto() {
   ProtoPlayerGarage::default_instance_->InitAsDefaultInstance();
   ProtoPlayerItem::default_instance_->InitAsDefaultInstance();
   ProtoPlayerInfo::default_instance_->InitAsDefaultInstance();
+  ProtoPlayerSimpleInfo::default_instance_->InitAsDefaultInstance();
+  PlayerListRequest::default_instance_->InitAsDefaultInstance();
+  PlayerListResponse::default_instance_->InitAsDefaultInstance();
+  ProtoPlayerStageQuitInfo::default_instance_->InitAsDefaultInstance();
+  PlayerStageQuitRequest::default_instance_->InitAsDefaultInstance();
+  PlayerStageQuitResponse::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_ClientData_2eproto);
 }
 
@@ -5669,8 +5687,6 @@ const int ProtoPlayerInfo::kLevelFieldNumber;
 const int ProtoPlayerInfo::kAvatarFieldNumber;
 const int ProtoPlayerInfo::kNextLevelExpFieldNumber;
 const int ProtoPlayerInfo::kSkillPointFieldNumber;
-const int ProtoPlayerInfo::kPlayerItemsFieldNumber;
-const int ProtoPlayerInfo::kPlayerGaragesFieldNumber;
 const int ProtoPlayerInfo::kSysCharacterIdFieldNumber;
 const int ProtoPlayerInfo::kLastLoginTimeFieldNumber;
 const int ProtoPlayerInfo::kFlagFieldNumber;
@@ -5827,17 +5843,16 @@ void ProtoPlayerInfo::Clear() {
   name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   username_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ZR_(nextlevelexp_, skillpoint_);
+  ZR_(syscharacterid_, battlefire_);
   level_ = 0u;
   avatar_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  syscharacterid_ = 0u;
   lastlogintime_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ZR_(flag_, questscore_);
+  ZR_(newbieprogress_, questscore_);
+  ZR_(revivecount_, armorsuitlevel_);
   nextpvptime_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   lastpvptime_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  revivecount_ = 0u;
-  ZR_(armorsuitlevel_, buytrialcount_);
   activatetime_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ZR_(buypowercount_, elitecount_);
+  ZR_(stamina_, elitecount_);
   ZR_(accounttype_, storageslots_);
   staminaids_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   serverzoneid_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
@@ -5845,8 +5860,6 @@ void ProtoPlayerInfo::Clear() {
 #undef ZR_HELPER_
 #undef ZR_
 
-  playeritems_.Clear();
-  playergarages_.Clear();
 }
 
 bool ProtoPlayerInfo::MergePartialFromCodedStream(
@@ -6040,39 +6053,6 @@ bool ProtoPlayerInfo::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(122)) goto parse_playerItems;
-        break;
-      }
-
-      // repeated .Proto.Message.ProtoPlayerItem playerItems = 15;
-      case 15: {
-        if (tag == 122) {
-         parse_playerItems:
-          DO_(input->IncrementRecursionDepth());
-         parse_loop_playerItems:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtualNoRecursionDepth(
-                input, add_playeritems()));
-        } else {
-          goto handle_unusual;
-        }
-        if (input->ExpectTag(122)) goto parse_loop_playerItems;
-        if (input->ExpectTag(130)) goto parse_loop_playerGarages;
-        input->UnsafeDecrementRecursionDepth();
-        break;
-      }
-
-      // repeated .Proto.Message.ProtoPlayerGarage playerGarages = 16;
-      case 16: {
-        if (tag == 130) {
-          DO_(input->IncrementRecursionDepth());
-         parse_loop_playerGarages:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtualNoRecursionDepth(
-                input, add_playergarages()));
-        } else {
-          goto handle_unusual;
-        }
-        if (input->ExpectTag(130)) goto parse_loop_playerGarages;
-        input->UnsafeDecrementRecursionDepth();
         if (input->ExpectTag(136)) goto parse_sysCharacterId;
         break;
       }
@@ -6084,6 +6064,21 @@ bool ProtoPlayerInfo::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
                  input, &syscharacterid_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(160)) goto parse_flag;
+        break;
+      }
+
+      // optional uint32 flag = 20;
+      case 20: {
+        if (tag == 160) {
+         parse_flag:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &flag_)));
 
         } else {
           goto handle_unusual;
@@ -6102,21 +6097,6 @@ bool ProtoPlayerInfo::MergePartialFromCodedStream(
             this->lastlogintime().data(), this->lastlogintime().length(),
             ::google::protobuf::internal::WireFormatLite::PARSE,
             "Proto.Message.ProtoPlayerInfo.lastLoginTime"));
-        } else {
-          goto handle_unusual;
-        }
-        if (input->ExpectTag(248)) goto parse_flag;
-        break;
-      }
-
-      // optional uint32 flag = 31;
-      case 31: {
-        if (tag == 248) {
-         parse_flag:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
-                 input, &flag_)));
-
         } else {
           goto handle_unusual;
         }
@@ -6549,21 +6529,14 @@ void ProtoPlayerInfo::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(14, this->skillpoint(), output);
   }
 
-  // repeated .Proto.Message.ProtoPlayerItem playerItems = 15;
-  for (unsigned int i = 0, n = this->playeritems_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessage(
-      15, this->playeritems(i), output);
-  }
-
-  // repeated .Proto.Message.ProtoPlayerGarage playerGarages = 16;
-  for (unsigned int i = 0, n = this->playergarages_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessage(
-      16, this->playergarages(i), output);
-  }
-
   // optional uint32 sysCharacterId = 17;
   if (this->syscharacterid() != 0) {
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(17, this->syscharacterid(), output);
+  }
+
+  // optional uint32 flag = 20;
+  if (this->flag() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(20, this->flag(), output);
   }
 
   // optional string lastLoginTime = 26;
@@ -6574,11 +6547,6 @@ void ProtoPlayerInfo::SerializeWithCachedSizes(
       "Proto.Message.ProtoPlayerInfo.lastLoginTime");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
       26, this->lastlogintime(), output);
-  }
-
-  // optional uint32 flag = 31;
-  if (this->flag() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt32(31, this->flag(), output);
   }
 
   // optional float battleFire = 32;
@@ -6817,7 +6785,7 @@ int ProtoPlayerInfo::ByteSize() const {
         this->lastlogintime());
   }
 
-  // optional uint32 flag = 31;
+  // optional uint32 flag = 20;
   if (this->flag() != 0) {
     total_size += 2 +
       ::google::protobuf::internal::WireFormatLite::UInt32Size(
@@ -6966,22 +6934,6 @@ int ProtoPlayerInfo::ByteSize() const {
         this->serverzoneid());
   }
 
-  // repeated .Proto.Message.ProtoPlayerItem playerItems = 15;
-  total_size += 1 * this->playeritems_size();
-  for (int i = 0; i < this->playeritems_size(); i++) {
-    total_size +=
-      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-        this->playeritems(i));
-  }
-
-  // repeated .Proto.Message.ProtoPlayerGarage playerGarages = 16;
-  total_size += 2 * this->playergarages_size();
-  for (int i = 0; i < this->playergarages_size(); i++) {
-    total_size +=
-      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-        this->playergarages(i));
-  }
-
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = total_size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
@@ -6998,8 +6950,6 @@ void ProtoPlayerInfo::MergeFrom(const ProtoPlayerInfo& from) {
   if (GOOGLE_PREDICT_FALSE(&from == this)) {
     ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
   }
-  playeritems_.MergeFrom(from.playeritems_);
-  playergarages_.MergeFrom(from.playergarages_);
   if (from.id() != 0) {
     set_id(from.id());
   }
@@ -7148,8 +7098,6 @@ void ProtoPlayerInfo::InternalSwap(ProtoPlayerInfo* other) {
   avatar_.Swap(&other->avatar_);
   std::swap(nextlevelexp_, other->nextlevelexp_);
   std::swap(skillpoint_, other->skillpoint_);
-  playeritems_.UnsafeArenaSwap(&other->playeritems_);
-  playergarages_.UnsafeArenaSwap(&other->playergarages_);
   std::swap(syscharacterid_, other->syscharacterid_);
   lastlogintime_.Swap(&other->lastlogintime_);
   std::swap(flag_, other->flag_);
@@ -7443,66 +7391,6 @@ void ProtoPlayerInfo::clear_skillpoint() {
   // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerInfo.skillPoint)
 }
 
-// repeated .Proto.Message.ProtoPlayerItem playerItems = 15;
-int ProtoPlayerInfo::playeritems_size() const {
-  return playeritems_.size();
-}
-void ProtoPlayerInfo::clear_playeritems() {
-  playeritems_.Clear();
-}
-const ::Proto::Message::ProtoPlayerItem& ProtoPlayerInfo::playeritems(int index) const {
-  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerInfo.playerItems)
-  return playeritems_.Get(index);
-}
-::Proto::Message::ProtoPlayerItem* ProtoPlayerInfo::mutable_playeritems(int index) {
-  // @@protoc_insertion_point(field_mutable:Proto.Message.ProtoPlayerInfo.playerItems)
-  return playeritems_.Mutable(index);
-}
-::Proto::Message::ProtoPlayerItem* ProtoPlayerInfo::add_playeritems() {
-  // @@protoc_insertion_point(field_add:Proto.Message.ProtoPlayerInfo.playerItems)
-  return playeritems_.Add();
-}
-::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerItem >*
-ProtoPlayerInfo::mutable_playeritems() {
-  // @@protoc_insertion_point(field_mutable_list:Proto.Message.ProtoPlayerInfo.playerItems)
-  return &playeritems_;
-}
-const ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerItem >&
-ProtoPlayerInfo::playeritems() const {
-  // @@protoc_insertion_point(field_list:Proto.Message.ProtoPlayerInfo.playerItems)
-  return playeritems_;
-}
-
-// repeated .Proto.Message.ProtoPlayerGarage playerGarages = 16;
-int ProtoPlayerInfo::playergarages_size() const {
-  return playergarages_.size();
-}
-void ProtoPlayerInfo::clear_playergarages() {
-  playergarages_.Clear();
-}
-const ::Proto::Message::ProtoPlayerGarage& ProtoPlayerInfo::playergarages(int index) const {
-  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerInfo.playerGarages)
-  return playergarages_.Get(index);
-}
-::Proto::Message::ProtoPlayerGarage* ProtoPlayerInfo::mutable_playergarages(int index) {
-  // @@protoc_insertion_point(field_mutable:Proto.Message.ProtoPlayerInfo.playerGarages)
-  return playergarages_.Mutable(index);
-}
-::Proto::Message::ProtoPlayerGarage* ProtoPlayerInfo::add_playergarages() {
-  // @@protoc_insertion_point(field_add:Proto.Message.ProtoPlayerInfo.playerGarages)
-  return playergarages_.Add();
-}
-::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerGarage >*
-ProtoPlayerInfo::mutable_playergarages() {
-  // @@protoc_insertion_point(field_mutable_list:Proto.Message.ProtoPlayerInfo.playerGarages)
-  return &playergarages_;
-}
-const ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerGarage >&
-ProtoPlayerInfo::playergarages() const {
-  // @@protoc_insertion_point(field_list:Proto.Message.ProtoPlayerInfo.playerGarages)
-  return playergarages_;
-}
-
 // optional uint32 sysCharacterId = 17;
 void ProtoPlayerInfo::clear_syscharacterid() {
   syscharacterid_ = 0u;
@@ -7561,7 +7449,7 @@ void ProtoPlayerInfo::clear_lastlogintime() {
   // @@protoc_insertion_point(field_set_allocated:Proto.Message.ProtoPlayerInfo.lastLoginTime)
 }
 
-// optional uint32 flag = 31;
+// optional uint32 flag = 20;
 void ProtoPlayerInfo::clear_flag() {
   flag_ = 0u;
 }
@@ -8017,6 +7905,2801 @@ void ProtoPlayerInfo::clear_serverzoneid() {
   }
   serverzoneid_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), serverzoneid);
   // @@protoc_insertion_point(field_set_allocated:Proto.Message.ProtoPlayerInfo.serverZoneId)
+}
+
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
+
+// ===================================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int ProtoPlayerSimpleInfo::kIdFieldNumber;
+const int ProtoPlayerSimpleInfo::kNameFieldNumber;
+const int ProtoPlayerSimpleInfo::kUserNameFieldNumber;
+const int ProtoPlayerSimpleInfo::kGoldFieldNumber;
+const int ProtoPlayerSimpleInfo::kDiamondFieldNumber;
+const int ProtoPlayerSimpleInfo::kPowerFieldNumber;
+const int ProtoPlayerSimpleInfo::kExpFieldNumber;
+const int ProtoPlayerSimpleInfo::kLevelFieldNumber;
+const int ProtoPlayerSimpleInfo::kAvatarFieldNumber;
+const int ProtoPlayerSimpleInfo::kNextLevelExpFieldNumber;
+const int ProtoPlayerSimpleInfo::kSkillPointFieldNumber;
+const int ProtoPlayerSimpleInfo::kBattleFireFieldNumber;
+const int ProtoPlayerSimpleInfo::kLastLoginTimeFieldNumber;
+const int ProtoPlayerSimpleInfo::kIsOnlineFieldNumber;
+const int ProtoPlayerSimpleInfo::kStaminaFieldNumber;
+const int ProtoPlayerSimpleInfo::kTrialFieldNumber;
+const int ProtoPlayerSimpleInfo::kVipLevelFieldNumber;
+const int ProtoPlayerSimpleInfo::kArenaFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+ProtoPlayerSimpleInfo::ProtoPlayerSimpleInfo()
+  : ::google::protobuf::MessageLite(), _arena_ptr_(NULL) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:Proto.Message.ProtoPlayerSimpleInfo)
+}
+
+void ProtoPlayerSimpleInfo::InitAsDefaultInstance() {
+  _is_default_instance_ = true;
+}
+
+ProtoPlayerSimpleInfo::ProtoPlayerSimpleInfo(const ProtoPlayerSimpleInfo& from)
+  : ::google::protobuf::MessageLite(),
+    _arena_ptr_(NULL) {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:Proto.Message.ProtoPlayerSimpleInfo)
+}
+
+void ProtoPlayerSimpleInfo::SharedCtor() {
+    _is_default_instance_ = false;
+  ::google::protobuf::internal::GetEmptyString();
+  _cached_size_ = 0;
+  id_ = GOOGLE_LONGLONG(0);
+  name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  username_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  gold_ = 0u;
+  diamond_ = 0u;
+  power_ = 0u;
+  exp_ = 0u;
+  level_ = 0u;
+  avatar_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  nextlevelexp_ = 0u;
+  skillpoint_ = 0u;
+  battlefire_ = 0;
+  lastlogintime_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  isonline_ = false;
+  stamina_ = 0u;
+  trial_ = 0u;
+  viplevel_ = 0u;
+  arena_ = 0u;
+}
+
+ProtoPlayerSimpleInfo::~ProtoPlayerSimpleInfo() {
+  // @@protoc_insertion_point(destructor:Proto.Message.ProtoPlayerSimpleInfo)
+  SharedDtor();
+}
+
+void ProtoPlayerSimpleInfo::SharedDtor() {
+  name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  username_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  avatar_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  lastlogintime_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  if (this != &default_instance()) {
+  #else
+  if (this != default_instance_) {
+  #endif
+  }
+}
+
+void ProtoPlayerSimpleInfo::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ProtoPlayerSimpleInfo& ProtoPlayerSimpleInfo::default_instance() {
+#ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  protobuf_AddDesc_ClientData_2eproto();
+#else
+  if (default_instance_ == NULL) protobuf_AddDesc_ClientData_2eproto();
+#endif
+  return *default_instance_;
+}
+
+ProtoPlayerSimpleInfo* ProtoPlayerSimpleInfo::default_instance_ = NULL;
+
+ProtoPlayerSimpleInfo* ProtoPlayerSimpleInfo::New(::google::protobuf::Arena* arena) const {
+  ProtoPlayerSimpleInfo* n = new ProtoPlayerSimpleInfo;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void ProtoPlayerSimpleInfo::Clear() {
+// @@protoc_insertion_point(message_clear_start:Proto.Message.ProtoPlayerSimpleInfo)
+#if defined(__clang__)
+#define ZR_HELPER_(f) \
+  _Pragma("clang diagnostic push") \
+  _Pragma("clang diagnostic ignored \"-Winvalid-offsetof\"") \
+  __builtin_offsetof(ProtoPlayerSimpleInfo, f) \
+  _Pragma("clang diagnostic pop")
+#else
+#define ZR_HELPER_(f) reinterpret_cast<char*>(\
+  &reinterpret_cast<ProtoPlayerSimpleInfo*>(16)->f)
+#endif
+
+#define ZR_(first, last) do {\
+  ::memset(&first, 0,\
+           ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
+} while (0)
+
+  ZR_(gold_, exp_);
+  id_ = GOOGLE_LONGLONG(0);
+  name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  username_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  level_ = 0u;
+  ZR_(nextlevelexp_, battlefire_);
+  ZR_(isonline_, trial_);
+  avatar_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  lastlogintime_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ZR_(viplevel_, arena_);
+
+#undef ZR_HELPER_
+#undef ZR_
+
+}
+
+bool ProtoPlayerSimpleInfo::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:Proto.Message.ProtoPlayerSimpleInfo)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(16383);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional sint64 id = 1;
+      case 1: {
+        if (tag == 8) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_SINT64>(
+                 input, &id_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(18)) goto parse_name;
+        break;
+      }
+
+      // optional string name = 2;
+      case 2: {
+        if (tag == 18) {
+         parse_name:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_name()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->name().data(), this->name().length(),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "Proto.Message.ProtoPlayerSimpleInfo.name"));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(26)) goto parse_userName;
+        break;
+      }
+
+      // optional string userName = 3;
+      case 3: {
+        if (tag == 26) {
+         parse_userName:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_username()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->username().data(), this->username().length(),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "Proto.Message.ProtoPlayerSimpleInfo.userName"));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(32)) goto parse_gold;
+        break;
+      }
+
+      // optional uint32 gold = 4;
+      case 4: {
+        if (tag == 32) {
+         parse_gold:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &gold_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(40)) goto parse_diamond;
+        break;
+      }
+
+      // optional uint32 diamond = 5;
+      case 5: {
+        if (tag == 40) {
+         parse_diamond:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &diamond_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(48)) goto parse_power;
+        break;
+      }
+
+      // optional uint32 power = 6;
+      case 6: {
+        if (tag == 48) {
+         parse_power:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &power_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(56)) goto parse_exp;
+        break;
+      }
+
+      // optional uint32 exp = 7;
+      case 7: {
+        if (tag == 56) {
+         parse_exp:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &exp_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(64)) goto parse_level;
+        break;
+      }
+
+      // optional uint32 level = 8;
+      case 8: {
+        if (tag == 64) {
+         parse_level:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &level_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(74)) goto parse_avatar;
+        break;
+      }
+
+      // optional string avatar = 9;
+      case 9: {
+        if (tag == 74) {
+         parse_avatar:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_avatar()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->avatar().data(), this->avatar().length(),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "Proto.Message.ProtoPlayerSimpleInfo.avatar"));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(80)) goto parse_nextLevelExp;
+        break;
+      }
+
+      // optional uint32 nextLevelExp = 10;
+      case 10: {
+        if (tag == 80) {
+         parse_nextLevelExp:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &nextlevelexp_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(88)) goto parse_skillPoint;
+        break;
+      }
+
+      // optional uint32 skillPoint = 11;
+      case 11: {
+        if (tag == 88) {
+         parse_skillPoint:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &skillpoint_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(101)) goto parse_battleFire;
+        break;
+      }
+
+      // optional float battleFire = 12;
+      case 12: {
+        if (tag == 101) {
+         parse_battleFire:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &battlefire_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(106)) goto parse_lastLoginTime;
+        break;
+      }
+
+      // optional string lastLoginTime = 13;
+      case 13: {
+        if (tag == 106) {
+         parse_lastLoginTime:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_lastlogintime()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->lastlogintime().data(), this->lastlogintime().length(),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "Proto.Message.ProtoPlayerSimpleInfo.lastLoginTime"));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(112)) goto parse_isOnline;
+        break;
+      }
+
+      // optional bool isOnline = 14;
+      case 14: {
+        if (tag == 112) {
+         parse_isOnline:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &isonline_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(120)) goto parse_stamina;
+        break;
+      }
+
+      // optional uint32 stamina = 15;
+      case 15: {
+        if (tag == 120) {
+         parse_stamina:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &stamina_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(128)) goto parse_trial;
+        break;
+      }
+
+      // optional uint32 trial = 16;
+      case 16: {
+        if (tag == 128) {
+         parse_trial:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &trial_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(136)) goto parse_vipLevel;
+        break;
+      }
+
+      // optional uint32 vipLevel = 17;
+      case 17: {
+        if (tag == 136) {
+         parse_vipLevel:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &viplevel_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(144)) goto parse_arena;
+        break;
+      }
+
+      // optional uint32 arena = 18;
+      case 18: {
+        if (tag == 144) {
+         parse_arena:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &arena_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormatLite::SkipField(input, tag));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:Proto.Message.ProtoPlayerSimpleInfo)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:Proto.Message.ProtoPlayerSimpleInfo)
+  return false;
+#undef DO_
+}
+
+void ProtoPlayerSimpleInfo::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:Proto.Message.ProtoPlayerSimpleInfo)
+  // optional sint64 id = 1;
+  if (this->id() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteSInt64(1, this->id(), output);
+  }
+
+  // optional string name = 2;
+  if (this->name().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->name().data(), this->name().length(),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "Proto.Message.ProtoPlayerSimpleInfo.name");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->name(), output);
+  }
+
+  // optional string userName = 3;
+  if (this->username().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->username().data(), this->username().length(),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "Proto.Message.ProtoPlayerSimpleInfo.userName");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      3, this->username(), output);
+  }
+
+  // optional uint32 gold = 4;
+  if (this->gold() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(4, this->gold(), output);
+  }
+
+  // optional uint32 diamond = 5;
+  if (this->diamond() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(5, this->diamond(), output);
+  }
+
+  // optional uint32 power = 6;
+  if (this->power() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(6, this->power(), output);
+  }
+
+  // optional uint32 exp = 7;
+  if (this->exp() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(7, this->exp(), output);
+  }
+
+  // optional uint32 level = 8;
+  if (this->level() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(8, this->level(), output);
+  }
+
+  // optional string avatar = 9;
+  if (this->avatar().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->avatar().data(), this->avatar().length(),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "Proto.Message.ProtoPlayerSimpleInfo.avatar");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      9, this->avatar(), output);
+  }
+
+  // optional uint32 nextLevelExp = 10;
+  if (this->nextlevelexp() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(10, this->nextlevelexp(), output);
+  }
+
+  // optional uint32 skillPoint = 11;
+  if (this->skillpoint() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(11, this->skillpoint(), output);
+  }
+
+  // optional float battleFire = 12;
+  if (this->battlefire() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(12, this->battlefire(), output);
+  }
+
+  // optional string lastLoginTime = 13;
+  if (this->lastlogintime().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->lastlogintime().data(), this->lastlogintime().length(),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "Proto.Message.ProtoPlayerSimpleInfo.lastLoginTime");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      13, this->lastlogintime(), output);
+  }
+
+  // optional bool isOnline = 14;
+  if (this->isonline() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(14, this->isonline(), output);
+  }
+
+  // optional uint32 stamina = 15;
+  if (this->stamina() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(15, this->stamina(), output);
+  }
+
+  // optional uint32 trial = 16;
+  if (this->trial() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(16, this->trial(), output);
+  }
+
+  // optional uint32 vipLevel = 17;
+  if (this->viplevel() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(17, this->viplevel(), output);
+  }
+
+  // optional uint32 arena = 18;
+  if (this->arena() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(18, this->arena(), output);
+  }
+
+  // @@protoc_insertion_point(serialize_end:Proto.Message.ProtoPlayerSimpleInfo)
+}
+
+int ProtoPlayerSimpleInfo::ByteSize() const {
+// @@protoc_insertion_point(message_byte_size_start:Proto.Message.ProtoPlayerSimpleInfo)
+  int total_size = 0;
+
+  // optional sint64 id = 1;
+  if (this->id() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::SInt64Size(
+        this->id());
+  }
+
+  // optional string name = 2;
+  if (this->name().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->name());
+  }
+
+  // optional string userName = 3;
+  if (this->username().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->username());
+  }
+
+  // optional uint32 gold = 4;
+  if (this->gold() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->gold());
+  }
+
+  // optional uint32 diamond = 5;
+  if (this->diamond() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->diamond());
+  }
+
+  // optional uint32 power = 6;
+  if (this->power() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->power());
+  }
+
+  // optional uint32 exp = 7;
+  if (this->exp() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->exp());
+  }
+
+  // optional uint32 level = 8;
+  if (this->level() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->level());
+  }
+
+  // optional string avatar = 9;
+  if (this->avatar().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->avatar());
+  }
+
+  // optional uint32 nextLevelExp = 10;
+  if (this->nextlevelexp() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->nextlevelexp());
+  }
+
+  // optional uint32 skillPoint = 11;
+  if (this->skillpoint() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->skillpoint());
+  }
+
+  // optional float battleFire = 12;
+  if (this->battlefire() != 0) {
+    total_size += 1 + 4;
+  }
+
+  // optional string lastLoginTime = 13;
+  if (this->lastlogintime().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->lastlogintime());
+  }
+
+  // optional bool isOnline = 14;
+  if (this->isonline() != 0) {
+    total_size += 1 + 1;
+  }
+
+  // optional uint32 stamina = 15;
+  if (this->stamina() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->stamina());
+  }
+
+  // optional uint32 trial = 16;
+  if (this->trial() != 0) {
+    total_size += 2 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->trial());
+  }
+
+  // optional uint32 vipLevel = 17;
+  if (this->viplevel() != 0) {
+    total_size += 2 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->viplevel());
+  }
+
+  // optional uint32 arena = 18;
+  if (this->arena() != 0) {
+    total_size += 2 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->arena());
+  }
+
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void ProtoPlayerSimpleInfo::CheckTypeAndMergeFrom(
+    const ::google::protobuf::MessageLite& from) {
+  MergeFrom(*::google::protobuf::down_cast<const ProtoPlayerSimpleInfo*>(&from));
+}
+
+void ProtoPlayerSimpleInfo::MergeFrom(const ProtoPlayerSimpleInfo& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:Proto.Message.ProtoPlayerSimpleInfo)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) {
+    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
+  }
+  if (from.id() != 0) {
+    set_id(from.id());
+  }
+  if (from.name().size() > 0) {
+
+    name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
+  }
+  if (from.username().size() > 0) {
+
+    username_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.username_);
+  }
+  if (from.gold() != 0) {
+    set_gold(from.gold());
+  }
+  if (from.diamond() != 0) {
+    set_diamond(from.diamond());
+  }
+  if (from.power() != 0) {
+    set_power(from.power());
+  }
+  if (from.exp() != 0) {
+    set_exp(from.exp());
+  }
+  if (from.level() != 0) {
+    set_level(from.level());
+  }
+  if (from.avatar().size() > 0) {
+
+    avatar_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.avatar_);
+  }
+  if (from.nextlevelexp() != 0) {
+    set_nextlevelexp(from.nextlevelexp());
+  }
+  if (from.skillpoint() != 0) {
+    set_skillpoint(from.skillpoint());
+  }
+  if (from.battlefire() != 0) {
+    set_battlefire(from.battlefire());
+  }
+  if (from.lastlogintime().size() > 0) {
+
+    lastlogintime_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.lastlogintime_);
+  }
+  if (from.isonline() != 0) {
+    set_isonline(from.isonline());
+  }
+  if (from.stamina() != 0) {
+    set_stamina(from.stamina());
+  }
+  if (from.trial() != 0) {
+    set_trial(from.trial());
+  }
+  if (from.viplevel() != 0) {
+    set_viplevel(from.viplevel());
+  }
+  if (from.arena() != 0) {
+    set_arena(from.arena());
+  }
+}
+
+void ProtoPlayerSimpleInfo::CopyFrom(const ProtoPlayerSimpleInfo& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Proto.Message.ProtoPlayerSimpleInfo)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool ProtoPlayerSimpleInfo::IsInitialized() const {
+
+  return true;
+}
+
+void ProtoPlayerSimpleInfo::Swap(ProtoPlayerSimpleInfo* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void ProtoPlayerSimpleInfo::InternalSwap(ProtoPlayerSimpleInfo* other) {
+  std::swap(id_, other->id_);
+  name_.Swap(&other->name_);
+  username_.Swap(&other->username_);
+  std::swap(gold_, other->gold_);
+  std::swap(diamond_, other->diamond_);
+  std::swap(power_, other->power_);
+  std::swap(exp_, other->exp_);
+  std::swap(level_, other->level_);
+  avatar_.Swap(&other->avatar_);
+  std::swap(nextlevelexp_, other->nextlevelexp_);
+  std::swap(skillpoint_, other->skillpoint_);
+  std::swap(battlefire_, other->battlefire_);
+  lastlogintime_.Swap(&other->lastlogintime_);
+  std::swap(isonline_, other->isonline_);
+  std::swap(stamina_, other->stamina_);
+  std::swap(trial_, other->trial_);
+  std::swap(viplevel_, other->viplevel_);
+  std::swap(arena_, other->arena_);
+  _unknown_fields_.Swap(&other->_unknown_fields_);
+  std::swap(_cached_size_, other->_cached_size_);
+}
+
+::std::string ProtoPlayerSimpleInfo::GetTypeName() const {
+  return "Proto.Message.ProtoPlayerSimpleInfo";
+}
+
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// ProtoPlayerSimpleInfo
+
+// optional sint64 id = 1;
+void ProtoPlayerSimpleInfo::clear_id() {
+  id_ = GOOGLE_LONGLONG(0);
+}
+ ::google::protobuf::int64 ProtoPlayerSimpleInfo::id() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.id)
+  return id_;
+}
+ void ProtoPlayerSimpleInfo::set_id(::google::protobuf::int64 value) {
+  
+  id_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.id)
+}
+
+// optional string name = 2;
+void ProtoPlayerSimpleInfo::clear_name() {
+  name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ const ::std::string& ProtoPlayerSimpleInfo::name() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.name)
+  return name_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void ProtoPlayerSimpleInfo::set_name(const ::std::string& value) {
+  
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.name)
+}
+ void ProtoPlayerSimpleInfo::set_name(const char* value) {
+  
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Proto.Message.ProtoPlayerSimpleInfo.name)
+}
+ void ProtoPlayerSimpleInfo::set_name(const char* value, size_t size) {
+  
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Proto.Message.ProtoPlayerSimpleInfo.name)
+}
+ ::std::string* ProtoPlayerSimpleInfo::mutable_name() {
+  
+  // @@protoc_insertion_point(field_mutable:Proto.Message.ProtoPlayerSimpleInfo.name)
+  return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* ProtoPlayerSimpleInfo::release_name() {
+  // @@protoc_insertion_point(field_release:Proto.Message.ProtoPlayerSimpleInfo.name)
+  
+  return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void ProtoPlayerSimpleInfo::set_allocated_name(::std::string* name) {
+  if (name != NULL) {
+    
+  } else {
+    
+  }
+  name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
+  // @@protoc_insertion_point(field_set_allocated:Proto.Message.ProtoPlayerSimpleInfo.name)
+}
+
+// optional string userName = 3;
+void ProtoPlayerSimpleInfo::clear_username() {
+  username_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ const ::std::string& ProtoPlayerSimpleInfo::username() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.userName)
+  return username_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void ProtoPlayerSimpleInfo::set_username(const ::std::string& value) {
+  
+  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.userName)
+}
+ void ProtoPlayerSimpleInfo::set_username(const char* value) {
+  
+  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Proto.Message.ProtoPlayerSimpleInfo.userName)
+}
+ void ProtoPlayerSimpleInfo::set_username(const char* value, size_t size) {
+  
+  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Proto.Message.ProtoPlayerSimpleInfo.userName)
+}
+ ::std::string* ProtoPlayerSimpleInfo::mutable_username() {
+  
+  // @@protoc_insertion_point(field_mutable:Proto.Message.ProtoPlayerSimpleInfo.userName)
+  return username_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* ProtoPlayerSimpleInfo::release_username() {
+  // @@protoc_insertion_point(field_release:Proto.Message.ProtoPlayerSimpleInfo.userName)
+  
+  return username_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void ProtoPlayerSimpleInfo::set_allocated_username(::std::string* username) {
+  if (username != NULL) {
+    
+  } else {
+    
+  }
+  username_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), username);
+  // @@protoc_insertion_point(field_set_allocated:Proto.Message.ProtoPlayerSimpleInfo.userName)
+}
+
+// optional uint32 gold = 4;
+void ProtoPlayerSimpleInfo::clear_gold() {
+  gold_ = 0u;
+}
+ ::google::protobuf::uint32 ProtoPlayerSimpleInfo::gold() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.gold)
+  return gold_;
+}
+ void ProtoPlayerSimpleInfo::set_gold(::google::protobuf::uint32 value) {
+  
+  gold_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.gold)
+}
+
+// optional uint32 diamond = 5;
+void ProtoPlayerSimpleInfo::clear_diamond() {
+  diamond_ = 0u;
+}
+ ::google::protobuf::uint32 ProtoPlayerSimpleInfo::diamond() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.diamond)
+  return diamond_;
+}
+ void ProtoPlayerSimpleInfo::set_diamond(::google::protobuf::uint32 value) {
+  
+  diamond_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.diamond)
+}
+
+// optional uint32 power = 6;
+void ProtoPlayerSimpleInfo::clear_power() {
+  power_ = 0u;
+}
+ ::google::protobuf::uint32 ProtoPlayerSimpleInfo::power() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.power)
+  return power_;
+}
+ void ProtoPlayerSimpleInfo::set_power(::google::protobuf::uint32 value) {
+  
+  power_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.power)
+}
+
+// optional uint32 exp = 7;
+void ProtoPlayerSimpleInfo::clear_exp() {
+  exp_ = 0u;
+}
+ ::google::protobuf::uint32 ProtoPlayerSimpleInfo::exp() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.exp)
+  return exp_;
+}
+ void ProtoPlayerSimpleInfo::set_exp(::google::protobuf::uint32 value) {
+  
+  exp_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.exp)
+}
+
+// optional uint32 level = 8;
+void ProtoPlayerSimpleInfo::clear_level() {
+  level_ = 0u;
+}
+ ::google::protobuf::uint32 ProtoPlayerSimpleInfo::level() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.level)
+  return level_;
+}
+ void ProtoPlayerSimpleInfo::set_level(::google::protobuf::uint32 value) {
+  
+  level_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.level)
+}
+
+// optional string avatar = 9;
+void ProtoPlayerSimpleInfo::clear_avatar() {
+  avatar_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ const ::std::string& ProtoPlayerSimpleInfo::avatar() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.avatar)
+  return avatar_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void ProtoPlayerSimpleInfo::set_avatar(const ::std::string& value) {
+  
+  avatar_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.avatar)
+}
+ void ProtoPlayerSimpleInfo::set_avatar(const char* value) {
+  
+  avatar_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Proto.Message.ProtoPlayerSimpleInfo.avatar)
+}
+ void ProtoPlayerSimpleInfo::set_avatar(const char* value, size_t size) {
+  
+  avatar_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Proto.Message.ProtoPlayerSimpleInfo.avatar)
+}
+ ::std::string* ProtoPlayerSimpleInfo::mutable_avatar() {
+  
+  // @@protoc_insertion_point(field_mutable:Proto.Message.ProtoPlayerSimpleInfo.avatar)
+  return avatar_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* ProtoPlayerSimpleInfo::release_avatar() {
+  // @@protoc_insertion_point(field_release:Proto.Message.ProtoPlayerSimpleInfo.avatar)
+  
+  return avatar_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void ProtoPlayerSimpleInfo::set_allocated_avatar(::std::string* avatar) {
+  if (avatar != NULL) {
+    
+  } else {
+    
+  }
+  avatar_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), avatar);
+  // @@protoc_insertion_point(field_set_allocated:Proto.Message.ProtoPlayerSimpleInfo.avatar)
+}
+
+// optional uint32 nextLevelExp = 10;
+void ProtoPlayerSimpleInfo::clear_nextlevelexp() {
+  nextlevelexp_ = 0u;
+}
+ ::google::protobuf::uint32 ProtoPlayerSimpleInfo::nextlevelexp() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.nextLevelExp)
+  return nextlevelexp_;
+}
+ void ProtoPlayerSimpleInfo::set_nextlevelexp(::google::protobuf::uint32 value) {
+  
+  nextlevelexp_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.nextLevelExp)
+}
+
+// optional uint32 skillPoint = 11;
+void ProtoPlayerSimpleInfo::clear_skillpoint() {
+  skillpoint_ = 0u;
+}
+ ::google::protobuf::uint32 ProtoPlayerSimpleInfo::skillpoint() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.skillPoint)
+  return skillpoint_;
+}
+ void ProtoPlayerSimpleInfo::set_skillpoint(::google::protobuf::uint32 value) {
+  
+  skillpoint_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.skillPoint)
+}
+
+// optional float battleFire = 12;
+void ProtoPlayerSimpleInfo::clear_battlefire() {
+  battlefire_ = 0;
+}
+ float ProtoPlayerSimpleInfo::battlefire() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.battleFire)
+  return battlefire_;
+}
+ void ProtoPlayerSimpleInfo::set_battlefire(float value) {
+  
+  battlefire_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.battleFire)
+}
+
+// optional string lastLoginTime = 13;
+void ProtoPlayerSimpleInfo::clear_lastlogintime() {
+  lastlogintime_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ const ::std::string& ProtoPlayerSimpleInfo::lastlogintime() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.lastLoginTime)
+  return lastlogintime_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void ProtoPlayerSimpleInfo::set_lastlogintime(const ::std::string& value) {
+  
+  lastlogintime_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.lastLoginTime)
+}
+ void ProtoPlayerSimpleInfo::set_lastlogintime(const char* value) {
+  
+  lastlogintime_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Proto.Message.ProtoPlayerSimpleInfo.lastLoginTime)
+}
+ void ProtoPlayerSimpleInfo::set_lastlogintime(const char* value, size_t size) {
+  
+  lastlogintime_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Proto.Message.ProtoPlayerSimpleInfo.lastLoginTime)
+}
+ ::std::string* ProtoPlayerSimpleInfo::mutable_lastlogintime() {
+  
+  // @@protoc_insertion_point(field_mutable:Proto.Message.ProtoPlayerSimpleInfo.lastLoginTime)
+  return lastlogintime_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ ::std::string* ProtoPlayerSimpleInfo::release_lastlogintime() {
+  // @@protoc_insertion_point(field_release:Proto.Message.ProtoPlayerSimpleInfo.lastLoginTime)
+  
+  return lastlogintime_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+ void ProtoPlayerSimpleInfo::set_allocated_lastlogintime(::std::string* lastlogintime) {
+  if (lastlogintime != NULL) {
+    
+  } else {
+    
+  }
+  lastlogintime_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), lastlogintime);
+  // @@protoc_insertion_point(field_set_allocated:Proto.Message.ProtoPlayerSimpleInfo.lastLoginTime)
+}
+
+// optional bool isOnline = 14;
+void ProtoPlayerSimpleInfo::clear_isonline() {
+  isonline_ = false;
+}
+ bool ProtoPlayerSimpleInfo::isonline() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.isOnline)
+  return isonline_;
+}
+ void ProtoPlayerSimpleInfo::set_isonline(bool value) {
+  
+  isonline_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.isOnline)
+}
+
+// optional uint32 stamina = 15;
+void ProtoPlayerSimpleInfo::clear_stamina() {
+  stamina_ = 0u;
+}
+ ::google::protobuf::uint32 ProtoPlayerSimpleInfo::stamina() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.stamina)
+  return stamina_;
+}
+ void ProtoPlayerSimpleInfo::set_stamina(::google::protobuf::uint32 value) {
+  
+  stamina_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.stamina)
+}
+
+// optional uint32 trial = 16;
+void ProtoPlayerSimpleInfo::clear_trial() {
+  trial_ = 0u;
+}
+ ::google::protobuf::uint32 ProtoPlayerSimpleInfo::trial() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.trial)
+  return trial_;
+}
+ void ProtoPlayerSimpleInfo::set_trial(::google::protobuf::uint32 value) {
+  
+  trial_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.trial)
+}
+
+// optional uint32 vipLevel = 17;
+void ProtoPlayerSimpleInfo::clear_viplevel() {
+  viplevel_ = 0u;
+}
+ ::google::protobuf::uint32 ProtoPlayerSimpleInfo::viplevel() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.vipLevel)
+  return viplevel_;
+}
+ void ProtoPlayerSimpleInfo::set_viplevel(::google::protobuf::uint32 value) {
+  
+  viplevel_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.vipLevel)
+}
+
+// optional uint32 arena = 18;
+void ProtoPlayerSimpleInfo::clear_arena() {
+  arena_ = 0u;
+}
+ ::google::protobuf::uint32 ProtoPlayerSimpleInfo::arena() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.arena)
+  return arena_;
+}
+ void ProtoPlayerSimpleInfo::set_arena(::google::protobuf::uint32 value) {
+  
+  arena_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.arena)
+}
+
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
+
+// ===================================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+PlayerListRequest::PlayerListRequest()
+  : ::google::protobuf::MessageLite(), _arena_ptr_(NULL) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:Proto.Message.PlayerListRequest)
+}
+
+void PlayerListRequest::InitAsDefaultInstance() {
+  _is_default_instance_ = true;
+}
+
+PlayerListRequest::PlayerListRequest(const PlayerListRequest& from)
+  : ::google::protobuf::MessageLite(),
+    _arena_ptr_(NULL) {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:Proto.Message.PlayerListRequest)
+}
+
+void PlayerListRequest::SharedCtor() {
+    _is_default_instance_ = false;
+  _cached_size_ = 0;
+}
+
+PlayerListRequest::~PlayerListRequest() {
+  // @@protoc_insertion_point(destructor:Proto.Message.PlayerListRequest)
+  SharedDtor();
+}
+
+void PlayerListRequest::SharedDtor() {
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  if (this != &default_instance()) {
+  #else
+  if (this != default_instance_) {
+  #endif
+  }
+}
+
+void PlayerListRequest::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const PlayerListRequest& PlayerListRequest::default_instance() {
+#ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  protobuf_AddDesc_ClientData_2eproto();
+#else
+  if (default_instance_ == NULL) protobuf_AddDesc_ClientData_2eproto();
+#endif
+  return *default_instance_;
+}
+
+PlayerListRequest* PlayerListRequest::default_instance_ = NULL;
+
+PlayerListRequest* PlayerListRequest::New(::google::protobuf::Arena* arena) const {
+  PlayerListRequest* n = new PlayerListRequest;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void PlayerListRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:Proto.Message.PlayerListRequest)
+}
+
+bool PlayerListRequest::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:Proto.Message.PlayerListRequest)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+  handle_unusual:
+    if (tag == 0 ||
+        ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+        ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+      goto success;
+    }
+    DO_(::google::protobuf::internal::WireFormatLite::SkipField(input, tag));
+  }
+success:
+  // @@protoc_insertion_point(parse_success:Proto.Message.PlayerListRequest)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:Proto.Message.PlayerListRequest)
+  return false;
+#undef DO_
+}
+
+void PlayerListRequest::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:Proto.Message.PlayerListRequest)
+  // @@protoc_insertion_point(serialize_end:Proto.Message.PlayerListRequest)
+}
+
+int PlayerListRequest::ByteSize() const {
+// @@protoc_insertion_point(message_byte_size_start:Proto.Message.PlayerListRequest)
+  int total_size = 0;
+
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void PlayerListRequest::CheckTypeAndMergeFrom(
+    const ::google::protobuf::MessageLite& from) {
+  MergeFrom(*::google::protobuf::down_cast<const PlayerListRequest*>(&from));
+}
+
+void PlayerListRequest::MergeFrom(const PlayerListRequest& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:Proto.Message.PlayerListRequest)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) {
+    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
+  }
+}
+
+void PlayerListRequest::CopyFrom(const PlayerListRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Proto.Message.PlayerListRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool PlayerListRequest::IsInitialized() const {
+
+  return true;
+}
+
+void PlayerListRequest::Swap(PlayerListRequest* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void PlayerListRequest::InternalSwap(PlayerListRequest* other) {
+  _unknown_fields_.Swap(&other->_unknown_fields_);
+  std::swap(_cached_size_, other->_cached_size_);
+}
+
+::std::string PlayerListRequest::GetTypeName() const {
+  return "Proto.Message.PlayerListRequest";
+}
+
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// PlayerListRequest
+
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
+
+// ===================================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int PlayerListResponse::kPlayerSimpleInfoFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+PlayerListResponse::PlayerListResponse()
+  : ::google::protobuf::MessageLite(), _arena_ptr_(NULL) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:Proto.Message.PlayerListResponse)
+}
+
+void PlayerListResponse::InitAsDefaultInstance() {
+  _is_default_instance_ = true;
+}
+
+PlayerListResponse::PlayerListResponse(const PlayerListResponse& from)
+  : ::google::protobuf::MessageLite(),
+    _arena_ptr_(NULL) {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:Proto.Message.PlayerListResponse)
+}
+
+void PlayerListResponse::SharedCtor() {
+    _is_default_instance_ = false;
+  _cached_size_ = 0;
+}
+
+PlayerListResponse::~PlayerListResponse() {
+  // @@protoc_insertion_point(destructor:Proto.Message.PlayerListResponse)
+  SharedDtor();
+}
+
+void PlayerListResponse::SharedDtor() {
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  if (this != &default_instance()) {
+  #else
+  if (this != default_instance_) {
+  #endif
+  }
+}
+
+void PlayerListResponse::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const PlayerListResponse& PlayerListResponse::default_instance() {
+#ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  protobuf_AddDesc_ClientData_2eproto();
+#else
+  if (default_instance_ == NULL) protobuf_AddDesc_ClientData_2eproto();
+#endif
+  return *default_instance_;
+}
+
+PlayerListResponse* PlayerListResponse::default_instance_ = NULL;
+
+PlayerListResponse* PlayerListResponse::New(::google::protobuf::Arena* arena) const {
+  PlayerListResponse* n = new PlayerListResponse;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void PlayerListResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:Proto.Message.PlayerListResponse)
+  playersimpleinfo_.Clear();
+}
+
+bool PlayerListResponse::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:Proto.Message.PlayerListResponse)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // repeated .Proto.Message.ProtoPlayerSimpleInfo playerSimpleInfo = 1;
+      case 1: {
+        if (tag == 10) {
+          DO_(input->IncrementRecursionDepth());
+         parse_loop_playerSimpleInfo:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtualNoRecursionDepth(
+                input, add_playersimpleinfo()));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(10)) goto parse_loop_playerSimpleInfo;
+        input->UnsafeDecrementRecursionDepth();
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormatLite::SkipField(input, tag));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:Proto.Message.PlayerListResponse)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:Proto.Message.PlayerListResponse)
+  return false;
+#undef DO_
+}
+
+void PlayerListResponse::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:Proto.Message.PlayerListResponse)
+  // repeated .Proto.Message.ProtoPlayerSimpleInfo playerSimpleInfo = 1;
+  for (unsigned int i = 0, n = this->playersimpleinfo_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessage(
+      1, this->playersimpleinfo(i), output);
+  }
+
+  // @@protoc_insertion_point(serialize_end:Proto.Message.PlayerListResponse)
+}
+
+int PlayerListResponse::ByteSize() const {
+// @@protoc_insertion_point(message_byte_size_start:Proto.Message.PlayerListResponse)
+  int total_size = 0;
+
+  // repeated .Proto.Message.ProtoPlayerSimpleInfo playerSimpleInfo = 1;
+  total_size += 1 * this->playersimpleinfo_size();
+  for (int i = 0; i < this->playersimpleinfo_size(); i++) {
+    total_size +=
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        this->playersimpleinfo(i));
+  }
+
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void PlayerListResponse::CheckTypeAndMergeFrom(
+    const ::google::protobuf::MessageLite& from) {
+  MergeFrom(*::google::protobuf::down_cast<const PlayerListResponse*>(&from));
+}
+
+void PlayerListResponse::MergeFrom(const PlayerListResponse& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:Proto.Message.PlayerListResponse)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) {
+    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
+  }
+  playersimpleinfo_.MergeFrom(from.playersimpleinfo_);
+}
+
+void PlayerListResponse::CopyFrom(const PlayerListResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Proto.Message.PlayerListResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool PlayerListResponse::IsInitialized() const {
+
+  return true;
+}
+
+void PlayerListResponse::Swap(PlayerListResponse* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void PlayerListResponse::InternalSwap(PlayerListResponse* other) {
+  playersimpleinfo_.UnsafeArenaSwap(&other->playersimpleinfo_);
+  _unknown_fields_.Swap(&other->_unknown_fields_);
+  std::swap(_cached_size_, other->_cached_size_);
+}
+
+::std::string PlayerListResponse::GetTypeName() const {
+  return "Proto.Message.PlayerListResponse";
+}
+
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// PlayerListResponse
+
+// repeated .Proto.Message.ProtoPlayerSimpleInfo playerSimpleInfo = 1;
+int PlayerListResponse::playersimpleinfo_size() const {
+  return playersimpleinfo_.size();
+}
+void PlayerListResponse::clear_playersimpleinfo() {
+  playersimpleinfo_.Clear();
+}
+const ::Proto::Message::ProtoPlayerSimpleInfo& PlayerListResponse::playersimpleinfo(int index) const {
+  // @@protoc_insertion_point(field_get:Proto.Message.PlayerListResponse.playerSimpleInfo)
+  return playersimpleinfo_.Get(index);
+}
+::Proto::Message::ProtoPlayerSimpleInfo* PlayerListResponse::mutable_playersimpleinfo(int index) {
+  // @@protoc_insertion_point(field_mutable:Proto.Message.PlayerListResponse.playerSimpleInfo)
+  return playersimpleinfo_.Mutable(index);
+}
+::Proto::Message::ProtoPlayerSimpleInfo* PlayerListResponse::add_playersimpleinfo() {
+  // @@protoc_insertion_point(field_add:Proto.Message.PlayerListResponse.playerSimpleInfo)
+  return playersimpleinfo_.Add();
+}
+::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerSimpleInfo >*
+PlayerListResponse::mutable_playersimpleinfo() {
+  // @@protoc_insertion_point(field_mutable_list:Proto.Message.PlayerListResponse.playerSimpleInfo)
+  return &playersimpleinfo_;
+}
+const ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerSimpleInfo >&
+PlayerListResponse::playersimpleinfo() const {
+  // @@protoc_insertion_point(field_list:Proto.Message.PlayerListResponse.playerSimpleInfo)
+  return playersimpleinfo_;
+}
+
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
+
+// ===================================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int ProtoPlayerStageQuitInfo::kIdFieldNumber;
+const int ProtoPlayerStageQuitInfo::kTotalScoreFieldNumber;
+const int ProtoPlayerStageQuitInfo::kRankingFieldNumber;
+const int ProtoPlayerStageQuitInfo::kGameTimeFieldNumber;
+const int ProtoPlayerStageQuitInfo::kFastestSingleTimeFieldNumber;
+const int ProtoPlayerStageQuitInfo::kFastestSpeedFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+ProtoPlayerStageQuitInfo::ProtoPlayerStageQuitInfo()
+  : ::google::protobuf::MessageLite(), _arena_ptr_(NULL) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:Proto.Message.ProtoPlayerStageQuitInfo)
+}
+
+void ProtoPlayerStageQuitInfo::InitAsDefaultInstance() {
+  _is_default_instance_ = true;
+}
+
+ProtoPlayerStageQuitInfo::ProtoPlayerStageQuitInfo(const ProtoPlayerStageQuitInfo& from)
+  : ::google::protobuf::MessageLite(),
+    _arena_ptr_(NULL) {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:Proto.Message.ProtoPlayerStageQuitInfo)
+}
+
+void ProtoPlayerStageQuitInfo::SharedCtor() {
+    _is_default_instance_ = false;
+  _cached_size_ = 0;
+  id_ = GOOGLE_LONGLONG(0);
+  totalscore_ = 0u;
+  ranking_ = 0u;
+  gametime_ = 0u;
+  fastestsingletime_ = 0u;
+  fastestspeed_ = 0u;
+}
+
+ProtoPlayerStageQuitInfo::~ProtoPlayerStageQuitInfo() {
+  // @@protoc_insertion_point(destructor:Proto.Message.ProtoPlayerStageQuitInfo)
+  SharedDtor();
+}
+
+void ProtoPlayerStageQuitInfo::SharedDtor() {
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  if (this != &default_instance()) {
+  #else
+  if (this != default_instance_) {
+  #endif
+  }
+}
+
+void ProtoPlayerStageQuitInfo::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ProtoPlayerStageQuitInfo& ProtoPlayerStageQuitInfo::default_instance() {
+#ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  protobuf_AddDesc_ClientData_2eproto();
+#else
+  if (default_instance_ == NULL) protobuf_AddDesc_ClientData_2eproto();
+#endif
+  return *default_instance_;
+}
+
+ProtoPlayerStageQuitInfo* ProtoPlayerStageQuitInfo::default_instance_ = NULL;
+
+ProtoPlayerStageQuitInfo* ProtoPlayerStageQuitInfo::New(::google::protobuf::Arena* arena) const {
+  ProtoPlayerStageQuitInfo* n = new ProtoPlayerStageQuitInfo;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void ProtoPlayerStageQuitInfo::Clear() {
+// @@protoc_insertion_point(message_clear_start:Proto.Message.ProtoPlayerStageQuitInfo)
+#if defined(__clang__)
+#define ZR_HELPER_(f) \
+  _Pragma("clang diagnostic push") \
+  _Pragma("clang diagnostic ignored \"-Winvalid-offsetof\"") \
+  __builtin_offsetof(ProtoPlayerStageQuitInfo, f) \
+  _Pragma("clang diagnostic pop")
+#else
+#define ZR_HELPER_(f) reinterpret_cast<char*>(\
+  &reinterpret_cast<ProtoPlayerStageQuitInfo*>(16)->f)
+#endif
+
+#define ZR_(first, last) do {\
+  ::memset(&first, 0,\
+           ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
+} while (0)
+
+  ZR_(id_, fastestspeed_);
+
+#undef ZR_HELPER_
+#undef ZR_
+
+}
+
+bool ProtoPlayerStageQuitInfo::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:Proto.Message.ProtoPlayerStageQuitInfo)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional sint64 id = 1;
+      case 1: {
+        if (tag == 8) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_SINT64>(
+                 input, &id_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(16)) goto parse_totalScore;
+        break;
+      }
+
+      // optional uint32 totalScore = 2;
+      case 2: {
+        if (tag == 16) {
+         parse_totalScore:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &totalscore_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(24)) goto parse_ranking;
+        break;
+      }
+
+      // optional uint32 ranking = 3;
+      case 3: {
+        if (tag == 24) {
+         parse_ranking:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &ranking_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(32)) goto parse_gameTime;
+        break;
+      }
+
+      // optional uint32 gameTime = 4;
+      case 4: {
+        if (tag == 32) {
+         parse_gameTime:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &gametime_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(40)) goto parse_fastestSingleTime;
+        break;
+      }
+
+      // optional uint32 fastestSingleTime = 5;
+      case 5: {
+        if (tag == 40) {
+         parse_fastestSingleTime:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &fastestsingletime_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(48)) goto parse_fastestSpeed;
+        break;
+      }
+
+      // optional uint32 fastestSpeed = 6;
+      case 6: {
+        if (tag == 48) {
+         parse_fastestSpeed:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &fastestspeed_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormatLite::SkipField(input, tag));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:Proto.Message.ProtoPlayerStageQuitInfo)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:Proto.Message.ProtoPlayerStageQuitInfo)
+  return false;
+#undef DO_
+}
+
+void ProtoPlayerStageQuitInfo::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:Proto.Message.ProtoPlayerStageQuitInfo)
+  // optional sint64 id = 1;
+  if (this->id() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteSInt64(1, this->id(), output);
+  }
+
+  // optional uint32 totalScore = 2;
+  if (this->totalscore() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->totalscore(), output);
+  }
+
+  // optional uint32 ranking = 3;
+  if (this->ranking() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(3, this->ranking(), output);
+  }
+
+  // optional uint32 gameTime = 4;
+  if (this->gametime() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(4, this->gametime(), output);
+  }
+
+  // optional uint32 fastestSingleTime = 5;
+  if (this->fastestsingletime() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(5, this->fastestsingletime(), output);
+  }
+
+  // optional uint32 fastestSpeed = 6;
+  if (this->fastestspeed() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(6, this->fastestspeed(), output);
+  }
+
+  // @@protoc_insertion_point(serialize_end:Proto.Message.ProtoPlayerStageQuitInfo)
+}
+
+int ProtoPlayerStageQuitInfo::ByteSize() const {
+// @@protoc_insertion_point(message_byte_size_start:Proto.Message.ProtoPlayerStageQuitInfo)
+  int total_size = 0;
+
+  // optional sint64 id = 1;
+  if (this->id() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::SInt64Size(
+        this->id());
+  }
+
+  // optional uint32 totalScore = 2;
+  if (this->totalscore() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->totalscore());
+  }
+
+  // optional uint32 ranking = 3;
+  if (this->ranking() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->ranking());
+  }
+
+  // optional uint32 gameTime = 4;
+  if (this->gametime() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->gametime());
+  }
+
+  // optional uint32 fastestSingleTime = 5;
+  if (this->fastestsingletime() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->fastestsingletime());
+  }
+
+  // optional uint32 fastestSpeed = 6;
+  if (this->fastestspeed() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->fastestspeed());
+  }
+
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void ProtoPlayerStageQuitInfo::CheckTypeAndMergeFrom(
+    const ::google::protobuf::MessageLite& from) {
+  MergeFrom(*::google::protobuf::down_cast<const ProtoPlayerStageQuitInfo*>(&from));
+}
+
+void ProtoPlayerStageQuitInfo::MergeFrom(const ProtoPlayerStageQuitInfo& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:Proto.Message.ProtoPlayerStageQuitInfo)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) {
+    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
+  }
+  if (from.id() != 0) {
+    set_id(from.id());
+  }
+  if (from.totalscore() != 0) {
+    set_totalscore(from.totalscore());
+  }
+  if (from.ranking() != 0) {
+    set_ranking(from.ranking());
+  }
+  if (from.gametime() != 0) {
+    set_gametime(from.gametime());
+  }
+  if (from.fastestsingletime() != 0) {
+    set_fastestsingletime(from.fastestsingletime());
+  }
+  if (from.fastestspeed() != 0) {
+    set_fastestspeed(from.fastestspeed());
+  }
+}
+
+void ProtoPlayerStageQuitInfo::CopyFrom(const ProtoPlayerStageQuitInfo& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Proto.Message.ProtoPlayerStageQuitInfo)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool ProtoPlayerStageQuitInfo::IsInitialized() const {
+
+  return true;
+}
+
+void ProtoPlayerStageQuitInfo::Swap(ProtoPlayerStageQuitInfo* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void ProtoPlayerStageQuitInfo::InternalSwap(ProtoPlayerStageQuitInfo* other) {
+  std::swap(id_, other->id_);
+  std::swap(totalscore_, other->totalscore_);
+  std::swap(ranking_, other->ranking_);
+  std::swap(gametime_, other->gametime_);
+  std::swap(fastestsingletime_, other->fastestsingletime_);
+  std::swap(fastestspeed_, other->fastestspeed_);
+  _unknown_fields_.Swap(&other->_unknown_fields_);
+  std::swap(_cached_size_, other->_cached_size_);
+}
+
+::std::string ProtoPlayerStageQuitInfo::GetTypeName() const {
+  return "Proto.Message.ProtoPlayerStageQuitInfo";
+}
+
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// ProtoPlayerStageQuitInfo
+
+// optional sint64 id = 1;
+void ProtoPlayerStageQuitInfo::clear_id() {
+  id_ = GOOGLE_LONGLONG(0);
+}
+ ::google::protobuf::int64 ProtoPlayerStageQuitInfo::id() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerStageQuitInfo.id)
+  return id_;
+}
+ void ProtoPlayerStageQuitInfo::set_id(::google::protobuf::int64 value) {
+  
+  id_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerStageQuitInfo.id)
+}
+
+// optional uint32 totalScore = 2;
+void ProtoPlayerStageQuitInfo::clear_totalscore() {
+  totalscore_ = 0u;
+}
+ ::google::protobuf::uint32 ProtoPlayerStageQuitInfo::totalscore() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerStageQuitInfo.totalScore)
+  return totalscore_;
+}
+ void ProtoPlayerStageQuitInfo::set_totalscore(::google::protobuf::uint32 value) {
+  
+  totalscore_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerStageQuitInfo.totalScore)
+}
+
+// optional uint32 ranking = 3;
+void ProtoPlayerStageQuitInfo::clear_ranking() {
+  ranking_ = 0u;
+}
+ ::google::protobuf::uint32 ProtoPlayerStageQuitInfo::ranking() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerStageQuitInfo.ranking)
+  return ranking_;
+}
+ void ProtoPlayerStageQuitInfo::set_ranking(::google::protobuf::uint32 value) {
+  
+  ranking_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerStageQuitInfo.ranking)
+}
+
+// optional uint32 gameTime = 4;
+void ProtoPlayerStageQuitInfo::clear_gametime() {
+  gametime_ = 0u;
+}
+ ::google::protobuf::uint32 ProtoPlayerStageQuitInfo::gametime() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerStageQuitInfo.gameTime)
+  return gametime_;
+}
+ void ProtoPlayerStageQuitInfo::set_gametime(::google::protobuf::uint32 value) {
+  
+  gametime_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerStageQuitInfo.gameTime)
+}
+
+// optional uint32 fastestSingleTime = 5;
+void ProtoPlayerStageQuitInfo::clear_fastestsingletime() {
+  fastestsingletime_ = 0u;
+}
+ ::google::protobuf::uint32 ProtoPlayerStageQuitInfo::fastestsingletime() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerStageQuitInfo.fastestSingleTime)
+  return fastestsingletime_;
+}
+ void ProtoPlayerStageQuitInfo::set_fastestsingletime(::google::protobuf::uint32 value) {
+  
+  fastestsingletime_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerStageQuitInfo.fastestSingleTime)
+}
+
+// optional uint32 fastestSpeed = 6;
+void ProtoPlayerStageQuitInfo::clear_fastestspeed() {
+  fastestspeed_ = 0u;
+}
+ ::google::protobuf::uint32 ProtoPlayerStageQuitInfo::fastestspeed() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerStageQuitInfo.fastestSpeed)
+  return fastestspeed_;
+}
+ void ProtoPlayerStageQuitInfo::set_fastestspeed(::google::protobuf::uint32 value) {
+  
+  fastestspeed_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerStageQuitInfo.fastestSpeed)
+}
+
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
+
+// ===================================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int PlayerStageQuitRequest::kRoomIdFieldNumber;
+const int PlayerStageQuitRequest::kGameTypeFieldNumber;
+const int PlayerStageQuitRequest::kSysLevelIdFieldNumber;
+const int PlayerStageQuitRequest::kPlayerStageQuitInfosFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+PlayerStageQuitRequest::PlayerStageQuitRequest()
+  : ::google::protobuf::MessageLite(), _arena_ptr_(NULL) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:Proto.Message.PlayerStageQuitRequest)
+}
+
+void PlayerStageQuitRequest::InitAsDefaultInstance() {
+  _is_default_instance_ = true;
+}
+
+PlayerStageQuitRequest::PlayerStageQuitRequest(const PlayerStageQuitRequest& from)
+  : ::google::protobuf::MessageLite(),
+    _arena_ptr_(NULL) {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:Proto.Message.PlayerStageQuitRequest)
+}
+
+void PlayerStageQuitRequest::SharedCtor() {
+    _is_default_instance_ = false;
+  _cached_size_ = 0;
+  roomid_ = 0u;
+  gametype_ = 0u;
+  syslevelid_ = GOOGLE_ULONGLONG(0);
+}
+
+PlayerStageQuitRequest::~PlayerStageQuitRequest() {
+  // @@protoc_insertion_point(destructor:Proto.Message.PlayerStageQuitRequest)
+  SharedDtor();
+}
+
+void PlayerStageQuitRequest::SharedDtor() {
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  if (this != &default_instance()) {
+  #else
+  if (this != default_instance_) {
+  #endif
+  }
+}
+
+void PlayerStageQuitRequest::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const PlayerStageQuitRequest& PlayerStageQuitRequest::default_instance() {
+#ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  protobuf_AddDesc_ClientData_2eproto();
+#else
+  if (default_instance_ == NULL) protobuf_AddDesc_ClientData_2eproto();
+#endif
+  return *default_instance_;
+}
+
+PlayerStageQuitRequest* PlayerStageQuitRequest::default_instance_ = NULL;
+
+PlayerStageQuitRequest* PlayerStageQuitRequest::New(::google::protobuf::Arena* arena) const {
+  PlayerStageQuitRequest* n = new PlayerStageQuitRequest;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void PlayerStageQuitRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:Proto.Message.PlayerStageQuitRequest)
+#if defined(__clang__)
+#define ZR_HELPER_(f) \
+  _Pragma("clang diagnostic push") \
+  _Pragma("clang diagnostic ignored \"-Winvalid-offsetof\"") \
+  __builtin_offsetof(PlayerStageQuitRequest, f) \
+  _Pragma("clang diagnostic pop")
+#else
+#define ZR_HELPER_(f) reinterpret_cast<char*>(\
+  &reinterpret_cast<PlayerStageQuitRequest*>(16)->f)
+#endif
+
+#define ZR_(first, last) do {\
+  ::memset(&first, 0,\
+           ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
+} while (0)
+
+  ZR_(roomid_, syslevelid_);
+
+#undef ZR_HELPER_
+#undef ZR_
+
+  playerstagequitinfos_.Clear();
+}
+
+bool PlayerStageQuitRequest::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:Proto.Message.PlayerStageQuitRequest)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional uint32 roomId = 1;
+      case 1: {
+        if (tag == 8) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &roomid_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(16)) goto parse_gameType;
+        break;
+      }
+
+      // optional uint32 gameType = 2;
+      case 2: {
+        if (tag == 16) {
+         parse_gameType:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &gametype_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(24)) goto parse_sysLevelId;
+        break;
+      }
+
+      // optional uint64 sysLevelId = 3;
+      case 3: {
+        if (tag == 24) {
+         parse_sysLevelId:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
+                 input, &syslevelid_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(34)) goto parse_playerStageQuitInfos;
+        break;
+      }
+
+      // repeated .Proto.Message.ProtoPlayerStageQuitInfo playerStageQuitInfos = 4;
+      case 4: {
+        if (tag == 34) {
+         parse_playerStageQuitInfos:
+          DO_(input->IncrementRecursionDepth());
+         parse_loop_playerStageQuitInfos:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtualNoRecursionDepth(
+                input, add_playerstagequitinfos()));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(34)) goto parse_loop_playerStageQuitInfos;
+        input->UnsafeDecrementRecursionDepth();
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormatLite::SkipField(input, tag));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:Proto.Message.PlayerStageQuitRequest)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:Proto.Message.PlayerStageQuitRequest)
+  return false;
+#undef DO_
+}
+
+void PlayerStageQuitRequest::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:Proto.Message.PlayerStageQuitRequest)
+  // optional uint32 roomId = 1;
+  if (this->roomid() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->roomid(), output);
+  }
+
+  // optional uint32 gameType = 2;
+  if (this->gametype() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->gametype(), output);
+  }
+
+  // optional uint64 sysLevelId = 3;
+  if (this->syslevelid() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(3, this->syslevelid(), output);
+  }
+
+  // repeated .Proto.Message.ProtoPlayerStageQuitInfo playerStageQuitInfos = 4;
+  for (unsigned int i = 0, n = this->playerstagequitinfos_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessage(
+      4, this->playerstagequitinfos(i), output);
+  }
+
+  // @@protoc_insertion_point(serialize_end:Proto.Message.PlayerStageQuitRequest)
+}
+
+int PlayerStageQuitRequest::ByteSize() const {
+// @@protoc_insertion_point(message_byte_size_start:Proto.Message.PlayerStageQuitRequest)
+  int total_size = 0;
+
+  // optional uint32 roomId = 1;
+  if (this->roomid() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->roomid());
+  }
+
+  // optional uint32 gameType = 2;
+  if (this->gametype() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->gametype());
+  }
+
+  // optional uint64 sysLevelId = 3;
+  if (this->syslevelid() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt64Size(
+        this->syslevelid());
+  }
+
+  // repeated .Proto.Message.ProtoPlayerStageQuitInfo playerStageQuitInfos = 4;
+  total_size += 1 * this->playerstagequitinfos_size();
+  for (int i = 0; i < this->playerstagequitinfos_size(); i++) {
+    total_size +=
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        this->playerstagequitinfos(i));
+  }
+
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void PlayerStageQuitRequest::CheckTypeAndMergeFrom(
+    const ::google::protobuf::MessageLite& from) {
+  MergeFrom(*::google::protobuf::down_cast<const PlayerStageQuitRequest*>(&from));
+}
+
+void PlayerStageQuitRequest::MergeFrom(const PlayerStageQuitRequest& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:Proto.Message.PlayerStageQuitRequest)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) {
+    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
+  }
+  playerstagequitinfos_.MergeFrom(from.playerstagequitinfos_);
+  if (from.roomid() != 0) {
+    set_roomid(from.roomid());
+  }
+  if (from.gametype() != 0) {
+    set_gametype(from.gametype());
+  }
+  if (from.syslevelid() != 0) {
+    set_syslevelid(from.syslevelid());
+  }
+}
+
+void PlayerStageQuitRequest::CopyFrom(const PlayerStageQuitRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Proto.Message.PlayerStageQuitRequest)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool PlayerStageQuitRequest::IsInitialized() const {
+
+  return true;
+}
+
+void PlayerStageQuitRequest::Swap(PlayerStageQuitRequest* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void PlayerStageQuitRequest::InternalSwap(PlayerStageQuitRequest* other) {
+  std::swap(roomid_, other->roomid_);
+  std::swap(gametype_, other->gametype_);
+  std::swap(syslevelid_, other->syslevelid_);
+  playerstagequitinfos_.UnsafeArenaSwap(&other->playerstagequitinfos_);
+  _unknown_fields_.Swap(&other->_unknown_fields_);
+  std::swap(_cached_size_, other->_cached_size_);
+}
+
+::std::string PlayerStageQuitRequest::GetTypeName() const {
+  return "Proto.Message.PlayerStageQuitRequest";
+}
+
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// PlayerStageQuitRequest
+
+// optional uint32 roomId = 1;
+void PlayerStageQuitRequest::clear_roomid() {
+  roomid_ = 0u;
+}
+ ::google::protobuf::uint32 PlayerStageQuitRequest::roomid() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.PlayerStageQuitRequest.roomId)
+  return roomid_;
+}
+ void PlayerStageQuitRequest::set_roomid(::google::protobuf::uint32 value) {
+  
+  roomid_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.PlayerStageQuitRequest.roomId)
+}
+
+// optional uint32 gameType = 2;
+void PlayerStageQuitRequest::clear_gametype() {
+  gametype_ = 0u;
+}
+ ::google::protobuf::uint32 PlayerStageQuitRequest::gametype() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.PlayerStageQuitRequest.gameType)
+  return gametype_;
+}
+ void PlayerStageQuitRequest::set_gametype(::google::protobuf::uint32 value) {
+  
+  gametype_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.PlayerStageQuitRequest.gameType)
+}
+
+// optional uint64 sysLevelId = 3;
+void PlayerStageQuitRequest::clear_syslevelid() {
+  syslevelid_ = GOOGLE_ULONGLONG(0);
+}
+ ::google::protobuf::uint64 PlayerStageQuitRequest::syslevelid() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.PlayerStageQuitRequest.sysLevelId)
+  return syslevelid_;
+}
+ void PlayerStageQuitRequest::set_syslevelid(::google::protobuf::uint64 value) {
+  
+  syslevelid_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.PlayerStageQuitRequest.sysLevelId)
+}
+
+// repeated .Proto.Message.ProtoPlayerStageQuitInfo playerStageQuitInfos = 4;
+int PlayerStageQuitRequest::playerstagequitinfos_size() const {
+  return playerstagequitinfos_.size();
+}
+void PlayerStageQuitRequest::clear_playerstagequitinfos() {
+  playerstagequitinfos_.Clear();
+}
+const ::Proto::Message::ProtoPlayerStageQuitInfo& PlayerStageQuitRequest::playerstagequitinfos(int index) const {
+  // @@protoc_insertion_point(field_get:Proto.Message.PlayerStageQuitRequest.playerStageQuitInfos)
+  return playerstagequitinfos_.Get(index);
+}
+::Proto::Message::ProtoPlayerStageQuitInfo* PlayerStageQuitRequest::mutable_playerstagequitinfos(int index) {
+  // @@protoc_insertion_point(field_mutable:Proto.Message.PlayerStageQuitRequest.playerStageQuitInfos)
+  return playerstagequitinfos_.Mutable(index);
+}
+::Proto::Message::ProtoPlayerStageQuitInfo* PlayerStageQuitRequest::add_playerstagequitinfos() {
+  // @@protoc_insertion_point(field_add:Proto.Message.PlayerStageQuitRequest.playerStageQuitInfos)
+  return playerstagequitinfos_.Add();
+}
+::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerStageQuitInfo >*
+PlayerStageQuitRequest::mutable_playerstagequitinfos() {
+  // @@protoc_insertion_point(field_mutable_list:Proto.Message.PlayerStageQuitRequest.playerStageQuitInfos)
+  return &playerstagequitinfos_;
+}
+const ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerStageQuitInfo >&
+PlayerStageQuitRequest::playerstagequitinfos() const {
+  // @@protoc_insertion_point(field_list:Proto.Message.PlayerStageQuitRequest.playerStageQuitInfos)
+  return playerstagequitinfos_;
+}
+
+#endif  // PROTOBUF_INLINE_NOT_IN_HEADERS
+
+// ===================================================================
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int PlayerStageQuitResponse::kRoomIdFieldNumber;
+const int PlayerStageQuitResponse::kGameTypeFieldNumber;
+const int PlayerStageQuitResponse::kSysLevelIdFieldNumber;
+const int PlayerStageQuitResponse::kPlayerStageQuitInfosFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+PlayerStageQuitResponse::PlayerStageQuitResponse()
+  : ::google::protobuf::MessageLite(), _arena_ptr_(NULL) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:Proto.Message.PlayerStageQuitResponse)
+}
+
+void PlayerStageQuitResponse::InitAsDefaultInstance() {
+  _is_default_instance_ = true;
+}
+
+PlayerStageQuitResponse::PlayerStageQuitResponse(const PlayerStageQuitResponse& from)
+  : ::google::protobuf::MessageLite(),
+    _arena_ptr_(NULL) {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:Proto.Message.PlayerStageQuitResponse)
+}
+
+void PlayerStageQuitResponse::SharedCtor() {
+    _is_default_instance_ = false;
+  _cached_size_ = 0;
+  roomid_ = 0u;
+  gametype_ = 0u;
+  syslevelid_ = GOOGLE_ULONGLONG(0);
+}
+
+PlayerStageQuitResponse::~PlayerStageQuitResponse() {
+  // @@protoc_insertion_point(destructor:Proto.Message.PlayerStageQuitResponse)
+  SharedDtor();
+}
+
+void PlayerStageQuitResponse::SharedDtor() {
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  if (this != &default_instance()) {
+  #else
+  if (this != default_instance_) {
+  #endif
+  }
+}
+
+void PlayerStageQuitResponse::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const PlayerStageQuitResponse& PlayerStageQuitResponse::default_instance() {
+#ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  protobuf_AddDesc_ClientData_2eproto();
+#else
+  if (default_instance_ == NULL) protobuf_AddDesc_ClientData_2eproto();
+#endif
+  return *default_instance_;
+}
+
+PlayerStageQuitResponse* PlayerStageQuitResponse::default_instance_ = NULL;
+
+PlayerStageQuitResponse* PlayerStageQuitResponse::New(::google::protobuf::Arena* arena) const {
+  PlayerStageQuitResponse* n = new PlayerStageQuitResponse;
+  if (arena != NULL) {
+    arena->Own(n);
+  }
+  return n;
+}
+
+void PlayerStageQuitResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:Proto.Message.PlayerStageQuitResponse)
+#if defined(__clang__)
+#define ZR_HELPER_(f) \
+  _Pragma("clang diagnostic push") \
+  _Pragma("clang diagnostic ignored \"-Winvalid-offsetof\"") \
+  __builtin_offsetof(PlayerStageQuitResponse, f) \
+  _Pragma("clang diagnostic pop")
+#else
+#define ZR_HELPER_(f) reinterpret_cast<char*>(\
+  &reinterpret_cast<PlayerStageQuitResponse*>(16)->f)
+#endif
+
+#define ZR_(first, last) do {\
+  ::memset(&first, 0,\
+           ZR_HELPER_(last) - ZR_HELPER_(first) + sizeof(last));\
+} while (0)
+
+  ZR_(roomid_, syslevelid_);
+
+#undef ZR_HELPER_
+#undef ZR_
+
+  playerstagequitinfos_.Clear();
+}
+
+bool PlayerStageQuitResponse::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:Proto.Message.PlayerStageQuitResponse)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional uint32 roomId = 1;
+      case 1: {
+        if (tag == 8) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &roomid_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(16)) goto parse_gameType;
+        break;
+      }
+
+      // optional uint32 gameType = 2;
+      case 2: {
+        if (tag == 16) {
+         parse_gameType:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &gametype_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(24)) goto parse_sysLevelId;
+        break;
+      }
+
+      // optional uint64 sysLevelId = 3;
+      case 3: {
+        if (tag == 24) {
+         parse_sysLevelId:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
+                 input, &syslevelid_)));
+
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(34)) goto parse_playerStageQuitInfos;
+        break;
+      }
+
+      // repeated .Proto.Message.ProtoPlayerStageQuitInfo playerStageQuitInfos = 4;
+      case 4: {
+        if (tag == 34) {
+         parse_playerStageQuitInfos:
+          DO_(input->IncrementRecursionDepth());
+         parse_loop_playerStageQuitInfos:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtualNoRecursionDepth(
+                input, add_playerstagequitinfos()));
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(34)) goto parse_loop_playerStageQuitInfos;
+        input->UnsafeDecrementRecursionDepth();
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormatLite::SkipField(input, tag));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:Proto.Message.PlayerStageQuitResponse)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:Proto.Message.PlayerStageQuitResponse)
+  return false;
+#undef DO_
+}
+
+void PlayerStageQuitResponse::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:Proto.Message.PlayerStageQuitResponse)
+  // optional uint32 roomId = 1;
+  if (this->roomid() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->roomid(), output);
+  }
+
+  // optional uint32 gameType = 2;
+  if (this->gametype() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(2, this->gametype(), output);
+  }
+
+  // optional uint64 sysLevelId = 3;
+  if (this->syslevelid() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(3, this->syslevelid(), output);
+  }
+
+  // repeated .Proto.Message.ProtoPlayerStageQuitInfo playerStageQuitInfos = 4;
+  for (unsigned int i = 0, n = this->playerstagequitinfos_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessage(
+      4, this->playerstagequitinfos(i), output);
+  }
+
+  // @@protoc_insertion_point(serialize_end:Proto.Message.PlayerStageQuitResponse)
+}
+
+int PlayerStageQuitResponse::ByteSize() const {
+// @@protoc_insertion_point(message_byte_size_start:Proto.Message.PlayerStageQuitResponse)
+  int total_size = 0;
+
+  // optional uint32 roomId = 1;
+  if (this->roomid() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->roomid());
+  }
+
+  // optional uint32 gameType = 2;
+  if (this->gametype() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->gametype());
+  }
+
+  // optional uint64 sysLevelId = 3;
+  if (this->syslevelid() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt64Size(
+        this->syslevelid());
+  }
+
+  // repeated .Proto.Message.ProtoPlayerStageQuitInfo playerStageQuitInfos = 4;
+  total_size += 1 * this->playerstagequitinfos_size();
+  for (int i = 0; i < this->playerstagequitinfos_size(); i++) {
+    total_size +=
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        this->playerstagequitinfos(i));
+  }
+
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void PlayerStageQuitResponse::CheckTypeAndMergeFrom(
+    const ::google::protobuf::MessageLite& from) {
+  MergeFrom(*::google::protobuf::down_cast<const PlayerStageQuitResponse*>(&from));
+}
+
+void PlayerStageQuitResponse::MergeFrom(const PlayerStageQuitResponse& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:Proto.Message.PlayerStageQuitResponse)
+  if (GOOGLE_PREDICT_FALSE(&from == this)) {
+    ::google::protobuf::internal::MergeFromFail(__FILE__, __LINE__);
+  }
+  playerstagequitinfos_.MergeFrom(from.playerstagequitinfos_);
+  if (from.roomid() != 0) {
+    set_roomid(from.roomid());
+  }
+  if (from.gametype() != 0) {
+    set_gametype(from.gametype());
+  }
+  if (from.syslevelid() != 0) {
+    set_syslevelid(from.syslevelid());
+  }
+}
+
+void PlayerStageQuitResponse::CopyFrom(const PlayerStageQuitResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Proto.Message.PlayerStageQuitResponse)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool PlayerStageQuitResponse::IsInitialized() const {
+
+  return true;
+}
+
+void PlayerStageQuitResponse::Swap(PlayerStageQuitResponse* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void PlayerStageQuitResponse::InternalSwap(PlayerStageQuitResponse* other) {
+  std::swap(roomid_, other->roomid_);
+  std::swap(gametype_, other->gametype_);
+  std::swap(syslevelid_, other->syslevelid_);
+  playerstagequitinfos_.UnsafeArenaSwap(&other->playerstagequitinfos_);
+  _unknown_fields_.Swap(&other->_unknown_fields_);
+  std::swap(_cached_size_, other->_cached_size_);
+}
+
+::std::string PlayerStageQuitResponse::GetTypeName() const {
+  return "Proto.Message.PlayerStageQuitResponse";
+}
+
+#if PROTOBUF_INLINE_NOT_IN_HEADERS
+// PlayerStageQuitResponse
+
+// optional uint32 roomId = 1;
+void PlayerStageQuitResponse::clear_roomid() {
+  roomid_ = 0u;
+}
+ ::google::protobuf::uint32 PlayerStageQuitResponse::roomid() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.PlayerStageQuitResponse.roomId)
+  return roomid_;
+}
+ void PlayerStageQuitResponse::set_roomid(::google::protobuf::uint32 value) {
+  
+  roomid_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.PlayerStageQuitResponse.roomId)
+}
+
+// optional uint32 gameType = 2;
+void PlayerStageQuitResponse::clear_gametype() {
+  gametype_ = 0u;
+}
+ ::google::protobuf::uint32 PlayerStageQuitResponse::gametype() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.PlayerStageQuitResponse.gameType)
+  return gametype_;
+}
+ void PlayerStageQuitResponse::set_gametype(::google::protobuf::uint32 value) {
+  
+  gametype_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.PlayerStageQuitResponse.gameType)
+}
+
+// optional uint64 sysLevelId = 3;
+void PlayerStageQuitResponse::clear_syslevelid() {
+  syslevelid_ = GOOGLE_ULONGLONG(0);
+}
+ ::google::protobuf::uint64 PlayerStageQuitResponse::syslevelid() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.PlayerStageQuitResponse.sysLevelId)
+  return syslevelid_;
+}
+ void PlayerStageQuitResponse::set_syslevelid(::google::protobuf::uint64 value) {
+  
+  syslevelid_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.PlayerStageQuitResponse.sysLevelId)
+}
+
+// repeated .Proto.Message.ProtoPlayerStageQuitInfo playerStageQuitInfos = 4;
+int PlayerStageQuitResponse::playerstagequitinfos_size() const {
+  return playerstagequitinfos_.size();
+}
+void PlayerStageQuitResponse::clear_playerstagequitinfos() {
+  playerstagequitinfos_.Clear();
+}
+const ::Proto::Message::ProtoPlayerStageQuitInfo& PlayerStageQuitResponse::playerstagequitinfos(int index) const {
+  // @@protoc_insertion_point(field_get:Proto.Message.PlayerStageQuitResponse.playerStageQuitInfos)
+  return playerstagequitinfos_.Get(index);
+}
+::Proto::Message::ProtoPlayerStageQuitInfo* PlayerStageQuitResponse::mutable_playerstagequitinfos(int index) {
+  // @@protoc_insertion_point(field_mutable:Proto.Message.PlayerStageQuitResponse.playerStageQuitInfos)
+  return playerstagequitinfos_.Mutable(index);
+}
+::Proto::Message::ProtoPlayerStageQuitInfo* PlayerStageQuitResponse::add_playerstagequitinfos() {
+  // @@protoc_insertion_point(field_add:Proto.Message.PlayerStageQuitResponse.playerStageQuitInfos)
+  return playerstagequitinfos_.Add();
+}
+::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerStageQuitInfo >*
+PlayerStageQuitResponse::mutable_playerstagequitinfos() {
+  // @@protoc_insertion_point(field_mutable_list:Proto.Message.PlayerStageQuitResponse.playerStageQuitInfos)
+  return &playerstagequitinfos_;
+}
+const ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerStageQuitInfo >&
+PlayerStageQuitResponse::playerstagequitinfos() const {
+  // @@protoc_insertion_point(field_list:Proto.Message.PlayerStageQuitResponse.playerStageQuitInfos)
+  return playerstagequitinfos_;
 }
 
 #endif  // PROTOBUF_INLINE_NOT_IN_HEADERS

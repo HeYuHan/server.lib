@@ -1,7 +1,0 @@
-
-#loginserver 0.0.0.0:9300
-export LD_LIBRARY_PATH=../../3rd/v86.4.99/lib/relsease:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=/opt/software/glibc-2.14/lib:$LD_LIBRARY_PATH
-
-channelserver channelserver 0.0.0.0:9300 ../script/js/main.js
-#channelserver channelserver.tcp 0.0.0.0:9500

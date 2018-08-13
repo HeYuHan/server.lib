@@ -31,8 +31,8 @@ public:
 	void Init();
 	Category& GetLogger();
 public:
-	char logName[64];
-	char filePath[128];
+	const char* logName;
+	const char* filePath;
 	bool m_LogToConsole;
 	bool m_LogToFile;
 private:

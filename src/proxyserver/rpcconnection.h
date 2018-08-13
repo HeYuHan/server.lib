@@ -23,17 +23,18 @@ public:
 	virtual void OnConnected();
 	virtual void OnReconnected(SocketPoolClinet*);
 	virtual void OnWrite();
+	virtual Core::Event* GetEvent();
 	void Init();
 	bool IsConnect();
 	
 
 public:
-
 	uint uid;
 	RPCConection *m_RPC;
 	RPCRequestPack<google::protobuf::Message, google::protobuf::Message> *m_CurrentRequest;
 	//Core::MutexLock m_Lock;
 private:
+	int m_ReuqestIndex;
 };
 
 class RPCConection
@@ -66,15 +67,17 @@ public:
 	Timer m_UpdateTimer;
 	float m_ReconectLostAddrTime;
 	SocketPool m_SocketPool;
+	Core::Event *m_Event;
 };
 
 extern RPCRequestSig RPC_ALL_REQUEST_INFO[RPC_SIG_COUNT];
 
 template<class T1, class T2>
-inline void RpcCall(RPCConection *con, int sig, Proto::Protocol::Header &header,T1 &request ,void **user_data, int data_len)
+inline void RpcCall(RPCConection *con,int sig, Proto::Protocol::Header &header,T1 &request , RPCInnerArg* arg)
 {
 	RPCRequestPack<T1, T2> *pack = CreateInnerRpcRequsetPack<T1,T2>();
 	pack->m_SIG = sig;
+	if(arg)pack->m_InnerArg = *arg;
 	pack->m_RequestHeader.CopyFrom(header);
 	if(pack->m_SIG != RPC_SIG_INNER_PROXY && pack->m_SIG != RPC_SIG_CLIENT_PROXY)
 	{
@@ -83,32 +86,21 @@ inline void RpcCall(RPCConection *con, int sig, Proto::Protocol::Header &header,
 	pack->m_RequestHeader.set_type(Proto::Protocol::PacketType::REQUEST);
 	pack->m_RequestHeader.set_rpcid(pack->m_SIG);
 	pack->m_Request->CopyFrom(request);
-	data_len = MIN(data_len, MAX_RPC_USER_DATA_LEN);
-	pack->m_UserDataLen = data_len;
-	for (int i = 0; i < data_len; i++)
-	{
-		pack->m_UserData[i] = user_data[i];
-	}
 	con->AddRequest(reinterpret_cast<RPCRequestPack<google::protobuf::Message, google::protobuf::Message>*>(pack));
 	//con->m_Lock.Lock();
 	//con->m_RequestQueue.push();
 	//con->m_Lock.Unlock();
 };
 
-inline void RpcProxyCall(RPCConection *con, int sig, Proto::Protocol::Header &header, void* request, int request_length, void **user_data, int data_len)
+inline void RpcProxyCall(RPCConection *con,int sig, Proto::Protocol::Header &header, void* request, int request_length, RPCInnerArg* arg)
 {
 	RPCRequestPack<google::protobuf::Message, google::protobuf::Message> *pack = CreateProxyRpcRequsetPack(request, request_length);
 	if (pack == NULL)return;
-
 	pack->m_SIG = sig;
+	if (arg)pack->m_InnerArg = *arg;
 	pack->m_RequestHeader.CopyFrom(header);
 	pack->m_RequestHeader.set_type(Proto::Protocol::PacketType::REQUEST);
 	pack->m_RequestHeader.set_rpcid(pack->m_SIG);
-	data_len = MIN(data_len, MAX_RPC_USER_DATA_LEN);
-	for (int i = 0; i < data_len; i++)
-	{
-		pack->m_UserData[i] = user_data[i];
-	}
 	con->AddRequest(pack);
 
 }

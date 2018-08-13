@@ -4,6 +4,13 @@
 #include "common.h"
 #include "Vector3.h"
 #include "ThreadPool2.h"
+namespace google
+{
+	namespace protobuf
+	{
+		class Message;
+	}
+}
 BEGIN_NS_CORE
 class NetworkConnection;
 typedef enum
@@ -36,12 +43,15 @@ public:
 	void WriteInt(int data);
 	void WriteUInt(uint data);
 	void WriteFloat(float data);
-	void WriteLong(long data);
-	void WriteULong(ulong data);
+	void WriteLong(int64 data);
+	void WriteULong(uint64 data);
 	void WriteString(const char* str);
 	void WriteData(const void* data, int count);
 	void WriteVector3(Vector3 &v3);
 	void WriteShortQuaternion(Quaternion &rot);
+	void WriteProtoBufferAutoSize(google::protobuf::Message *message);
+	void WriteProtoBuffer(google::protobuf::Message *message);
+	
 	void BeginWrite();
 	void EndWrite();
 	//////////////////////////////////////////////////////////////
@@ -56,12 +66,14 @@ public:
 	void ReadInt(int &data);
 	void ReadUInt(uint &data);
 	void ReadFloat(float &data);
-	void ReadLong(long &data);
-	void ReadULong(ulong &data);
+	void ReadLong(int64 &data);
+	void ReadULong(uint64 &data);
 	int ReadString(char* str, int size);
 	void ReadData(void* data, int count);
 	void ReadVector3(Vector3 &v3);
 	void ReadShortQuaternion(Quaternion &rot);
+	bool ReadProtoBuffer(google::protobuf::Message *message,int size);
+	bool ReadProtoBufferAutoSize(google::protobuf::Message *message);
 public:
 	NetworkConnection* connection;
 public:
@@ -75,7 +87,6 @@ public:
 	char* read_end;
 	char* read_position;
 	char* read_buff_end;
-	uint uid;
 private:
 	char* web_frame;
 	MutexLock m_WriteLock;
@@ -88,6 +99,7 @@ class NetworkConnection
 public:
 	NetworkConnection();
 	~NetworkConnection();
+	virtual int SetEvent(struct event_base *) { return -1; }
 	virtual void Update(float time) = 0;
 	virtual int Read(void* data, int size) = 0;
 	virtual int Send(void* data, int size) = 0;

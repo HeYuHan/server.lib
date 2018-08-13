@@ -3,6 +3,7 @@
 #include "log.h"
 #include "ThreadPool2.h"
 BEGIN_NS_CORE
+#define MAX_UID 0xffff
 template<class T>
 class ObjectPool
 {
@@ -89,7 +90,7 @@ void ObjectPool<T>::ClearDataMem(unsigned int size)
 template <class T>
 bool ObjectPool<T>::Initialize(unsigned int size)
 {
-	if (size == 0 || size > 0xffff)
+	if (size == 0 || size > MAX_UID)
 		return false;
 
 	this->size = size;
@@ -189,16 +190,14 @@ void ObjectPool<T>::Free(uint uid)
 			return;
 		}
 
-
 		link_array[obj - data_array] = free_obj;
 		free_obj = obj;
 
 		count--;
-		
 		// update magic
 		ushort magic = uid >> 16;
 		magic = magic == 0 ? 1 : magic + 1;
-		obj->uid = (magic << 16) | (uid & 0xffff);
+		obj->uid = (magic << 16) | (uid & MAX_UID);
 
 		data_allocate[obj - data_array] = false;
 	}
@@ -208,7 +207,7 @@ void ObjectPool<T>::Free(uint uid)
 template<class T>
 T * ObjectPool<T>::Get(uint uid)
 {
-	uint index = uid & 0xffff;
+	uint index = uid & MAX_UID;
 	if (index < size)
 	{
 		T * obj = &data_array[index];

@@ -14,6 +14,7 @@ public:
 	~ThreadEventPool();
 public:
 	bool Init(unsigned int size);
+	void Destory();
 	struct event_base *Get();
 private:
 	int m_Size;

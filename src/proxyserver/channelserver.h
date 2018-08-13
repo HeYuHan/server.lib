@@ -6,21 +6,8 @@
 #include <common.h>
 #include <objectpool.h>
 USING_NS_CORE
-
-
-namespace ChannelInner
-{
-	typedef enum
-	{
-		CM_CHANNEL_INFO=1,
-		CM_CHANNEL_STATE,
-		CM_CHANNEL_RPC,
-	}ChannelMessage;
-	typedef enum
-	{
-		SM_CHANNEL_RPC=1
-	}ProxyMessage;
-}
+class Room;
+class ChannelListener;
 class ChannelClient:public NetworkStream, public ISocketClient
 {
 	friend class ChannelListener;
@@ -33,7 +20,6 @@ public:
 	virtual bool ThreadSafe() override;
 
 	// 通过 ISocketClient 继承
-	virtual uint GetUid() override;
 	virtual void OnWrite() override;
 	virtual void OnRevcMessage() override;
 	virtual void OnDisconnect() override;
@@ -42,15 +28,22 @@ public:
 private:
 	ChannelListener *m_Listener;
 public:
+	bool IsValid();
 	void Init();
 	void SetInfo();
 	void SyncState();
 	void RpcRequest();
+	int GetRate();
+	void OnStartGame();
+	void OnChangeRoomState();
+	void ValidateEnterRoom();
+	void LeaveRoom();
+	void FreeRoom(uint roomid);
 public:
-	uint uid;
 	char m_InnerAddr[64 + 1];
 	char m_OuterAddr[64 + 1];
-
+	int m_RoomCount;
+	int m_RoomMaxCount;
 };
 
 
@@ -65,9 +58,9 @@ public:
 
 	// 通过 TcpListener 继承
 	virtual void OnTcpAccept(evutil_socket_t socket, sockaddr *) override;
-	
-
 	bool Init(int channel_count);
+	ChannelClient *GetCanUseChannelRoom();
+	void FreeRoom(uint channel,uint room);
 private:
 	static void OnAcceptPoolClinet(NS_CORE::SocketPoolClinet* c, void *arg);
 public:

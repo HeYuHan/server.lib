@@ -1,1 +1,0 @@
-protoc -I=.\info --cpp_out=.\out --csharp_out=.\out .\info\*.proto

@@ -15,22 +15,55 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\proto\out\ClientData.pb.cc">
+    <ClCompile Include="..\src\proto\out\ProxyMessageProtocol.pb.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\proto\out\RoomInfo.pb.cc">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\proto\out\RpcProtocol.pb.cc">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\proto\out\AllMessagePackages.pb.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\proto\out\ChannelMessageProtocol.pb.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\proto\out\ClientData.pb.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\proto\out\CommonTypes.pb.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\proto\out\InnerMessageProtocol.pb.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\proto\out\ClientData.pb.h">
+    <ClInclude Include="..\src\proto\out\ProxyMessageProtocol.pb.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\proto\out\RoomInfo.pb.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\proto\out\RpcProtocol.pb.h">
       <Filter>头文件</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\src\proto\out\RpcProtocol.cs" />
+    <ClInclude Include="..\src\proto\out\AllMessagePackages.pb.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\proto\out\ChannelMessageProtocol.pb.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\proto\out\ClientData.pb.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\proto\out\CommonTypes.pb.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\proto\out\InnerMessageProtocol.pb.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

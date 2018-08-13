@@ -18,6 +18,7 @@ public:
 	void InitSocket(evutil_socket_t socket, sockaddr* addr, struct event_base *base);
 	bool Connect(const char* ip, int port, event_base * base);
 	bool Connect(const char* addr, event_base * base);
+	bool Reconnect(event_base * base);
 	virtual void Disconnect();
 	void HandShake();
 	

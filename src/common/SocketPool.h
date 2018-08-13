@@ -14,12 +14,13 @@ class ISocketClient
 {
 	friend class SocketPoolClinet;
 public:
-	virtual uint GetUid() = 0;
+	Core::uint uid;
 protected:
 	virtual void OnWrite() = 0;
 	virtual void OnRevcMessage() = 0;
 	virtual void OnDisconnect() = 0;
 	virtual void OnConnected() = 0;
+	virtual Core::Event* GetEvent() { return NULL; }
 	virtual void OnReconnected(SocketPoolClinet*) = 0;
 	
 };
@@ -37,6 +38,7 @@ public:
 	ISocketClient *m_Handle;
 	SocketPool *m_Pool;
 public:
+	virtual int SetEvent(struct event_base *base);
 	virtual void Update(float time);
 	virtual int Read(void* data, int size);
 	virtual int Send(void* data, int size);

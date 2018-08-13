@@ -60,7 +60,7 @@ void Timer::Stop()
 {
 	if (m_Run)
 	{
-		evtimer_del(m_TimerEvent);
+		if(m_TimerEvent)evtimer_del(m_TimerEvent);
 		
 	}
 	m_Run = false;

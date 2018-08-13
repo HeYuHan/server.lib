@@ -24,15 +24,9 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="lua_mytestclass.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Student.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="lua_mytestclass.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

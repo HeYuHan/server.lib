@@ -2,12 +2,12 @@
 #include <memory.h>
 Logger gLogger;
 Logger::Logger():
+	logName("SRS"),
+	filePath("./log/srs.log"),
 	m_LogToConsole(true),
 	m_LogToFile(false),
 	logger(NULL)
 {
-	memset(logName, 0, sizeof(logName));
-	memset(filePath, 0, sizeof(filePath));
 }
 Logger::~Logger()
 {
@@ -17,15 +17,6 @@ Logger::~Logger()
 
 void Logger::Init()
 {
-	if (strlen(logName) == 0)
-	{
-		strcpy(logName, "SRS");
-		
-	}
-	if (strlen(filePath) == 0)
-	{
-		strcpy(filePath, "./log/srs.log");
-	}
 	PatternLayout *layout = new PatternLayout();
 	layout->setConversionPattern("%d:%c|%p:%m%n");
 	logger = &Category::getRoot().getInstance(logName);

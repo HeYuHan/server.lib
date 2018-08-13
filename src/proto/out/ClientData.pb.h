@@ -38,14 +38,20 @@ void protobuf_ShutdownFile_ClientData_2eproto();
 
 class PlayerCreateRequest;
 class PlayerCreateResponse;
+class PlayerListRequest;
+class PlayerListResponse;
 class PlayerLoginRequest;
 class PlayerLoginResponse;
 class PlayerLogoutRequest;
 class PlayerLogoutResponse;
+class PlayerStageQuitRequest;
+class PlayerStageQuitResponse;
 class ProtoPlayer;
 class ProtoPlayerGarage;
 class ProtoPlayerInfo;
 class ProtoPlayerItem;
+class ProtoPlayerSimpleInfo;
+class ProtoPlayerStageQuitInfo;
 class UserActivateRequest;
 class UserActivateResponse;
 class UserLoginRequest;
@@ -1879,30 +1885,6 @@ class ProtoPlayerInfo : public ::google::protobuf::MessageLite /* @@protoc_inser
   ::google::protobuf::uint32 skillpoint() const;
   void set_skillpoint(::google::protobuf::uint32 value);
 
-  // repeated .Proto.Message.ProtoPlayerItem playerItems = 15;
-  int playeritems_size() const;
-  void clear_playeritems();
-  static const int kPlayerItemsFieldNumber = 15;
-  const ::Proto::Message::ProtoPlayerItem& playeritems(int index) const;
-  ::Proto::Message::ProtoPlayerItem* mutable_playeritems(int index);
-  ::Proto::Message::ProtoPlayerItem* add_playeritems();
-  ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerItem >*
-      mutable_playeritems();
-  const ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerItem >&
-      playeritems() const;
-
-  // repeated .Proto.Message.ProtoPlayerGarage playerGarages = 16;
-  int playergarages_size() const;
-  void clear_playergarages();
-  static const int kPlayerGaragesFieldNumber = 16;
-  const ::Proto::Message::ProtoPlayerGarage& playergarages(int index) const;
-  ::Proto::Message::ProtoPlayerGarage* mutable_playergarages(int index);
-  ::Proto::Message::ProtoPlayerGarage* add_playergarages();
-  ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerGarage >*
-      mutable_playergarages();
-  const ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerGarage >&
-      playergarages() const;
-
   // optional uint32 sysCharacterId = 17;
   void clear_syscharacterid();
   static const int kSysCharacterIdFieldNumber = 17;
@@ -1920,9 +1902,9 @@ class ProtoPlayerInfo : public ::google::protobuf::MessageLite /* @@protoc_inser
   ::std::string* release_lastlogintime();
   void set_allocated_lastlogintime(::std::string* lastlogintime);
 
-  // optional uint32 flag = 31;
+  // optional uint32 flag = 20;
   void clear_flag();
-  static const int kFlagFieldNumber = 31;
+  static const int kFlagFieldNumber = 20;
   ::google::protobuf::uint32 flag() const;
   void set_flag(::google::protobuf::uint32 value);
 
@@ -2096,8 +2078,6 @@ class ProtoPlayerInfo : public ::google::protobuf::MessageLite /* @@protoc_inser
   ::google::protobuf::internal::ArenaStringPtr avatar_;
   ::google::protobuf::uint32 nextlevelexp_;
   ::google::protobuf::uint32 skillpoint_;
-  ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerItem > playeritems_;
-  ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerGarage > playergarages_;
   ::google::protobuf::internal::ArenaStringPtr lastlogintime_;
   ::google::protobuf::uint32 syscharacterid_;
   ::google::protobuf::uint32 flag_;
@@ -2133,6 +2113,785 @@ class ProtoPlayerInfo : public ::google::protobuf::MessageLite /* @@protoc_inser
 
   void InitAsDefaultInstance();
   static ProtoPlayerInfo* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class ProtoPlayerSimpleInfo : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:Proto.Message.ProtoPlayerSimpleInfo) */ {
+ public:
+  ProtoPlayerSimpleInfo();
+  virtual ~ProtoPlayerSimpleInfo();
+
+  ProtoPlayerSimpleInfo(const ProtoPlayerSimpleInfo& from);
+
+  inline ProtoPlayerSimpleInfo& operator=(const ProtoPlayerSimpleInfo& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  static const ProtoPlayerSimpleInfo& default_instance();
+
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  // Returns the internal default instance pointer. This function can
+  // return NULL thus should not be used by the user. This is intended
+  // for Protobuf internal code. Please use default_instance() declared
+  // above instead.
+  static inline const ProtoPlayerSimpleInfo* internal_default_instance() {
+    return default_instance_;
+  }
+  #endif
+
+  void Swap(ProtoPlayerSimpleInfo* other);
+
+  // implements Message ----------------------------------------------
+
+  inline ProtoPlayerSimpleInfo* New() const { return New(NULL); }
+
+  ProtoPlayerSimpleInfo* New(::google::protobuf::Arena* arena) const;
+  void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from);
+  void CopyFrom(const ProtoPlayerSimpleInfo& from);
+  void MergeFrom(const ProtoPlayerSimpleInfo& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  void DiscardUnknownFields();
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(ProtoPlayerSimpleInfo* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _arena_ptr_;
+  }
+  inline ::google::protobuf::Arena* MaybeArenaPtr() const {
+    return _arena_ptr_;
+  }
+  public:
+
+  ::std::string GetTypeName() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional sint64 id = 1;
+  void clear_id();
+  static const int kIdFieldNumber = 1;
+  ::google::protobuf::int64 id() const;
+  void set_id(::google::protobuf::int64 value);
+
+  // optional string name = 2;
+  void clear_name();
+  static const int kNameFieldNumber = 2;
+  const ::std::string& name() const;
+  void set_name(const ::std::string& value);
+  void set_name(const char* value);
+  void set_name(const char* value, size_t size);
+  ::std::string* mutable_name();
+  ::std::string* release_name();
+  void set_allocated_name(::std::string* name);
+
+  // optional string userName = 3;
+  void clear_username();
+  static const int kUserNameFieldNumber = 3;
+  const ::std::string& username() const;
+  void set_username(const ::std::string& value);
+  void set_username(const char* value);
+  void set_username(const char* value, size_t size);
+  ::std::string* mutable_username();
+  ::std::string* release_username();
+  void set_allocated_username(::std::string* username);
+
+  // optional uint32 gold = 4;
+  void clear_gold();
+  static const int kGoldFieldNumber = 4;
+  ::google::protobuf::uint32 gold() const;
+  void set_gold(::google::protobuf::uint32 value);
+
+  // optional uint32 diamond = 5;
+  void clear_diamond();
+  static const int kDiamondFieldNumber = 5;
+  ::google::protobuf::uint32 diamond() const;
+  void set_diamond(::google::protobuf::uint32 value);
+
+  // optional uint32 power = 6;
+  void clear_power();
+  static const int kPowerFieldNumber = 6;
+  ::google::protobuf::uint32 power() const;
+  void set_power(::google::protobuf::uint32 value);
+
+  // optional uint32 exp = 7;
+  void clear_exp();
+  static const int kExpFieldNumber = 7;
+  ::google::protobuf::uint32 exp() const;
+  void set_exp(::google::protobuf::uint32 value);
+
+  // optional uint32 level = 8;
+  void clear_level();
+  static const int kLevelFieldNumber = 8;
+  ::google::protobuf::uint32 level() const;
+  void set_level(::google::protobuf::uint32 value);
+
+  // optional string avatar = 9;
+  void clear_avatar();
+  static const int kAvatarFieldNumber = 9;
+  const ::std::string& avatar() const;
+  void set_avatar(const ::std::string& value);
+  void set_avatar(const char* value);
+  void set_avatar(const char* value, size_t size);
+  ::std::string* mutable_avatar();
+  ::std::string* release_avatar();
+  void set_allocated_avatar(::std::string* avatar);
+
+  // optional uint32 nextLevelExp = 10;
+  void clear_nextlevelexp();
+  static const int kNextLevelExpFieldNumber = 10;
+  ::google::protobuf::uint32 nextlevelexp() const;
+  void set_nextlevelexp(::google::protobuf::uint32 value);
+
+  // optional uint32 skillPoint = 11;
+  void clear_skillpoint();
+  static const int kSkillPointFieldNumber = 11;
+  ::google::protobuf::uint32 skillpoint() const;
+  void set_skillpoint(::google::protobuf::uint32 value);
+
+  // optional float battleFire = 12;
+  void clear_battlefire();
+  static const int kBattleFireFieldNumber = 12;
+  float battlefire() const;
+  void set_battlefire(float value);
+
+  // optional string lastLoginTime = 13;
+  void clear_lastlogintime();
+  static const int kLastLoginTimeFieldNumber = 13;
+  const ::std::string& lastlogintime() const;
+  void set_lastlogintime(const ::std::string& value);
+  void set_lastlogintime(const char* value);
+  void set_lastlogintime(const char* value, size_t size);
+  ::std::string* mutable_lastlogintime();
+  ::std::string* release_lastlogintime();
+  void set_allocated_lastlogintime(::std::string* lastlogintime);
+
+  // optional bool isOnline = 14;
+  void clear_isonline();
+  static const int kIsOnlineFieldNumber = 14;
+  bool isonline() const;
+  void set_isonline(bool value);
+
+  // optional uint32 stamina = 15;
+  void clear_stamina();
+  static const int kStaminaFieldNumber = 15;
+  ::google::protobuf::uint32 stamina() const;
+  void set_stamina(::google::protobuf::uint32 value);
+
+  // optional uint32 trial = 16;
+  void clear_trial();
+  static const int kTrialFieldNumber = 16;
+  ::google::protobuf::uint32 trial() const;
+  void set_trial(::google::protobuf::uint32 value);
+
+  // optional uint32 vipLevel = 17;
+  void clear_viplevel();
+  static const int kVipLevelFieldNumber = 17;
+  ::google::protobuf::uint32 viplevel() const;
+  void set_viplevel(::google::protobuf::uint32 value);
+
+  // optional uint32 arena = 18;
+  void clear_arena();
+  static const int kArenaFieldNumber = 18;
+  ::google::protobuf::uint32 arena() const;
+  void set_arena(::google::protobuf::uint32 value);
+
+  // @@protoc_insertion_point(class_scope:Proto.Message.ProtoPlayerSimpleInfo)
+ private:
+
+  ::google::protobuf::internal::ArenaStringPtr _unknown_fields_;
+  ::google::protobuf::Arena* _arena_ptr_;
+
+  bool _is_default_instance_;
+  ::google::protobuf::int64 id_;
+  ::google::protobuf::internal::ArenaStringPtr name_;
+  ::google::protobuf::internal::ArenaStringPtr username_;
+  ::google::protobuf::uint32 gold_;
+  ::google::protobuf::uint32 diamond_;
+  ::google::protobuf::uint32 power_;
+  ::google::protobuf::uint32 exp_;
+  ::google::protobuf::internal::ArenaStringPtr avatar_;
+  ::google::protobuf::uint32 level_;
+  ::google::protobuf::uint32 nextlevelexp_;
+  ::google::protobuf::uint32 skillpoint_;
+  float battlefire_;
+  ::google::protobuf::internal::ArenaStringPtr lastlogintime_;
+  bool isonline_;
+  ::google::protobuf::uint32 stamina_;
+  ::google::protobuf::uint32 trial_;
+  ::google::protobuf::uint32 viplevel_;
+  ::google::protobuf::uint32 arena_;
+  mutable int _cached_size_;
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  friend void  protobuf_AddDesc_ClientData_2eproto_impl();
+  #else
+  friend void  protobuf_AddDesc_ClientData_2eproto();
+  #endif
+  friend void protobuf_AssignDesc_ClientData_2eproto();
+  friend void protobuf_ShutdownFile_ClientData_2eproto();
+
+  void InitAsDefaultInstance();
+  static ProtoPlayerSimpleInfo* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class PlayerListRequest : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:Proto.Message.PlayerListRequest) */ {
+ public:
+  PlayerListRequest();
+  virtual ~PlayerListRequest();
+
+  PlayerListRequest(const PlayerListRequest& from);
+
+  inline PlayerListRequest& operator=(const PlayerListRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  static const PlayerListRequest& default_instance();
+
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  // Returns the internal default instance pointer. This function can
+  // return NULL thus should not be used by the user. This is intended
+  // for Protobuf internal code. Please use default_instance() declared
+  // above instead.
+  static inline const PlayerListRequest* internal_default_instance() {
+    return default_instance_;
+  }
+  #endif
+
+  void Swap(PlayerListRequest* other);
+
+  // implements Message ----------------------------------------------
+
+  inline PlayerListRequest* New() const { return New(NULL); }
+
+  PlayerListRequest* New(::google::protobuf::Arena* arena) const;
+  void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from);
+  void CopyFrom(const PlayerListRequest& from);
+  void MergeFrom(const PlayerListRequest& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  void DiscardUnknownFields();
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(PlayerListRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _arena_ptr_;
+  }
+  inline ::google::protobuf::Arena* MaybeArenaPtr() const {
+    return _arena_ptr_;
+  }
+  public:
+
+  ::std::string GetTypeName() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:Proto.Message.PlayerListRequest)
+ private:
+
+  ::google::protobuf::internal::ArenaStringPtr _unknown_fields_;
+  ::google::protobuf::Arena* _arena_ptr_;
+
+  bool _is_default_instance_;
+  mutable int _cached_size_;
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  friend void  protobuf_AddDesc_ClientData_2eproto_impl();
+  #else
+  friend void  protobuf_AddDesc_ClientData_2eproto();
+  #endif
+  friend void protobuf_AssignDesc_ClientData_2eproto();
+  friend void protobuf_ShutdownFile_ClientData_2eproto();
+
+  void InitAsDefaultInstance();
+  static PlayerListRequest* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class PlayerListResponse : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:Proto.Message.PlayerListResponse) */ {
+ public:
+  PlayerListResponse();
+  virtual ~PlayerListResponse();
+
+  PlayerListResponse(const PlayerListResponse& from);
+
+  inline PlayerListResponse& operator=(const PlayerListResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  static const PlayerListResponse& default_instance();
+
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  // Returns the internal default instance pointer. This function can
+  // return NULL thus should not be used by the user. This is intended
+  // for Protobuf internal code. Please use default_instance() declared
+  // above instead.
+  static inline const PlayerListResponse* internal_default_instance() {
+    return default_instance_;
+  }
+  #endif
+
+  void Swap(PlayerListResponse* other);
+
+  // implements Message ----------------------------------------------
+
+  inline PlayerListResponse* New() const { return New(NULL); }
+
+  PlayerListResponse* New(::google::protobuf::Arena* arena) const;
+  void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from);
+  void CopyFrom(const PlayerListResponse& from);
+  void MergeFrom(const PlayerListResponse& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  void DiscardUnknownFields();
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(PlayerListResponse* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _arena_ptr_;
+  }
+  inline ::google::protobuf::Arena* MaybeArenaPtr() const {
+    return _arena_ptr_;
+  }
+  public:
+
+  ::std::string GetTypeName() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated .Proto.Message.ProtoPlayerSimpleInfo playerSimpleInfo = 1;
+  int playersimpleinfo_size() const;
+  void clear_playersimpleinfo();
+  static const int kPlayerSimpleInfoFieldNumber = 1;
+  const ::Proto::Message::ProtoPlayerSimpleInfo& playersimpleinfo(int index) const;
+  ::Proto::Message::ProtoPlayerSimpleInfo* mutable_playersimpleinfo(int index);
+  ::Proto::Message::ProtoPlayerSimpleInfo* add_playersimpleinfo();
+  ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerSimpleInfo >*
+      mutable_playersimpleinfo();
+  const ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerSimpleInfo >&
+      playersimpleinfo() const;
+
+  // @@protoc_insertion_point(class_scope:Proto.Message.PlayerListResponse)
+ private:
+
+  ::google::protobuf::internal::ArenaStringPtr _unknown_fields_;
+  ::google::protobuf::Arena* _arena_ptr_;
+
+  bool _is_default_instance_;
+  ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerSimpleInfo > playersimpleinfo_;
+  mutable int _cached_size_;
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  friend void  protobuf_AddDesc_ClientData_2eproto_impl();
+  #else
+  friend void  protobuf_AddDesc_ClientData_2eproto();
+  #endif
+  friend void protobuf_AssignDesc_ClientData_2eproto();
+  friend void protobuf_ShutdownFile_ClientData_2eproto();
+
+  void InitAsDefaultInstance();
+  static PlayerListResponse* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class ProtoPlayerStageQuitInfo : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:Proto.Message.ProtoPlayerStageQuitInfo) */ {
+ public:
+  ProtoPlayerStageQuitInfo();
+  virtual ~ProtoPlayerStageQuitInfo();
+
+  ProtoPlayerStageQuitInfo(const ProtoPlayerStageQuitInfo& from);
+
+  inline ProtoPlayerStageQuitInfo& operator=(const ProtoPlayerStageQuitInfo& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  static const ProtoPlayerStageQuitInfo& default_instance();
+
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  // Returns the internal default instance pointer. This function can
+  // return NULL thus should not be used by the user. This is intended
+  // for Protobuf internal code. Please use default_instance() declared
+  // above instead.
+  static inline const ProtoPlayerStageQuitInfo* internal_default_instance() {
+    return default_instance_;
+  }
+  #endif
+
+  void Swap(ProtoPlayerStageQuitInfo* other);
+
+  // implements Message ----------------------------------------------
+
+  inline ProtoPlayerStageQuitInfo* New() const { return New(NULL); }
+
+  ProtoPlayerStageQuitInfo* New(::google::protobuf::Arena* arena) const;
+  void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from);
+  void CopyFrom(const ProtoPlayerStageQuitInfo& from);
+  void MergeFrom(const ProtoPlayerStageQuitInfo& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  void DiscardUnknownFields();
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(ProtoPlayerStageQuitInfo* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _arena_ptr_;
+  }
+  inline ::google::protobuf::Arena* MaybeArenaPtr() const {
+    return _arena_ptr_;
+  }
+  public:
+
+  ::std::string GetTypeName() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional sint64 id = 1;
+  void clear_id();
+  static const int kIdFieldNumber = 1;
+  ::google::protobuf::int64 id() const;
+  void set_id(::google::protobuf::int64 value);
+
+  // optional uint32 totalScore = 2;
+  void clear_totalscore();
+  static const int kTotalScoreFieldNumber = 2;
+  ::google::protobuf::uint32 totalscore() const;
+  void set_totalscore(::google::protobuf::uint32 value);
+
+  // optional uint32 ranking = 3;
+  void clear_ranking();
+  static const int kRankingFieldNumber = 3;
+  ::google::protobuf::uint32 ranking() const;
+  void set_ranking(::google::protobuf::uint32 value);
+
+  // optional uint32 gameTime = 4;
+  void clear_gametime();
+  static const int kGameTimeFieldNumber = 4;
+  ::google::protobuf::uint32 gametime() const;
+  void set_gametime(::google::protobuf::uint32 value);
+
+  // optional uint32 fastestSingleTime = 5;
+  void clear_fastestsingletime();
+  static const int kFastestSingleTimeFieldNumber = 5;
+  ::google::protobuf::uint32 fastestsingletime() const;
+  void set_fastestsingletime(::google::protobuf::uint32 value);
+
+  // optional uint32 fastestSpeed = 6;
+  void clear_fastestspeed();
+  static const int kFastestSpeedFieldNumber = 6;
+  ::google::protobuf::uint32 fastestspeed() const;
+  void set_fastestspeed(::google::protobuf::uint32 value);
+
+  // @@protoc_insertion_point(class_scope:Proto.Message.ProtoPlayerStageQuitInfo)
+ private:
+
+  ::google::protobuf::internal::ArenaStringPtr _unknown_fields_;
+  ::google::protobuf::Arena* _arena_ptr_;
+
+  bool _is_default_instance_;
+  ::google::protobuf::int64 id_;
+  ::google::protobuf::uint32 totalscore_;
+  ::google::protobuf::uint32 ranking_;
+  ::google::protobuf::uint32 gametime_;
+  ::google::protobuf::uint32 fastestsingletime_;
+  ::google::protobuf::uint32 fastestspeed_;
+  mutable int _cached_size_;
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  friend void  protobuf_AddDesc_ClientData_2eproto_impl();
+  #else
+  friend void  protobuf_AddDesc_ClientData_2eproto();
+  #endif
+  friend void protobuf_AssignDesc_ClientData_2eproto();
+  friend void protobuf_ShutdownFile_ClientData_2eproto();
+
+  void InitAsDefaultInstance();
+  static ProtoPlayerStageQuitInfo* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class PlayerStageQuitRequest : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:Proto.Message.PlayerStageQuitRequest) */ {
+ public:
+  PlayerStageQuitRequest();
+  virtual ~PlayerStageQuitRequest();
+
+  PlayerStageQuitRequest(const PlayerStageQuitRequest& from);
+
+  inline PlayerStageQuitRequest& operator=(const PlayerStageQuitRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  static const PlayerStageQuitRequest& default_instance();
+
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  // Returns the internal default instance pointer. This function can
+  // return NULL thus should not be used by the user. This is intended
+  // for Protobuf internal code. Please use default_instance() declared
+  // above instead.
+  static inline const PlayerStageQuitRequest* internal_default_instance() {
+    return default_instance_;
+  }
+  #endif
+
+  void Swap(PlayerStageQuitRequest* other);
+
+  // implements Message ----------------------------------------------
+
+  inline PlayerStageQuitRequest* New() const { return New(NULL); }
+
+  PlayerStageQuitRequest* New(::google::protobuf::Arena* arena) const;
+  void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from);
+  void CopyFrom(const PlayerStageQuitRequest& from);
+  void MergeFrom(const PlayerStageQuitRequest& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  void DiscardUnknownFields();
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(PlayerStageQuitRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _arena_ptr_;
+  }
+  inline ::google::protobuf::Arena* MaybeArenaPtr() const {
+    return _arena_ptr_;
+  }
+  public:
+
+  ::std::string GetTypeName() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional uint32 roomId = 1;
+  void clear_roomid();
+  static const int kRoomIdFieldNumber = 1;
+  ::google::protobuf::uint32 roomid() const;
+  void set_roomid(::google::protobuf::uint32 value);
+
+  // optional uint32 gameType = 2;
+  void clear_gametype();
+  static const int kGameTypeFieldNumber = 2;
+  ::google::protobuf::uint32 gametype() const;
+  void set_gametype(::google::protobuf::uint32 value);
+
+  // optional uint64 sysLevelId = 3;
+  void clear_syslevelid();
+  static const int kSysLevelIdFieldNumber = 3;
+  ::google::protobuf::uint64 syslevelid() const;
+  void set_syslevelid(::google::protobuf::uint64 value);
+
+  // repeated .Proto.Message.ProtoPlayerStageQuitInfo playerStageQuitInfos = 4;
+  int playerstagequitinfos_size() const;
+  void clear_playerstagequitinfos();
+  static const int kPlayerStageQuitInfosFieldNumber = 4;
+  const ::Proto::Message::ProtoPlayerStageQuitInfo& playerstagequitinfos(int index) const;
+  ::Proto::Message::ProtoPlayerStageQuitInfo* mutable_playerstagequitinfos(int index);
+  ::Proto::Message::ProtoPlayerStageQuitInfo* add_playerstagequitinfos();
+  ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerStageQuitInfo >*
+      mutable_playerstagequitinfos();
+  const ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerStageQuitInfo >&
+      playerstagequitinfos() const;
+
+  // @@protoc_insertion_point(class_scope:Proto.Message.PlayerStageQuitRequest)
+ private:
+
+  ::google::protobuf::internal::ArenaStringPtr _unknown_fields_;
+  ::google::protobuf::Arena* _arena_ptr_;
+
+  bool _is_default_instance_;
+  ::google::protobuf::uint32 roomid_;
+  ::google::protobuf::uint32 gametype_;
+  ::google::protobuf::uint64 syslevelid_;
+  ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerStageQuitInfo > playerstagequitinfos_;
+  mutable int _cached_size_;
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  friend void  protobuf_AddDesc_ClientData_2eproto_impl();
+  #else
+  friend void  protobuf_AddDesc_ClientData_2eproto();
+  #endif
+  friend void protobuf_AssignDesc_ClientData_2eproto();
+  friend void protobuf_ShutdownFile_ClientData_2eproto();
+
+  void InitAsDefaultInstance();
+  static PlayerStageQuitRequest* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class PlayerStageQuitResponse : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:Proto.Message.PlayerStageQuitResponse) */ {
+ public:
+  PlayerStageQuitResponse();
+  virtual ~PlayerStageQuitResponse();
+
+  PlayerStageQuitResponse(const PlayerStageQuitResponse& from);
+
+  inline PlayerStageQuitResponse& operator=(const PlayerStageQuitResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  static const PlayerStageQuitResponse& default_instance();
+
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  // Returns the internal default instance pointer. This function can
+  // return NULL thus should not be used by the user. This is intended
+  // for Protobuf internal code. Please use default_instance() declared
+  // above instead.
+  static inline const PlayerStageQuitResponse* internal_default_instance() {
+    return default_instance_;
+  }
+  #endif
+
+  void Swap(PlayerStageQuitResponse* other);
+
+  // implements Message ----------------------------------------------
+
+  inline PlayerStageQuitResponse* New() const { return New(NULL); }
+
+  PlayerStageQuitResponse* New(::google::protobuf::Arena* arena) const;
+  void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from);
+  void CopyFrom(const PlayerStageQuitResponse& from);
+  void MergeFrom(const PlayerStageQuitResponse& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  void DiscardUnknownFields();
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(PlayerStageQuitResponse* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return _arena_ptr_;
+  }
+  inline ::google::protobuf::Arena* MaybeArenaPtr() const {
+    return _arena_ptr_;
+  }
+  public:
+
+  ::std::string GetTypeName() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional uint32 roomId = 1;
+  void clear_roomid();
+  static const int kRoomIdFieldNumber = 1;
+  ::google::protobuf::uint32 roomid() const;
+  void set_roomid(::google::protobuf::uint32 value);
+
+  // optional uint32 gameType = 2;
+  void clear_gametype();
+  static const int kGameTypeFieldNumber = 2;
+  ::google::protobuf::uint32 gametype() const;
+  void set_gametype(::google::protobuf::uint32 value);
+
+  // optional uint64 sysLevelId = 3;
+  void clear_syslevelid();
+  static const int kSysLevelIdFieldNumber = 3;
+  ::google::protobuf::uint64 syslevelid() const;
+  void set_syslevelid(::google::protobuf::uint64 value);
+
+  // repeated .Proto.Message.ProtoPlayerStageQuitInfo playerStageQuitInfos = 4;
+  int playerstagequitinfos_size() const;
+  void clear_playerstagequitinfos();
+  static const int kPlayerStageQuitInfosFieldNumber = 4;
+  const ::Proto::Message::ProtoPlayerStageQuitInfo& playerstagequitinfos(int index) const;
+  ::Proto::Message::ProtoPlayerStageQuitInfo* mutable_playerstagequitinfos(int index);
+  ::Proto::Message::ProtoPlayerStageQuitInfo* add_playerstagequitinfos();
+  ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerStageQuitInfo >*
+      mutable_playerstagequitinfos();
+  const ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerStageQuitInfo >&
+      playerstagequitinfos() const;
+
+  // @@protoc_insertion_point(class_scope:Proto.Message.PlayerStageQuitResponse)
+ private:
+
+  ::google::protobuf::internal::ArenaStringPtr _unknown_fields_;
+  ::google::protobuf::Arena* _arena_ptr_;
+
+  bool _is_default_instance_;
+  ::google::protobuf::uint32 roomid_;
+  ::google::protobuf::uint32 gametype_;
+  ::google::protobuf::uint64 syslevelid_;
+  ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerStageQuitInfo > playerstagequitinfos_;
+  mutable int _cached_size_;
+  #ifdef GOOGLE_PROTOBUF_NO_STATIC_INITIALIZER
+  friend void  protobuf_AddDesc_ClientData_2eproto_impl();
+  #else
+  friend void  protobuf_AddDesc_ClientData_2eproto();
+  #endif
+  friend void protobuf_AssignDesc_ClientData_2eproto();
+  friend void protobuf_ShutdownFile_ClientData_2eproto();
+
+  void InitAsDefaultInstance();
+  static PlayerStageQuitResponse* default_instance_;
 };
 // ===================================================================
 
@@ -3946,66 +4705,6 @@ inline void ProtoPlayerInfo::set_skillpoint(::google::protobuf::uint32 value) {
   // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerInfo.skillPoint)
 }
 
-// repeated .Proto.Message.ProtoPlayerItem playerItems = 15;
-inline int ProtoPlayerInfo::playeritems_size() const {
-  return playeritems_.size();
-}
-inline void ProtoPlayerInfo::clear_playeritems() {
-  playeritems_.Clear();
-}
-inline const ::Proto::Message::ProtoPlayerItem& ProtoPlayerInfo::playeritems(int index) const {
-  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerInfo.playerItems)
-  return playeritems_.Get(index);
-}
-inline ::Proto::Message::ProtoPlayerItem* ProtoPlayerInfo::mutable_playeritems(int index) {
-  // @@protoc_insertion_point(field_mutable:Proto.Message.ProtoPlayerInfo.playerItems)
-  return playeritems_.Mutable(index);
-}
-inline ::Proto::Message::ProtoPlayerItem* ProtoPlayerInfo::add_playeritems() {
-  // @@protoc_insertion_point(field_add:Proto.Message.ProtoPlayerInfo.playerItems)
-  return playeritems_.Add();
-}
-inline ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerItem >*
-ProtoPlayerInfo::mutable_playeritems() {
-  // @@protoc_insertion_point(field_mutable_list:Proto.Message.ProtoPlayerInfo.playerItems)
-  return &playeritems_;
-}
-inline const ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerItem >&
-ProtoPlayerInfo::playeritems() const {
-  // @@protoc_insertion_point(field_list:Proto.Message.ProtoPlayerInfo.playerItems)
-  return playeritems_;
-}
-
-// repeated .Proto.Message.ProtoPlayerGarage playerGarages = 16;
-inline int ProtoPlayerInfo::playergarages_size() const {
-  return playergarages_.size();
-}
-inline void ProtoPlayerInfo::clear_playergarages() {
-  playergarages_.Clear();
-}
-inline const ::Proto::Message::ProtoPlayerGarage& ProtoPlayerInfo::playergarages(int index) const {
-  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerInfo.playerGarages)
-  return playergarages_.Get(index);
-}
-inline ::Proto::Message::ProtoPlayerGarage* ProtoPlayerInfo::mutable_playergarages(int index) {
-  // @@protoc_insertion_point(field_mutable:Proto.Message.ProtoPlayerInfo.playerGarages)
-  return playergarages_.Mutable(index);
-}
-inline ::Proto::Message::ProtoPlayerGarage* ProtoPlayerInfo::add_playergarages() {
-  // @@protoc_insertion_point(field_add:Proto.Message.ProtoPlayerInfo.playerGarages)
-  return playergarages_.Add();
-}
-inline ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerGarage >*
-ProtoPlayerInfo::mutable_playergarages() {
-  // @@protoc_insertion_point(field_mutable_list:Proto.Message.ProtoPlayerInfo.playerGarages)
-  return &playergarages_;
-}
-inline const ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerGarage >&
-ProtoPlayerInfo::playergarages() const {
-  // @@protoc_insertion_point(field_list:Proto.Message.ProtoPlayerInfo.playerGarages)
-  return playergarages_;
-}
-
 // optional uint32 sysCharacterId = 17;
 inline void ProtoPlayerInfo::clear_syscharacterid() {
   syscharacterid_ = 0u;
@@ -4064,7 +4763,7 @@ inline void ProtoPlayerInfo::set_allocated_lastlogintime(::std::string* lastlogi
   // @@protoc_insertion_point(field_set_allocated:Proto.Message.ProtoPlayerInfo.lastLoginTime)
 }
 
-// optional uint32 flag = 31;
+// optional uint32 flag = 20;
 inline void ProtoPlayerInfo::clear_flag() {
   flag_ = 0u;
 }
@@ -4522,7 +5221,673 @@ inline void ProtoPlayerInfo::set_allocated_serverzoneid(::std::string* serverzon
   // @@protoc_insertion_point(field_set_allocated:Proto.Message.ProtoPlayerInfo.serverZoneId)
 }
 
+// -------------------------------------------------------------------
+
+// ProtoPlayerSimpleInfo
+
+// optional sint64 id = 1;
+inline void ProtoPlayerSimpleInfo::clear_id() {
+  id_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 ProtoPlayerSimpleInfo::id() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.id)
+  return id_;
+}
+inline void ProtoPlayerSimpleInfo::set_id(::google::protobuf::int64 value) {
+  
+  id_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.id)
+}
+
+// optional string name = 2;
+inline void ProtoPlayerSimpleInfo::clear_name() {
+  name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ProtoPlayerSimpleInfo::name() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.name)
+  return name_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ProtoPlayerSimpleInfo::set_name(const ::std::string& value) {
+  
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.name)
+}
+inline void ProtoPlayerSimpleInfo::set_name(const char* value) {
+  
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Proto.Message.ProtoPlayerSimpleInfo.name)
+}
+inline void ProtoPlayerSimpleInfo::set_name(const char* value, size_t size) {
+  
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Proto.Message.ProtoPlayerSimpleInfo.name)
+}
+inline ::std::string* ProtoPlayerSimpleInfo::mutable_name() {
+  
+  // @@protoc_insertion_point(field_mutable:Proto.Message.ProtoPlayerSimpleInfo.name)
+  return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ProtoPlayerSimpleInfo::release_name() {
+  // @@protoc_insertion_point(field_release:Proto.Message.ProtoPlayerSimpleInfo.name)
+  
+  return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ProtoPlayerSimpleInfo::set_allocated_name(::std::string* name) {
+  if (name != NULL) {
+    
+  } else {
+    
+  }
+  name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
+  // @@protoc_insertion_point(field_set_allocated:Proto.Message.ProtoPlayerSimpleInfo.name)
+}
+
+// optional string userName = 3;
+inline void ProtoPlayerSimpleInfo::clear_username() {
+  username_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ProtoPlayerSimpleInfo::username() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.userName)
+  return username_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ProtoPlayerSimpleInfo::set_username(const ::std::string& value) {
+  
+  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.userName)
+}
+inline void ProtoPlayerSimpleInfo::set_username(const char* value) {
+  
+  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Proto.Message.ProtoPlayerSimpleInfo.userName)
+}
+inline void ProtoPlayerSimpleInfo::set_username(const char* value, size_t size) {
+  
+  username_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Proto.Message.ProtoPlayerSimpleInfo.userName)
+}
+inline ::std::string* ProtoPlayerSimpleInfo::mutable_username() {
+  
+  // @@protoc_insertion_point(field_mutable:Proto.Message.ProtoPlayerSimpleInfo.userName)
+  return username_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ProtoPlayerSimpleInfo::release_username() {
+  // @@protoc_insertion_point(field_release:Proto.Message.ProtoPlayerSimpleInfo.userName)
+  
+  return username_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ProtoPlayerSimpleInfo::set_allocated_username(::std::string* username) {
+  if (username != NULL) {
+    
+  } else {
+    
+  }
+  username_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), username);
+  // @@protoc_insertion_point(field_set_allocated:Proto.Message.ProtoPlayerSimpleInfo.userName)
+}
+
+// optional uint32 gold = 4;
+inline void ProtoPlayerSimpleInfo::clear_gold() {
+  gold_ = 0u;
+}
+inline ::google::protobuf::uint32 ProtoPlayerSimpleInfo::gold() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.gold)
+  return gold_;
+}
+inline void ProtoPlayerSimpleInfo::set_gold(::google::protobuf::uint32 value) {
+  
+  gold_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.gold)
+}
+
+// optional uint32 diamond = 5;
+inline void ProtoPlayerSimpleInfo::clear_diamond() {
+  diamond_ = 0u;
+}
+inline ::google::protobuf::uint32 ProtoPlayerSimpleInfo::diamond() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.diamond)
+  return diamond_;
+}
+inline void ProtoPlayerSimpleInfo::set_diamond(::google::protobuf::uint32 value) {
+  
+  diamond_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.diamond)
+}
+
+// optional uint32 power = 6;
+inline void ProtoPlayerSimpleInfo::clear_power() {
+  power_ = 0u;
+}
+inline ::google::protobuf::uint32 ProtoPlayerSimpleInfo::power() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.power)
+  return power_;
+}
+inline void ProtoPlayerSimpleInfo::set_power(::google::protobuf::uint32 value) {
+  
+  power_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.power)
+}
+
+// optional uint32 exp = 7;
+inline void ProtoPlayerSimpleInfo::clear_exp() {
+  exp_ = 0u;
+}
+inline ::google::protobuf::uint32 ProtoPlayerSimpleInfo::exp() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.exp)
+  return exp_;
+}
+inline void ProtoPlayerSimpleInfo::set_exp(::google::protobuf::uint32 value) {
+  
+  exp_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.exp)
+}
+
+// optional uint32 level = 8;
+inline void ProtoPlayerSimpleInfo::clear_level() {
+  level_ = 0u;
+}
+inline ::google::protobuf::uint32 ProtoPlayerSimpleInfo::level() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.level)
+  return level_;
+}
+inline void ProtoPlayerSimpleInfo::set_level(::google::protobuf::uint32 value) {
+  
+  level_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.level)
+}
+
+// optional string avatar = 9;
+inline void ProtoPlayerSimpleInfo::clear_avatar() {
+  avatar_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ProtoPlayerSimpleInfo::avatar() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.avatar)
+  return avatar_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ProtoPlayerSimpleInfo::set_avatar(const ::std::string& value) {
+  
+  avatar_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.avatar)
+}
+inline void ProtoPlayerSimpleInfo::set_avatar(const char* value) {
+  
+  avatar_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Proto.Message.ProtoPlayerSimpleInfo.avatar)
+}
+inline void ProtoPlayerSimpleInfo::set_avatar(const char* value, size_t size) {
+  
+  avatar_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Proto.Message.ProtoPlayerSimpleInfo.avatar)
+}
+inline ::std::string* ProtoPlayerSimpleInfo::mutable_avatar() {
+  
+  // @@protoc_insertion_point(field_mutable:Proto.Message.ProtoPlayerSimpleInfo.avatar)
+  return avatar_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ProtoPlayerSimpleInfo::release_avatar() {
+  // @@protoc_insertion_point(field_release:Proto.Message.ProtoPlayerSimpleInfo.avatar)
+  
+  return avatar_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ProtoPlayerSimpleInfo::set_allocated_avatar(::std::string* avatar) {
+  if (avatar != NULL) {
+    
+  } else {
+    
+  }
+  avatar_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), avatar);
+  // @@protoc_insertion_point(field_set_allocated:Proto.Message.ProtoPlayerSimpleInfo.avatar)
+}
+
+// optional uint32 nextLevelExp = 10;
+inline void ProtoPlayerSimpleInfo::clear_nextlevelexp() {
+  nextlevelexp_ = 0u;
+}
+inline ::google::protobuf::uint32 ProtoPlayerSimpleInfo::nextlevelexp() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.nextLevelExp)
+  return nextlevelexp_;
+}
+inline void ProtoPlayerSimpleInfo::set_nextlevelexp(::google::protobuf::uint32 value) {
+  
+  nextlevelexp_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.nextLevelExp)
+}
+
+// optional uint32 skillPoint = 11;
+inline void ProtoPlayerSimpleInfo::clear_skillpoint() {
+  skillpoint_ = 0u;
+}
+inline ::google::protobuf::uint32 ProtoPlayerSimpleInfo::skillpoint() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.skillPoint)
+  return skillpoint_;
+}
+inline void ProtoPlayerSimpleInfo::set_skillpoint(::google::protobuf::uint32 value) {
+  
+  skillpoint_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.skillPoint)
+}
+
+// optional float battleFire = 12;
+inline void ProtoPlayerSimpleInfo::clear_battlefire() {
+  battlefire_ = 0;
+}
+inline float ProtoPlayerSimpleInfo::battlefire() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.battleFire)
+  return battlefire_;
+}
+inline void ProtoPlayerSimpleInfo::set_battlefire(float value) {
+  
+  battlefire_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.battleFire)
+}
+
+// optional string lastLoginTime = 13;
+inline void ProtoPlayerSimpleInfo::clear_lastlogintime() {
+  lastlogintime_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ProtoPlayerSimpleInfo::lastlogintime() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.lastLoginTime)
+  return lastlogintime_.GetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ProtoPlayerSimpleInfo::set_lastlogintime(const ::std::string& value) {
+  
+  lastlogintime_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.lastLoginTime)
+}
+inline void ProtoPlayerSimpleInfo::set_lastlogintime(const char* value) {
+  
+  lastlogintime_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Proto.Message.ProtoPlayerSimpleInfo.lastLoginTime)
+}
+inline void ProtoPlayerSimpleInfo::set_lastlogintime(const char* value, size_t size) {
+  
+  lastlogintime_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Proto.Message.ProtoPlayerSimpleInfo.lastLoginTime)
+}
+inline ::std::string* ProtoPlayerSimpleInfo::mutable_lastlogintime() {
+  
+  // @@protoc_insertion_point(field_mutable:Proto.Message.ProtoPlayerSimpleInfo.lastLoginTime)
+  return lastlogintime_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ProtoPlayerSimpleInfo::release_lastlogintime() {
+  // @@protoc_insertion_point(field_release:Proto.Message.ProtoPlayerSimpleInfo.lastLoginTime)
+  
+  return lastlogintime_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ProtoPlayerSimpleInfo::set_allocated_lastlogintime(::std::string* lastlogintime) {
+  if (lastlogintime != NULL) {
+    
+  } else {
+    
+  }
+  lastlogintime_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), lastlogintime);
+  // @@protoc_insertion_point(field_set_allocated:Proto.Message.ProtoPlayerSimpleInfo.lastLoginTime)
+}
+
+// optional bool isOnline = 14;
+inline void ProtoPlayerSimpleInfo::clear_isonline() {
+  isonline_ = false;
+}
+inline bool ProtoPlayerSimpleInfo::isonline() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.isOnline)
+  return isonline_;
+}
+inline void ProtoPlayerSimpleInfo::set_isonline(bool value) {
+  
+  isonline_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.isOnline)
+}
+
+// optional uint32 stamina = 15;
+inline void ProtoPlayerSimpleInfo::clear_stamina() {
+  stamina_ = 0u;
+}
+inline ::google::protobuf::uint32 ProtoPlayerSimpleInfo::stamina() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.stamina)
+  return stamina_;
+}
+inline void ProtoPlayerSimpleInfo::set_stamina(::google::protobuf::uint32 value) {
+  
+  stamina_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.stamina)
+}
+
+// optional uint32 trial = 16;
+inline void ProtoPlayerSimpleInfo::clear_trial() {
+  trial_ = 0u;
+}
+inline ::google::protobuf::uint32 ProtoPlayerSimpleInfo::trial() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.trial)
+  return trial_;
+}
+inline void ProtoPlayerSimpleInfo::set_trial(::google::protobuf::uint32 value) {
+  
+  trial_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.trial)
+}
+
+// optional uint32 vipLevel = 17;
+inline void ProtoPlayerSimpleInfo::clear_viplevel() {
+  viplevel_ = 0u;
+}
+inline ::google::protobuf::uint32 ProtoPlayerSimpleInfo::viplevel() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.vipLevel)
+  return viplevel_;
+}
+inline void ProtoPlayerSimpleInfo::set_viplevel(::google::protobuf::uint32 value) {
+  
+  viplevel_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.vipLevel)
+}
+
+// optional uint32 arena = 18;
+inline void ProtoPlayerSimpleInfo::clear_arena() {
+  arena_ = 0u;
+}
+inline ::google::protobuf::uint32 ProtoPlayerSimpleInfo::arena() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerSimpleInfo.arena)
+  return arena_;
+}
+inline void ProtoPlayerSimpleInfo::set_arena(::google::protobuf::uint32 value) {
+  
+  arena_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerSimpleInfo.arena)
+}
+
+// -------------------------------------------------------------------
+
+// PlayerListRequest
+
+// -------------------------------------------------------------------
+
+// PlayerListResponse
+
+// repeated .Proto.Message.ProtoPlayerSimpleInfo playerSimpleInfo = 1;
+inline int PlayerListResponse::playersimpleinfo_size() const {
+  return playersimpleinfo_.size();
+}
+inline void PlayerListResponse::clear_playersimpleinfo() {
+  playersimpleinfo_.Clear();
+}
+inline const ::Proto::Message::ProtoPlayerSimpleInfo& PlayerListResponse::playersimpleinfo(int index) const {
+  // @@protoc_insertion_point(field_get:Proto.Message.PlayerListResponse.playerSimpleInfo)
+  return playersimpleinfo_.Get(index);
+}
+inline ::Proto::Message::ProtoPlayerSimpleInfo* PlayerListResponse::mutable_playersimpleinfo(int index) {
+  // @@protoc_insertion_point(field_mutable:Proto.Message.PlayerListResponse.playerSimpleInfo)
+  return playersimpleinfo_.Mutable(index);
+}
+inline ::Proto::Message::ProtoPlayerSimpleInfo* PlayerListResponse::add_playersimpleinfo() {
+  // @@protoc_insertion_point(field_add:Proto.Message.PlayerListResponse.playerSimpleInfo)
+  return playersimpleinfo_.Add();
+}
+inline ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerSimpleInfo >*
+PlayerListResponse::mutable_playersimpleinfo() {
+  // @@protoc_insertion_point(field_mutable_list:Proto.Message.PlayerListResponse.playerSimpleInfo)
+  return &playersimpleinfo_;
+}
+inline const ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerSimpleInfo >&
+PlayerListResponse::playersimpleinfo() const {
+  // @@protoc_insertion_point(field_list:Proto.Message.PlayerListResponse.playerSimpleInfo)
+  return playersimpleinfo_;
+}
+
+// -------------------------------------------------------------------
+
+// ProtoPlayerStageQuitInfo
+
+// optional sint64 id = 1;
+inline void ProtoPlayerStageQuitInfo::clear_id() {
+  id_ = GOOGLE_LONGLONG(0);
+}
+inline ::google::protobuf::int64 ProtoPlayerStageQuitInfo::id() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerStageQuitInfo.id)
+  return id_;
+}
+inline void ProtoPlayerStageQuitInfo::set_id(::google::protobuf::int64 value) {
+  
+  id_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerStageQuitInfo.id)
+}
+
+// optional uint32 totalScore = 2;
+inline void ProtoPlayerStageQuitInfo::clear_totalscore() {
+  totalscore_ = 0u;
+}
+inline ::google::protobuf::uint32 ProtoPlayerStageQuitInfo::totalscore() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerStageQuitInfo.totalScore)
+  return totalscore_;
+}
+inline void ProtoPlayerStageQuitInfo::set_totalscore(::google::protobuf::uint32 value) {
+  
+  totalscore_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerStageQuitInfo.totalScore)
+}
+
+// optional uint32 ranking = 3;
+inline void ProtoPlayerStageQuitInfo::clear_ranking() {
+  ranking_ = 0u;
+}
+inline ::google::protobuf::uint32 ProtoPlayerStageQuitInfo::ranking() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerStageQuitInfo.ranking)
+  return ranking_;
+}
+inline void ProtoPlayerStageQuitInfo::set_ranking(::google::protobuf::uint32 value) {
+  
+  ranking_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerStageQuitInfo.ranking)
+}
+
+// optional uint32 gameTime = 4;
+inline void ProtoPlayerStageQuitInfo::clear_gametime() {
+  gametime_ = 0u;
+}
+inline ::google::protobuf::uint32 ProtoPlayerStageQuitInfo::gametime() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerStageQuitInfo.gameTime)
+  return gametime_;
+}
+inline void ProtoPlayerStageQuitInfo::set_gametime(::google::protobuf::uint32 value) {
+  
+  gametime_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerStageQuitInfo.gameTime)
+}
+
+// optional uint32 fastestSingleTime = 5;
+inline void ProtoPlayerStageQuitInfo::clear_fastestsingletime() {
+  fastestsingletime_ = 0u;
+}
+inline ::google::protobuf::uint32 ProtoPlayerStageQuitInfo::fastestsingletime() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerStageQuitInfo.fastestSingleTime)
+  return fastestsingletime_;
+}
+inline void ProtoPlayerStageQuitInfo::set_fastestsingletime(::google::protobuf::uint32 value) {
+  
+  fastestsingletime_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerStageQuitInfo.fastestSingleTime)
+}
+
+// optional uint32 fastestSpeed = 6;
+inline void ProtoPlayerStageQuitInfo::clear_fastestspeed() {
+  fastestspeed_ = 0u;
+}
+inline ::google::protobuf::uint32 ProtoPlayerStageQuitInfo::fastestspeed() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.ProtoPlayerStageQuitInfo.fastestSpeed)
+  return fastestspeed_;
+}
+inline void ProtoPlayerStageQuitInfo::set_fastestspeed(::google::protobuf::uint32 value) {
+  
+  fastestspeed_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.ProtoPlayerStageQuitInfo.fastestSpeed)
+}
+
+// -------------------------------------------------------------------
+
+// PlayerStageQuitRequest
+
+// optional uint32 roomId = 1;
+inline void PlayerStageQuitRequest::clear_roomid() {
+  roomid_ = 0u;
+}
+inline ::google::protobuf::uint32 PlayerStageQuitRequest::roomid() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.PlayerStageQuitRequest.roomId)
+  return roomid_;
+}
+inline void PlayerStageQuitRequest::set_roomid(::google::protobuf::uint32 value) {
+  
+  roomid_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.PlayerStageQuitRequest.roomId)
+}
+
+// optional uint32 gameType = 2;
+inline void PlayerStageQuitRequest::clear_gametype() {
+  gametype_ = 0u;
+}
+inline ::google::protobuf::uint32 PlayerStageQuitRequest::gametype() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.PlayerStageQuitRequest.gameType)
+  return gametype_;
+}
+inline void PlayerStageQuitRequest::set_gametype(::google::protobuf::uint32 value) {
+  
+  gametype_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.PlayerStageQuitRequest.gameType)
+}
+
+// optional uint64 sysLevelId = 3;
+inline void PlayerStageQuitRequest::clear_syslevelid() {
+  syslevelid_ = GOOGLE_ULONGLONG(0);
+}
+inline ::google::protobuf::uint64 PlayerStageQuitRequest::syslevelid() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.PlayerStageQuitRequest.sysLevelId)
+  return syslevelid_;
+}
+inline void PlayerStageQuitRequest::set_syslevelid(::google::protobuf::uint64 value) {
+  
+  syslevelid_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.PlayerStageQuitRequest.sysLevelId)
+}
+
+// repeated .Proto.Message.ProtoPlayerStageQuitInfo playerStageQuitInfos = 4;
+inline int PlayerStageQuitRequest::playerstagequitinfos_size() const {
+  return playerstagequitinfos_.size();
+}
+inline void PlayerStageQuitRequest::clear_playerstagequitinfos() {
+  playerstagequitinfos_.Clear();
+}
+inline const ::Proto::Message::ProtoPlayerStageQuitInfo& PlayerStageQuitRequest::playerstagequitinfos(int index) const {
+  // @@protoc_insertion_point(field_get:Proto.Message.PlayerStageQuitRequest.playerStageQuitInfos)
+  return playerstagequitinfos_.Get(index);
+}
+inline ::Proto::Message::ProtoPlayerStageQuitInfo* PlayerStageQuitRequest::mutable_playerstagequitinfos(int index) {
+  // @@protoc_insertion_point(field_mutable:Proto.Message.PlayerStageQuitRequest.playerStageQuitInfos)
+  return playerstagequitinfos_.Mutable(index);
+}
+inline ::Proto::Message::ProtoPlayerStageQuitInfo* PlayerStageQuitRequest::add_playerstagequitinfos() {
+  // @@protoc_insertion_point(field_add:Proto.Message.PlayerStageQuitRequest.playerStageQuitInfos)
+  return playerstagequitinfos_.Add();
+}
+inline ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerStageQuitInfo >*
+PlayerStageQuitRequest::mutable_playerstagequitinfos() {
+  // @@protoc_insertion_point(field_mutable_list:Proto.Message.PlayerStageQuitRequest.playerStageQuitInfos)
+  return &playerstagequitinfos_;
+}
+inline const ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerStageQuitInfo >&
+PlayerStageQuitRequest::playerstagequitinfos() const {
+  // @@protoc_insertion_point(field_list:Proto.Message.PlayerStageQuitRequest.playerStageQuitInfos)
+  return playerstagequitinfos_;
+}
+
+// -------------------------------------------------------------------
+
+// PlayerStageQuitResponse
+
+// optional uint32 roomId = 1;
+inline void PlayerStageQuitResponse::clear_roomid() {
+  roomid_ = 0u;
+}
+inline ::google::protobuf::uint32 PlayerStageQuitResponse::roomid() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.PlayerStageQuitResponse.roomId)
+  return roomid_;
+}
+inline void PlayerStageQuitResponse::set_roomid(::google::protobuf::uint32 value) {
+  
+  roomid_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.PlayerStageQuitResponse.roomId)
+}
+
+// optional uint32 gameType = 2;
+inline void PlayerStageQuitResponse::clear_gametype() {
+  gametype_ = 0u;
+}
+inline ::google::protobuf::uint32 PlayerStageQuitResponse::gametype() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.PlayerStageQuitResponse.gameType)
+  return gametype_;
+}
+inline void PlayerStageQuitResponse::set_gametype(::google::protobuf::uint32 value) {
+  
+  gametype_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.PlayerStageQuitResponse.gameType)
+}
+
+// optional uint64 sysLevelId = 3;
+inline void PlayerStageQuitResponse::clear_syslevelid() {
+  syslevelid_ = GOOGLE_ULONGLONG(0);
+}
+inline ::google::protobuf::uint64 PlayerStageQuitResponse::syslevelid() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.PlayerStageQuitResponse.sysLevelId)
+  return syslevelid_;
+}
+inline void PlayerStageQuitResponse::set_syslevelid(::google::protobuf::uint64 value) {
+  
+  syslevelid_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.PlayerStageQuitResponse.sysLevelId)
+}
+
+// repeated .Proto.Message.ProtoPlayerStageQuitInfo playerStageQuitInfos = 4;
+inline int PlayerStageQuitResponse::playerstagequitinfos_size() const {
+  return playerstagequitinfos_.size();
+}
+inline void PlayerStageQuitResponse::clear_playerstagequitinfos() {
+  playerstagequitinfos_.Clear();
+}
+inline const ::Proto::Message::ProtoPlayerStageQuitInfo& PlayerStageQuitResponse::playerstagequitinfos(int index) const {
+  // @@protoc_insertion_point(field_get:Proto.Message.PlayerStageQuitResponse.playerStageQuitInfos)
+  return playerstagequitinfos_.Get(index);
+}
+inline ::Proto::Message::ProtoPlayerStageQuitInfo* PlayerStageQuitResponse::mutable_playerstagequitinfos(int index) {
+  // @@protoc_insertion_point(field_mutable:Proto.Message.PlayerStageQuitResponse.playerStageQuitInfos)
+  return playerstagequitinfos_.Mutable(index);
+}
+inline ::Proto::Message::ProtoPlayerStageQuitInfo* PlayerStageQuitResponse::add_playerstagequitinfos() {
+  // @@protoc_insertion_point(field_add:Proto.Message.PlayerStageQuitResponse.playerStageQuitInfos)
+  return playerstagequitinfos_.Add();
+}
+inline ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerStageQuitInfo >*
+PlayerStageQuitResponse::mutable_playerstagequitinfos() {
+  // @@protoc_insertion_point(field_mutable_list:Proto.Message.PlayerStageQuitResponse.playerStageQuitInfos)
+  return &playerstagequitinfos_;
+}
+inline const ::google::protobuf::RepeatedPtrField< ::Proto::Message::ProtoPlayerStageQuitInfo >&
+PlayerStageQuitResponse::playerstagequitinfos() const {
+  // @@protoc_insertion_point(field_list:Proto.Message.PlayerStageQuitResponse.playerStageQuitInfos)
+  return playerstagequitinfos_;
+}
+
 #endif  // !PROTOBUF_INLINE_NOT_IN_HEADERS
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

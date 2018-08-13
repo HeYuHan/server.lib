@@ -1,6 +1,7 @@
+
 syntax = "proto3";
+
 package Proto.Message;
-option java_package = "com.pearl.srs.proto";
 option optimize_for = LITE_RUNTIME;
 
 enum ResponseCode{
@@ -82,6 +83,7 @@ enum ResponseCode{
 
 	BATTLE_MATCH_EXIST = 1200; // 已经在匹配中
 }
+
 enum AccountType{
 	NONE = 0;
 	NOR	= 1;//普通玩家
@@ -145,6 +147,7 @@ message PlayerCreateRequest{
 	string appStore = 7; // 渠道
 	string device = 8; // 登录设备(10901：安卓、10903：ios正版、10905：ios越狱、10906：PC)
 }
+
 message PlayerCreateResponse {
 	ProtoPlayerInfo playerInfo = 1;
 }
@@ -189,11 +192,9 @@ message ProtoPlayerInfo {
 	string avatar = 12; // 头像
 	uint32 nextLevelExp = 13; // 玩家升级所需要的经验
 	uint32 skillPoint = 14; // 技能点
-	repeated ProtoPlayerItem playerItems = 15; // 玩家所有的道具
-	repeated ProtoPlayerGarage playerGarages = 16; //玩家车库信息
 	uint32 sysCharacterId = 17; // 系统角色ID
 	string lastLoginTime = 26; // 最后登入时间
-	uint32 flag = 31; //标签
+	uint32 flag = 20; //标签
 	float battleFire = 32; //战斗力
 	uint32 newbieProgress = 37; // 新手引导进度
 	bool haveNewMail = 39; // 是否有新邮件
@@ -216,4 +217,60 @@ message ProtoPlayerInfo {
 	uint32 storageSlots = 65; // 背包格子总数
 
 	string serverZoneId = 100; // 服务器大区ID
+}
+
+message ProtoPlayerSimpleInfo {
+	sint64 id = 1; //玩家唯一ID
+	string name = 2; // 角色名字
+	string userName = 3; // 用户名字
+	uint32 gold = 4; //金币
+	uint32 diamond = 5; //钻石
+	uint32 power = 6; //能量
+	uint32 exp = 7; // 经验
+	uint32 level = 8; //等级
+	string avatar = 9; // 头像
+	uint32 nextLevelExp = 10; // 玩家升级所需要的经验
+	uint32 skillPoint = 11; // 技能点
+	float battleFire = 12; // 战斗力
+	string lastLoginTime = 13;
+	bool isOnline = 14; // 角色是否在线，true:在线
+	uint32 stamina = 15; // 体力
+	uint32 trial = 16;//历练值
+	uint32 vipLevel = 17; //玩家VIP等级
+	uint32 arena = 18; // 竞技场货币
+}
+
+message PlayerListRequest {
+
+}
+
+message PlayerListResponse {
+	repeated ProtoPlayerSimpleInfo playerSimpleInfo = 1;
+
+}
+
+message ProtoPlayerStageQuitInfo {
+	sint64 id = 1; //玩家唯一ID
+	uint32 totalScore = 2; //分数
+	uint32 ranking = 3; //排名
+	uint32 gameTime = 4; //时长
+	uint32 fastestSingleTime = 5;//最快单圈时间
+	uint32 fastestSpeed = 6; //最高时速
+
+}
+
+message PlayerStageQuitRequest {
+	uint32 roomId = 1; //房间ID
+	uint32 gameType = 2; //比赛类型
+	uint64 sysLevelId = 3; //地图ID
+	repeated ProtoPlayerStageQuitInfo playerStageQuitInfos = 4;
+
+}
+
+message PlayerStageQuitResponse {
+	uint32 roomId = 1; //房间ID
+	uint32 gameType = 2; //比赛类型
+	uint64 sysLevelId = 3; //地图ID
+	repeated ProtoPlayerStageQuitInfo playerStageQuitInfos = 4;
+
 }

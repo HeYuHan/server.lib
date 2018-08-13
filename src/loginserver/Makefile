@@ -20,8 +20,8 @@ endif
 CFLAGS += -D$(PF)
 
 ifdef RELEASE
-	CFLAGS += -Wall -Werror -g -O2
-	LFLAGS += -Wall -Werror -g -O2
+	CFLAGS += -Wall  -g -O2
+	LFLAGS += -Wall  -g -O2
 else
 	CFLAGS += -g -D_DEBUG
 	LFLAGS += -g

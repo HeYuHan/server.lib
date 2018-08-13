@@ -9,6 +9,14 @@
 #define USING_NS_CORE using namespace Core;
 #define NS_CORE Core
 
+#define OFFSET(x) (1<<x)
+
+#define GET_SET(__TYPE__,__NAME__) \
+private:\
+	__TYPE__ m_##__NAME__;\
+public:\
+	__TYPE__ Get##__NAME__(){return m_##__NAME__;}\
+	void Set##__NAME__(__TYPE__ value){m_##__NAME__=value;}
 //lib
 #if _WIN32
 //pthread
@@ -19,13 +27,15 @@
 #pragma comment(lib,"./../3rd/libevent/libevent_core.lib")
 #pragma comment(lib,"./../3rd/libevent/libevent_extras.lib")
 #endif
+struct event_base;
 BEGIN_NS_CORE
-typedef long account_id;
-typedef long player_id;
+typedef event_base Event;
+typedef unsigned long long account_id;
+typedef unsigned long long player_id;
 typedef unsigned char byte;
 typedef byte uint8;
-typedef long int64;
-typedef unsigned long uint64;
+typedef long long int64;
+typedef unsigned long long uint64;
 
 typedef unsigned int uint32;
 typedef int int32;
@@ -34,8 +44,6 @@ typedef short int16;
 typedef unsigned long int ulong;
 typedef unsigned short int ushort;
 typedef unsigned int uint;
-typedef long long llong;
-typedef unsigned long long ullong;
 END_NS_CORE
 #if defined(MACOS)
 

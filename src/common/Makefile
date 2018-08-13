@@ -1,25 +1,29 @@
 CC = g++
+C = gcc
 AR = ar
 
 EVENT_SOURCE_DIR = ../../3rd/libevent
 LOG4CPP_SOURCE_DIR = ../../3rd/log4cpp
 RAKNET_SOURCE_DIR = ../../3rd/RakNet
+TO_LUA_SOURCE_DIR = ../../3rd/tolua++
 
 #LFLAGS = -m64 -pie -fPIC
 
 CFLAGS = -c -fPIC
 CFLAGS += -I.
 CFLAGS += -I./$(RAKNET_SOURCE_DIR)/Source
-CFLAGS += -I./$(SPIDERMONKEY_HEAD_DIR)
-CFLAGS += -I/usr/local
-CFLAGS += -std=c++11
+CFLAGS += -I/usr/local/include
+
+
+
+CPPFLAGS = -std=c++11
 
 EVENT_LIB = /usr/local/lib/libevent.a 
 EVENT_LIB_CORE = /usr/local/lib/libevent_core.a 
 EVENT_LIB_EXT = /usr/local/lib/libevent_extra.a 
 EVENT_LIB_PTHREAD = /usr/local/lib/libevent_pthreads.a
 LOG_LIB = /usr/local/lib/liblog4cpp.a
-RAKNET_LIB = ../../3rd/RakNet/Lib/libraknet.a
+RAKNET_LIB = ../../3rd/RakNet/lib/libraknet.a
 
 
 
@@ -27,15 +31,18 @@ EVENT_LIB_PREFIX = --prefix=/usr/local
 LOG_LIB_PREFIX = --prefix=/usr/local
 
 TARGET = ../lib/libcommon.a
-SOURCES = $(wildcard *.cpp) $(wildcard json/*.cpp)
-OBJS    = $(patsubst %.cpp,objs/%.o,$(SOURCES))
+SOURCES = $(wildcard *.cpp) $(wildcard json/*.cpp) $(wildcard ScriptBind/*.cpp) $(wildcard ScriptBind/Lua/*.cpp)
+OBJS += $(patsubst %.cpp,objs/%.o,$(SOURCES)) 
+
+LUA_SOURCES = $(wildcard lua/*.c)
+LUA = $(patsubst %.c,objs/%.o,$(LUA_SOURCES))
 
 PF = LINUX
 DEPS_LIB = $(LOG_LIB) $(EVENT_LIB) $(RAKNET_LIB)
 
 ifneq ($(shell uname), Linux) 
 	PF = MACOS
-	EVENT_LIB_PREFIX += CPPFLAGS="-I/usr/local/Cellar/openssl/1.0.2h_1/include" LDFLAGS="-I/usr/local/Cellar/openssl/1.0.2h_1/lib"
+	EVENT_LIB_PREFIX += CFLAGS="-I/usr/local/Cellar/openssl/1.0.2h_1/include" LDFLAGS="-I/usr/local/Cellar/openssl/1.0.2h_1/lib"
 endif
 
 CFLAGS += -D$(PF)
@@ -73,11 +80,14 @@ $(RAKNET_LIB) : $(RAKNET_SOURCE_DIR)/Makefile
 	$(MAKE) -C $(RAKNET_SOURCE_DIR)
 
 
+objs/lua/%.o: lua/%.c
+	$(C) $(CFLAGS) -o $@ $<
+
 objs/%.o: %.cpp
-	$(CC) $(CFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) $(CPPFLAGS)  -o $@ $<
 
 clean :
-	rm -f $(TARGET) objs/*.o objs/json/*.o *.o
+	rm -f $(TARGET) objs/*.o objs/json/*.o *.o objs/lua/*.o objs/ScriptBind/*.o objs/ScriptBind/Lua/*.o
 	
 
 deps: $(DEPS_LIB)
@@ -92,7 +102,8 @@ clean_deps:
 
 
 
-$(TARGET) : $(TEMP) $(OBJS)
+$(TARGET) : $(TEMP) $(OBJS) $(LUA)
+	
 	$(AR) -x $(RAKNET_LIB)
 	$(AR) -x $(EVENT_LIB)
 	$(AR) -x $(EVENT_LIB_CORE)
@@ -100,6 +111,6 @@ $(TARGET) : $(TEMP) $(OBJS)
 	$(AR) -x $(EVENT_LIB_PTHREAD)
 	$(AR) -x $(LOG_LIB)
 
-	$(AR) $(LFLAGS) rcs $@ $(OBJS) *.o 
+	$(AR) $(LFLAGS) rcs $@ $(OBJS) $(LUA) *.o
 	rm -f *.o
 	

@@ -33,6 +33,12 @@
     <ClCompile Include="..\src\proxyserver\channelserver.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\proxyserver\room.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\proxyserver\chatserver.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\proxyserver\rpcconnection.h">
@@ -47,10 +53,13 @@
     <ClInclude Include="..\src\proxyserver\client.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\proxyserver\message_type.h">
+    <ClInclude Include="..\src\proxyserver\channelserver.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\proxyserver\channelserver.h">
+    <ClInclude Include="..\src\proxyserver\room.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\proxyserver\chatserver.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

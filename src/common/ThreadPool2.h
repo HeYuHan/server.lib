@@ -20,6 +20,7 @@ namespace Core
 		ThreadNoncopyable(const ThreadNoncopyable & rhs);
 		ThreadNoncopyable & operator=(const ThreadNoncopyable &rhs);
 	};
+	
 
 	class Thread :private ThreadNoncopyable
 	{
@@ -28,6 +29,7 @@ namespace Core
 		~Thread();
 		void Start();
 		void Join();
+		void Deatch();
 		void Run();
 	private:
 		static void* RunInThread(void *arg);
@@ -46,6 +48,17 @@ namespace Core
 		pthread_mutex_t * GetPtr();
 	private:
 		pthread_mutex_t mutex;
+	};
+	class ThreadObject
+	{
+	public:
+		ThreadObject();
+	private:
+		MutexLock m_Lock;
+		bool m_Locked;
+	public:
+		void Lock();
+		void UnLock();
 	};
 	class EasyMutexLock
 	{

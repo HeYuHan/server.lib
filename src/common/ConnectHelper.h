@@ -6,11 +6,13 @@
 #ifdef WIN32
 #include <winsock2.h>
 #else
+#include <netinet/in.h>
 #include <sys/socket.h>
 #endif // WIN32
 #include <vector>
 
 BEGIN_NS_CORE
+class ConnectHelper;
 class ConnectResult
 {
 	friend class ConnectTask;

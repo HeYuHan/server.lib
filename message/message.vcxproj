@@ -18,6 +18,26 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\proto\out\AllMessagePackages.pb.cc" />
+    <ClCompile Include="..\src\proto\out\ChannelMessageProtocol.pb.cc" />
+    <ClCompile Include="..\src\proto\out\ClientData.pb.cc" />
+    <ClCompile Include="..\src\proto\out\CommonTypes.pb.cc" />
+    <ClCompile Include="..\src\proto\out\InnerMessageProtocol.pb.cc" />
+    <ClCompile Include="..\src\proto\out\ProxyMessageProtocol.pb.cc" />
+    <ClCompile Include="..\src\proto\out\RoomInfo.pb.cc" />
+    <ClCompile Include="..\src\proto\out\RpcProtocol.pb.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\proto\out\AllMessagePackages.pb.h" />
+    <ClInclude Include="..\src\proto\out\ChannelMessageProtocol.pb.h" />
+    <ClInclude Include="..\src\proto\out\ClientData.pb.h" />
+    <ClInclude Include="..\src\proto\out\CommonTypes.pb.h" />
+    <ClInclude Include="..\src\proto\out\InnerMessageProtocol.pb.h" />
+    <ClInclude Include="..\src\proto\out\ProxyMessageProtocol.pb.h" />
+    <ClInclude Include="..\src\proto\out\RoomInfo.pb.h" />
+    <ClInclude Include="..\src\proto\out\RpcProtocol.pb.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E89C0657-8D20-4657-A81D-87DB353940FE}</ProjectGuid>
     <RootNamespace>message</RootNamespace>
@@ -117,17 +137,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\proto\out\ClientData.pb.cc" />
-    <ClCompile Include="..\src\proto\out\RpcProtocol.pb.cc" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\src\proto\out\ClientData.pb.h" />
-    <ClInclude Include="..\src\proto\out\RpcProtocol.pb.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\src\proto\out\RpcProtocol.cs" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

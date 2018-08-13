@@ -4,12 +4,12 @@
 #include "log.h"
 #include <string.h>
 #include "common.h"
-#ifdef LINUX
+#ifndef WIN32
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/signal.h>
 #endif // LINUX
-#include <DR_SHA1.h>
+#include "DR_SHA1.h"
 #include "ThreadPool2.h"
 USING_NS_CORE
 static bool m_RandomFirst = true;
@@ -102,7 +102,7 @@ bool ParseSockAddr(sockaddr_in & addr, const char * str, bool by_name)
 }
 void CaculateSha1(const char * text, char * out)
 {
-	CSHA1 sha1;
+	NS_CORE::CSHA1 sha1;
 	sha1.Update((unsigned char*)text, strlen(text));
 	sha1.Final();
 	sha1.GetHash((unsigned char*)out);
@@ -131,7 +131,11 @@ unsigned int PthreadSelf()
 {
 #ifdef WIN32
 	return::GetCurrentThreadId();
-#else
-	return pthread_self();
+#endif
+#ifdef LINUX
+	 return pthread_self();
+#endif
+#ifdef MACOS
+	return (unsigned long long) pthread_self();
 #endif
 }

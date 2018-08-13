@@ -1,18 +1,26 @@
+#c++11
+#wget http://people.centos.org/tru/devtools-2/devtools-2.repo -O /etc/yum.repos.d/devtools-2.repo
+#yum install devtoolset-2-gcc devtoolset-2-binutils devtoolset-2-gcc-c++
+#ln -s /opt/rh/devtoolset-2/root/usr/bin/* /usr/local/bin/
+#hash -r
+#gcc --version
 debug:
 	$(MAKE) -C common
+	$(MAKE) -C proto
 	$(MAKE) -C channelserver
-	$(MAKE) -C loginserver
+	$(MAKE) -C proxyserver
 
 release:
 	$(MAKE) RELEASE=1 -C common
 	$(MAKE) RELEASE=1 -C channelserver
-	$(MAKE) RELEASE=1 -C loginserver
+	$(MAKE) RELEASE=1 -C proxyserver
 
 clean:
 	$(MAKE) clean -C common
+	$(MAKE) clean -C proto
 	$(MAKE) clean -C channelserver
-	$(MAKE) clean -C loginserver
-	rm -rf ntcp.server*
+	$(MAKE) clean -C proxyserver
+	rm -rf srs.server*
 
 deps:
 	$(MAKE) deps -C common
@@ -21,18 +29,15 @@ clean_deps:
 	$(MAKE) clean_deps -C common
 
 package:
-	rm -rf ntcp.server*
-	mkdir -p ntcp.server.build/v8
-	mkdir -p ntcp.server.build/js
-	mkdir -p ntcp.server.build/log
-	cp bin/channelserver ntcp.server.build/
-	cp script/js/* ntcp.server.build/js/
-	cp bin/v8/*.bin ntcp.server.build/
-	cp bin/ntcp_service ntcp.server.build/
-	cp bin/keep_process ntcp.server.build/
-	cp ../3rd/v86.4.99/lib/relsease/* ntcp.server.build/v8
-	echo -e "export LD_LIBRARY_PATH=./v8:$LD_LIBRARY_PATH\nchannelserver channelserver 0.0.0.0:9500 ./js/main.js" > ntcp.server.build/ntcp_config
-	chmod -R 777 ntcp.server.build/
-	tar -zcvf ntcp.server.build.$(shell date +%Y%m%d%H%M%S).tar.gz ntcp.server.build
-	rm -rf ntcp.server.build
+	rm -rf srs.server*
+	mkdir -p srs.server.build/script
+	mkdir -p srs.server.build/log
+	cp bin/channelserver srs.server.build/
+	cp bin/proxyserver srs.server.build/
+	cp -r script/* srs.server.build/script/
+	cp bin/srs_* srs.server.build/
+	cp bin/keep_process srs.server.build/
+	chmod -R 777 srs.server.build/
+	tar -zcvf srs.server.build.$(shell date +%Y%m%d%H%M%S).tar.gz srs.server.build
+	rm -rf srs.server.build
 

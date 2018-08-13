@@ -1,9 +1,9 @@
 #include "LuaEngine.h"
 #include <vector>
-#include <tolua++.h>
 #include "log.h"
-
+#include <ScriptBind/Lua/LuaBind.h>
 using namespace std;
+BEGIN_NS_CORE
 vector<register_lua_model> all_model;
 LuaEngine *LuaEngine::m_Instance = NULL;
 
@@ -19,10 +19,10 @@ void LuaEngine::RegisterModel(register_lua_model model)
 
 void LuaEngine::Start(const char* mainLua)
 {
-	L = lua_open();
+	L = OpenLua();
 	luaL_openlibs(L);
 	
-	for (int i=0;i<all_model.size();i++)
+	for (size_t i=0;i<all_model.size();i++)
 	{
 		all_model[i](L);
 	}
@@ -41,12 +41,11 @@ bool LuaEngine::DoFile(const char* file_path)
 }
 bool LuaEngine::CreateScriptHandle(LuaInterface *lua)
 {
-	if (lua->m_LuaRef > 0)
+	if (lua->m_Table.IsValid())
 	{
-		log_error("handle is create %d", lua->m_LuaRef);
+		log_error("handle is create %d", lua->m_Table.lua_ref_);
 		return false;
 	}
-	lua->m_LuaRef = 0;
 	int top = lua_gettop(L);
 	char script[256] = { 0 };
 	const char* extendName = lua->GetScriptTypeName();
@@ -59,7 +58,6 @@ bool LuaEngine::CreateScriptHandle(LuaInterface *lua)
 	{
 		sprintf(script, "require('%s')\r\nreturn _G.%s%s", require, extendName?extendName: lua->GetNativeTypeName(), extendName ? "" : "Ext");
 	}
-	std::string s(script);
 	if (luaL_dostring(L, script))
 	{
 		log_error("%s", lua_tostring(L, -1));
@@ -73,61 +71,65 @@ bool LuaEngine::CreateScriptHandle(LuaInterface *lua)
 		Pop(top);
 		return false;
 	}
+
 	lua_newtable(L);
 	lua_newtable(L);
 	lua_pushstring(L, "__index");
 	lua_pushvalue(L, -4);
 	lua_settable(L, -3);
-
-	/*lua_pushvalue(L, -3);
-	lua_setfield(L, -1, "__index");*/
+	
 	lua_setmetatable(L, -2);
 
-
-
-	lua_pushstring(L, "native");
-	tolua_pushusertype(L, (void*)lua, lua->GetNativeTypeName());
-	lua_pushstring(L, "handle");
-	lua_pushvalue(L, -3);
-	lua_settable(L, -3);
-	lua_settable(L, -3);
-
-	if (!lua_istable(L, -1))
-
+	lua->m_Table = LuaTable(L,-1);
+	
+	if (lua->m_Table.IsValid())
+	{
+		lua->L = L;
+		lua->m_EnterFunction = lua->m_Table.Get<LuaFunction>("OnEnter");
+		if (!lua->m_EnterFunction.IsValid())
+		{
+			log_error("not found enter function %p", lua);
+			Pop(top);
+			return false;
+		}
+	}
+	else
 	{
 		log_error("%s not in top", lua->GetNativeTypeName());
 		Pop(top);
 		return false;
 	}
-	int ref = luaL_ref(L, LUA_REGISTRYINDEX);
 	Pop(top);
-	lua->m_LuaRef = ref;
-	lua->L = L;
-	lua->EnterScript();
 	
 	return true;
 }
 
 void LuaEngine::DestoryScriptHandle(LuaInterface * lua)
 {
-	if (lua->m_LuaRef > 0)
+	if (lua->m_Table.IsValid())
 	{
-		luaL_unref(L, LUA_REGISTRYINDEX,lua->m_LuaRef);
-		lua->m_LuaRef = 0;
+		lua->m_Table.Release();
 	}
 }
 
 void LuaEngine::LuaSearchPath(char * name, char * value)
 {
 	std::string v;
+	int top = lua_gettop(L);
 	lua_getglobal(L, "package");
 	lua_getfield(L, -1, name);
+	if (lua_isnil(L, -1))
+	{
+		log_error("cant get search path:%s", name);
+		goto exit;
+	}
 	v.append(lua_tostring(L, -1));
 	v.append(";");
 	v.append(value);
 	lua_pushstring(L, v.c_str());
 	lua_setfield(L, -3, name);
-	lua_pop(L, 2);
+	exit:
+	Pop(top);
 }
 
 LuaEngine * LuaEngine::GetInstance()
@@ -143,11 +145,11 @@ void LuaEngine::Pop(int old_top,const char* msg)
 	if (ret == 0)return;
 	lua_settop(L,old_top);
 #if _DEBUG
-	log_info("%s pop value count:%d", msg, ret);
+	log_info("%s pop value count:%d", msg?msg:"lua", ret);
 #endif
 }
 
-LuaInterface::LuaInterface():m_LuaRef(0),L(NULL)
+LuaInterface::LuaInterface():L(NULL)
 {
 }
 
@@ -155,35 +157,4 @@ LuaInterface::~LuaInterface()
 {
 	L = NULL;
 }
-
-bool LuaInterface::EnterScript()
-{
-	if (m_LuaRef == 0||NULL == L)return false;
-	int top = lua_gettop(L);
-	bool ok = true;
-	lua_rawgeti(L, LUA_REGISTRYINDEX, m_LuaRef);
-	ok = lua_istable(L, -1);
-	if (!ok)
-	{
-		log_error("%s", "Native Script Ref Is Not Table");
-		goto ret;
-	}
-	lua_getfield(L, -1, "OnEnter");
-	ok = lua_isfunction(L, -1);
-	if (!ok)
-	{
-		log_error("%s", "Script Eneter Function Not Found");
-		goto ret;
-	}
-	lua_pushvalue(L,-2);
-	int ret = lua_pcall(L, 1, 0, 0);
-	if (ret)
-	{
-		log_error("%s", lua_tostring(L, -1));
-		ret = false;
-	}
-ret:
-	LuaEngine::GetInstance()->Pop(top);
-	//lua_pop(L, 1);
-	return ok;
-}
+END_NS_CORE

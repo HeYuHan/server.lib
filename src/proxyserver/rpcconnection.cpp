@@ -3,7 +3,7 @@
 #include <tools.h>
 #include <ThreadEventPool.h>
 #include "rpcrequest.h"
-#include <google/protobuf/message.h>
+#include <ClientData.pb.h>
 #include "ClientData.pb.h"
 #include "server.h"
 RPCRequestSig RPC_ALL_REQUEST_INFO[RPC_SIG_COUNT] = { 0 };
@@ -35,11 +35,13 @@ void RPCClient::OnDisconnect()
 {
 	if (m_CurrentRequest)
 	{
-		if (!m_CurrentRequest->m_Processed)
+		m_CurrentRequest->m_Send = false;
+		if (m_RPC)
 		{
-			this->m_RPC->AddRequest(m_CurrentRequest);
-			m_CurrentRequest = NULL;
+			m_RPC->AddRequest(m_CurrentRequest);
 		}
+		/*delete m_CurrentRequest;*/
+		m_CurrentRequest = NULL;
 	}
 	if(m_RPC && connection)this->m_RPC->AddLostAddr(connection->GetSocket());
 	m_RPC->m_CachedClient.Free(uid);
@@ -48,6 +50,7 @@ void RPCClient::OnDisconnect()
 void RPCClient::OnConnected()
 {
 	NetworkStream::Reset();
+	m_ReuqestIndex = 0;
 	//Proto::Protocol::Header header;
 	//Proto::Message::PlayerCreateRequest request;
 	//request.set_userid(8);
@@ -78,18 +81,58 @@ bool RPCClient::IsConnect()
 void RPCClient::OnWrite()
 {
 	//EasyMutexLock l(m_Lock);
-	if (m_CurrentRequest)return;
+	if (m_CurrentRequest)
+	{
+		timeval current;
+		evutil_gettimeofday(&current, NULL);
+		float timeout = DiffTime(current, m_CurrentRequest->m_RequestTimeBegin);
+		//log_info("rpc request %s time out %f", m_CurrentRequest->m_RequestHeader.methodname().c_str(), timeout);
+		if (timeout > 20)
+		{
+			log_error("rpc reqeust is time out %s", m_CurrentRequest->m_RequestHeader.methodname().c_str());
+			m_CurrentRequest->m_Processed = true;
+			if (m_CurrentRequest->m_IsProxy)
+			{
+				m_CurrentRequest->m_ResponseProxy = NULL;
+				m_CurrentRequest->m_ResponseProxyLength = 0;
+				m_CurrentRequest->m_ResponseHeader.set_code(Proto::Message::ResponseCode::TIMEOUT);
+				if (RPC_ALL_REQUEST_INFO[m_CurrentRequest->m_SIG].m_CallBack)
+				{
+					RPC_ALL_REQUEST_INFO[m_CurrentRequest->m_SIG].m_CallBack(m_CurrentRequest);
+				}
+			}
+			else
+			{
+				m_CurrentRequest->m_ResponseHeader.set_code(Proto::Message::ResponseCode::TIMEOUT);
+				if (RPC_ALL_REQUEST_INFO[m_CurrentRequest->m_SIG].m_CallBack)
+				{
+					RPC_ALL_REQUEST_INFO[m_CurrentRequest->m_SIG].m_CallBack(m_CurrentRequest);
+				}
+			}
+			delete m_CurrentRequest;
+			m_CurrentRequest = NULL;
+		}
+		else
+		{
+			return;
+		}
+		
+	}
 	
 	if (!m_CurrentRequest)
 	{
 		m_CurrentRequest = m_RPC->GetRequest();
+		if (!m_CurrentRequest)
+		{
+			m_ReuqestIndex = 0;
+		}
 	}
+
 	if (m_CurrentRequest && !m_CurrentRequest->m_Send)
 	{
-		
+		m_CurrentRequest->m_RequestIndex = m_ReuqestIndex++;
+		evutil_gettimeofday(&m_CurrentRequest->m_RequestTimeBegin, NULL);
 		BeginWrite();
-		//WriteUShort(m_CurrentRequest->m_SIG);
-		//WriteString(RPC_ALL_REQUEST_INFO[m_CurrentRequest->m_SIG].m_MethodName);
 		if (m_CurrentRequest)
 		{
 			
@@ -134,14 +177,26 @@ void RPCClient::OnWrite()
 		}
 		EndWrite();
 		m_CurrentRequest->m_Send = true;
-		log_info("rpc client wait response %s", m_CurrentRequest->m_RequestHeader.methodname().c_str());
+		
+		log_info("rpc client %d wait response %s index %d", uid,m_CurrentRequest->m_RequestHeader.methodname().c_str(),m_CurrentRequest->m_RequestIndex);
 	}
 	
 }
 
+Core::Event * RPCClient::GetEvent()
+{
+	return m_RPC->m_Event;
+}
+
 void RPCClient::OnMessage()
 {
-	//EasyMutexLock l(m_Lock);
+	
+	if (!m_CurrentRequest || m_CurrentRequest->m_RequestIndex != (m_ReuqestIndex - 1))
+	{
+		log_error("%s","request is null or request index is error(maybe time out,request removed)");
+		OnWrite();
+		return;
+	}
 	int head_len = 0;
 	ReadInt(head_len);
 	int un_read_len = read_end - read_position;
@@ -154,10 +209,14 @@ void RPCClient::OnMessage()
 		bool parse_head = m_CurrentRequest->m_ResponseHeader.ParseFromArray(read_position, head_len);
 		if (!parse_head || m_CurrentRequest->m_ResponseHeader.rpcid()!=m_CurrentRequest->m_RequestHeader.rpcid())
 		{
-			log_error("response heard cant match requset:%s res:%s", m_CurrentRequest->m_RequestHeader.methodname(), m_CurrentRequest->m_ResponseHeader.methodname());
+			log_error("response heard cant match requset:%s res:%s", m_CurrentRequest->m_RequestHeader.methodname().c_str(), m_CurrentRequest->m_ResponseHeader.methodname().c_str());
 		}
 		else 
 		{
+			timeval current;
+			gettimeofday(&current, NULL);
+			float timeout = DiffTime(current, m_CurrentRequest->m_RequestTimeBegin);
+			log_info("rpc response %d method name %s time %f code %d", uid,m_CurrentRequest->m_ResponseHeader.methodname().c_str(), timeout,m_CurrentRequest->m_ResponseHeader.code());
 			if (m_CurrentRequest->m_IsProxy)
 			{
 				m_CurrentRequest->m_ResponseProxy = read_position + head_len;
@@ -169,17 +228,17 @@ void RPCClient::OnMessage()
 			}
 			else if (m_CurrentRequest->m_Response)
 			{
-				bool parse_content = m_CurrentRequest->m_Response->ParseFromArray(read_position + head_len, un_read_len - head_len);
-				if (!parse_content)
+				if (m_CurrentRequest->m_ResponseHeader.code() == 0)
 				{
-					log_error("cant parse resopnse message content %s", m_CurrentRequest->m_RequestHeader.methodname());
-				}
-				else
-				{
-					if (RPC_ALL_REQUEST_INFO[m_CurrentRequest->m_SIG].m_CallBack)
+					bool parse_content = m_CurrentRequest->m_Response->ParseFromArray(read_position + head_len, un_read_len - head_len);
+					if (!parse_content)
 					{
-						RPC_ALL_REQUEST_INFO[m_CurrentRequest->m_SIG].m_CallBack(m_CurrentRequest);
+						log_error("cant parse rpc resopnse message %s", m_CurrentRequest->m_RequestHeader.methodname().c_str());
 					}
+				}
+				if (RPC_ALL_REQUEST_INFO[m_CurrentRequest->m_SIG].m_CallBack)
+				{
+					RPC_ALL_REQUEST_INFO[m_CurrentRequest->m_SIG].m_CallBack(m_CurrentRequest);
 				}
 			}
 
@@ -292,8 +351,9 @@ bool RPCConection::Connect(int addrc, char ** addrs)
 		}*/
 	}
 	m_ReconectLostAddrTime = 100;
-	m_UpdateTimer.Init(0.001f, UpdateRPCConnection, this, true);
-	m_UpdateTimer.Begin();
+	m_Event = gEventPool.Get();
+	m_UpdateTimer.Init(0.01f, UpdateRPCConnection, this, true);
+	m_UpdateTimer.Begin(m_Event);
 	return true;
 }
 
@@ -410,8 +470,18 @@ RPCRequestPack<google::protobuf::Message, google::protobuf::Message> * RPCConect
 
 void RPCConection::AddRequest(RPCRequestPack<google::protobuf::Message, google::protobuf::Message> * info)
 {
-	EasyMutexLock l(m_Lock);
+	m_Lock.Lock();
 	info->m_Processed = false;
 	info->m_Send = false;
 	m_RequestQueue.push(info);
+	m_Lock.Unlock();
+	RPCClient* client = m_CachedClient.Begin();
+	for (int i = 0; i < m_CachedClient.Size(); i++)
+	{
+		RPCClient* temp = client + i;
+		if (temp->IsConnect())
+		{
+			temp->OnWrite();
+		}
+	}
 }

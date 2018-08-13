@@ -73,7 +73,7 @@
     <OutDir>$(SolutionDir)exe</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)3rd\curl-7.60.0\include;$(SolutionDir)3rd\log4cpp\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)3rd\pthread\include;$(SolutionDir)3rd\libevent\WIN32-Code\nmake;$(SolutionDir)3rd\libevent\include;$(SolutionDir)3rd\RakNet\Source;$(SolutionDir)src\proto\out;$(SolutionDir)src\common;$(SolutionDir)3rd\protobuf-3.0.0\cmake\build\solution\include</IncludePath>
+    <IncludePath>$(SolutionDir)3rd\curl-7.60.0\include;$(SolutionDir)3rd\log4cpp\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)3rd\pthread\include;$(SolutionDir)3rd\libevent\WIN32-Code\nmake;$(SolutionDir)3rd\libevent\include;$(SolutionDir)3rd\RakNet\Source;$(SolutionDir)src\proto\out;$(SolutionDir)src\common\linux;$(SolutionDir)src\common;$(SolutionDir)3rd\protobuf-3.0.0\cmake\build\solution\include</IncludePath>
     <OutDir>$(SolutionDir)exe</OutDir>
     <IntDir>$(SolutionDir)Temp\$(ProjectName)</IntDir>
     <TargetName>proxyserver</TargetName>
@@ -128,16 +128,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\proxyserver\channelserver.cpp" />
+    <ClCompile Include="..\src\proxyserver\chatserver.cpp" />
     <ClCompile Include="..\src\proxyserver\client.cpp" />
     <ClCompile Include="..\src\proxyserver\main.cpp" />
+    <ClCompile Include="..\src\proxyserver\room.cpp" />
     <ClCompile Include="..\src\proxyserver\rpcconnection.cpp" />
     <ClCompile Include="..\src\proxyserver\rpcrequest.cpp" />
     <ClCompile Include="..\src\proxyserver\server.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\proxyserver\channelserver.h" />
+    <ClInclude Include="..\src\proxyserver\chatserver.h" />
     <ClInclude Include="..\src\proxyserver\client.h" />
-    <ClInclude Include="..\src\proxyserver\message_type.h" />
+    <ClInclude Include="..\src\proxyserver\room.h" />
     <ClInclude Include="..\src\proxyserver\rpcconnection.h" />
     <ClInclude Include="..\src\proxyserver\rpcrequest.h" />
     <ClInclude Include="..\src\proxyserver\server.h" />

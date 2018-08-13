@@ -63,7 +63,7 @@ void MainThreadMessageQueue::Init()
 	if (m_Init)return;
 	m_Init = true;
 	memset(m_MessageList, 0, sizeof(m_MessageList));
-	m_Timer.Init(0.01f, UpdateQueue, NULL, true);
+	m_Timer.Init(0.00001f, UpdateQueue, NULL, true);
 	m_Timer.Begin();
 	m_QueueCount = 0;
 	m_ListFull.Init(&m_Lock);

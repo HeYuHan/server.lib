@@ -107,6 +107,21 @@ bool TcpConnection::Connect(const char * addr, event_base * base)
 	return false;
 }
 
+bool TcpConnection::Reconnect(event_base * base)
+{
+	m_Socket = socket(AF_INET, SOCK_STREAM, 0);
+	if (0 == connect(m_Socket, (sockaddr*)&m_Addr, sizeof(m_Addr)))
+	{
+		m_BufferEvent = bufferevent_socket_new(base, m_Socket, BEV_OPT_CLOSE_ON_FREE);
+		bufferevent_setcb(m_BufferEvent, ReadEvent, WriteEvent, SocketEvent, this);
+		bufferevent_enable(m_BufferEvent, EV_READ | EV_WRITE | EV_PERSIST);
+		OnConnected();
+		return true;
+	}
+	evutil_closesocket(m_Socket);
+	return false;
+}
+
 void TcpConnection::Disconnect()
 {
 	bufferevent_flush(m_BufferEvent, EV_WRITE, BEV_NORMAL);
@@ -198,7 +213,7 @@ void TcpConnection::SocketEvent(bufferevent * bev, short events, void * arg)
 	else if (events & BEV_EVENT_ERROR) {
 		//printf("some other error\n");
 	}
-	int fd = bufferevent_getfd(bev);
+	//int fd = bufferevent_getfd(bev);
 	TcpConnection* c = (TcpConnection*)arg;
 	c->Disconnect();
 }

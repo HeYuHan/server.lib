@@ -69,8 +69,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)3rd\lua-5.1.5\src;$(SolutionDir)3rd\tolua++\include;$(SolutionDir)3rd\tolua++\bind;$(SolutionDir)3rd\log4cpp\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)3rd\pthread\include;$(SolutionDir)3rd\libevent\WIN32-Code\nmake;$(SolutionDir)3rd\libevent\include;$(SolutionDir)3rd\RakNet\Source;$(SolutionDir)src\common</IncludePath>
-    <LibraryPath>$(SolutionDir)3rd\lua-5.1.5\src;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
+    <IncludePath>$(SolutionDir)3rd\log4cpp\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)3rd\pthread\include;$(SolutionDir)3rd\libevent\WIN32-Code\nmake;$(SolutionDir)3rd\libevent\include;$(SolutionDir)3rd\RakNet\Source;$(SolutionDir)src\common</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
     <OutDir>$(SolutionDir)exe\</OutDir>
     <IntDir>$(SolutionDir)Temp\$(ProjectName)</IntDir>
   </PropertyGroup>
@@ -89,7 +89,7 @@
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>lua51.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -119,18 +119,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="lua_mytestclass.cpp" />
     <ClCompile Include="Student.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="lua_mytestclass.hpp" />
     <ClInclude Include="Student.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\3rd\tolua++\win32\vc7\toluapp.vcxproj">
-      <Project>{71891c1a-e328-4258-ac3f-6f9698c6d8b4}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\Common\Common.vcxproj">
       <Project>{a699974b-76d3-4586-b306-6fedaac4734c}</Project>
     </ProjectReference>

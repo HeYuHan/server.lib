@@ -3,6 +3,7 @@
 #define __HTTP_CLIENT_H__
 #include "common.h"
 #include <curl/curl.h>
+#include <string>
 BEGIN_NS_CORE
 class HttpClient
 {

@@ -1,10 +1,13 @@
 print('student lua enter')
-StudentExt = {var1 = 0}
+StudentExt = {var1 = 1}
 StudentExt.__index = StudentExt
 
 function StudentExt:OnEnter(native)
-    self.native:Run()
-    self.native:Run(111)
+    --native:Run()
+    native:Run(111)
     print('Student:OnEnter=>' .. self.var1)
+    native:PrintArg()
    
 end
+local s = Student:new()
+s:Run(12345)

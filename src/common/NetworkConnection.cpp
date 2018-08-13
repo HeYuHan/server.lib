@@ -3,10 +3,10 @@
 #include "log.h"
 #include "WebSocket.h"
 #include "tools.h"
+#include <google/protobuf/message.h>
 BEGIN_NS_CORE
 #define FLOAT_RATE 100.0f
-NetworkStream::NetworkStream(int send_buff_size, int read_buff_size):web_frame(NULL),
-connection(NULL)
+NetworkStream::NetworkStream(int send_buff_size, int read_buff_size):connection(NULL),web_frame(NULL)
 {
 	read_buff = new char[read_buff_size];
 	write_buff = new char[send_buff_size];
@@ -215,6 +215,7 @@ void NetworkStream::WriteData(const void* data, int count)
 {
 	if (write_buff == NULL || count < 0 || write_end + count > write_buff_end)
 	{
+		log_error("cant write data %p", this);
 		throw WRITEERROR;
 	}
 	if (count > 0)
@@ -241,22 +242,50 @@ void NetworkStream::WriteShortQuaternion(Quaternion & rot)
 	WriteShort(z);
 	WriteShort(w);
 }
+void NetworkStream::WriteProtoBufferAutoSize(google::protobuf::Message * message)
+{
+	int size = message->ByteSize();
+	WriteInt(size);
+	int empty_size = write_buff_end - write_end;
+	if (empty_size < size)
+	{
+		log_error("buffer size too small msg size:%d", size);
+		throw NETERR::WRITEERROR;
+	}
+	else
+	{
+		message->SerializeToArray(write_end, empty_size);
+		write_end += size;
+	}
+}
 void NetworkStream::BeginWrite()
 {
 	Lock(WRITE);
 	write_position = write_buff;
 	write_end = write_buff;
-	if (connection->m_Type == UDP_SOCKET)
+	if (connection)
 	{
-		write_end = write_buff + 5;
+		if (connection->m_Type == UDP_SOCKET)
+		{
+			write_end = write_buff + 5;
+		}
+		else if (connection->m_Type == TCP_SOCKET)
+		{
+			write_end = write_buff + 4;
+		}
 	}
-	else if(connection->m_Type == TCP_SOCKET)
+	else
 	{
-		write_end = write_buff + 4;
+		log_error("beginwrite connection is null %p", this);
 	}
 }
 void NetworkStream::EndWrite()
 {
+	if (!connection)
+	{
+		log_error("endwrite connection is null %p", this);
+		return;
+	}
 	int head_len = connection->m_Type == UDP_SOCKET ? 5 : 4;
 	int data_len = write_end - write_position - head_len;
 	if (connection->m_Type == UDP_SOCKET)
@@ -337,14 +366,16 @@ void NetworkStream::ReadFloat(float &data)
 	ReadInt(ret);
 	data = ret / FLOAT_RATE;
 }
-void NetworkStream::ReadLong(long &data)
+
+void NetworkStream::ReadLong(int64 &data)
 {
-	ReadData(&data, sizeof(long));
+	ReadData(&data, sizeof(uint64));
 }
-void NetworkStream::ReadULong(ulong &data)
+void NetworkStream::ReadULong(uint64 &data)
 {
-	ReadData(&data, sizeof(ulong));
+	ReadData(&data, sizeof(uint64));
 }
+
 int NetworkStream::ReadString(char* str, int size)
 {
 	int len = 0;
@@ -387,7 +418,36 @@ void NetworkStream::ReadShortQuaternion(Quaternion & rot)
 	ReadShort(w);
 	rot = Quaternion(x / 1000.0f, y / 1000.0f, z / 1000.0f, w / 1000.0f);
 }
+void NetworkStream::WriteProtoBuffer(google::protobuf::Message *message)
+{
+	int size = message->ByteSize();
+	//WriteInt(size);
+	int empty_size = write_buff_end - write_end;
+	if (empty_size < size)
+	{
+		log_error("buffer size too small msg size:%d", size);
+		throw NETERR::WRITEERROR;
+	}
+	else
+	{
+		message->SerializeToArray(write_end, empty_size);
+		write_end += size;
+	}
+}
 
+bool NetworkStream::ReadProtoBuffer(google::protobuf::Message * message,int size)
+{
+	bool ret = message->ParseFromArray(read_position, size);
+	read_position += size;
+	return ret;
+}
+
+bool NetworkStream::ReadProtoBufferAutoSize(google::protobuf::Message * message)
+{
+	int size = 0;
+	ReadInt(size);
+	return ReadProtoBuffer(message,size);
+}
 
 
 
