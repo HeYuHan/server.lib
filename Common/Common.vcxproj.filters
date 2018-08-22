@@ -16,14 +16,14 @@
     <Filter Include="json">
       <UniqueIdentifier>{954c7adb-bd1f-4713-946e-2193e44f27e7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ScriptBind">
-      <UniqueIdentifier>{64119413-0cdc-4206-a2db-c6c6b482588a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ScriptBind\Lua">
-      <UniqueIdentifier>{db1aefc8-f291-4814-b104-7d56f75e15a4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="lua">
       <UniqueIdentifier>{4237c5eb-8b25-437c-8609-dffa2721b261}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LuaBridge">
+      <UniqueIdentifier>{e878f618-8be0-4f13-8e8c-552b607424c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="http">
+      <UniqueIdentifier>{adc08d1c-b475-4c4e-a559-d9182aad9a15}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -96,13 +96,7 @@
     <ClInclude Include="..\src\common\Vector3.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\common\HttpConnection3.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\common\HttpListenner.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\common\HttpConnection4.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\common\base64.h">
@@ -137,30 +131,6 @@
     </ClInclude>
     <ClInclude Include="..\src\common\DR_SHA1.h">
       <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\common\ScriptBind\Lua\LuaBind.h">
-      <Filter>ScriptBind\Lua</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\common\ScriptBind\Lua\LuaFunction.h">
-      <Filter>ScriptBind\Lua</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\common\ScriptBind\Lua\LuaHelp.h">
-      <Filter>ScriptBind\Lua</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\common\ScriptBind\Lua\LuaObject.h">
-      <Filter>ScriptBind\Lua</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\common\ScriptBind\Lua\LuaStackGuard.h">
-      <Filter>ScriptBind\Lua</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\common\ScriptBind\Lua\LuaTable.h">
-      <Filter>ScriptBind\Lua</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\common\ScriptBind\ExportHelp.h">
-      <Filter>ScriptBind</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\common\ScriptBind\Script.h">
-      <Filter>ScriptBind</Filter>
     </ClInclude>
     <ClInclude Include="..\src\common\lua\lapi.h">
       <Filter>lua</Filter>
@@ -240,8 +210,20 @@
     <ClInclude Include="..\src\common\LuaEngine.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\common\ScriptBind\Lua\template.h">
-      <Filter>ScriptBind\Lua</Filter>
+    <ClInclude Include="..\src\common\httplib.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\common\LuaBridge\LuaBridge.h">
+      <Filter>LuaBridge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\common\LuaBridge\RefCountedObject.h">
+      <Filter>LuaBridge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\common\LuaBridge\RefCountedPtr.h">
+      <Filter>LuaBridge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\common\http\httplib.h">
+      <Filter>http</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -293,13 +275,7 @@
     <ClCompile Include="..\src\common\Vector3.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\common\HttpConnection3.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\common\HttpListenner.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\common\HttpConnection4.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\src\common\base64.cpp">
@@ -337,24 +313,6 @@
     </ClCompile>
     <ClCompile Include="..\src\common\DR_SHA1.cpp">
       <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\common\ScriptBind\Lua\LuaBind.cpp">
-      <Filter>ScriptBind\Lua</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\common\ScriptBind\Lua\LuaFunction.cpp">
-      <Filter>ScriptBind\Lua</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\common\ScriptBind\Lua\LuaHelp.cpp">
-      <Filter>ScriptBind\Lua</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\common\ScriptBind\Lua\LuaObject.cpp">
-      <Filter>ScriptBind\Lua</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\common\ScriptBind\Lua\LuaTable.cpp">
-      <Filter>ScriptBind\Lua</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\common\ScriptBind\Script.cpp">
-      <Filter>ScriptBind</Filter>
     </ClCompile>
     <ClCompile Include="..\src\common\lua\lapi.c">
       <Filter>lua</Filter>

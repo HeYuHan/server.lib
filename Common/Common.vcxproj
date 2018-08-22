@@ -84,7 +84,7 @@
     <TargetName>libcommon_d</TargetName>
     <OutDir>$(SolutionDir)lib\</OutDir>
     <IntDir>$(SolutionDir)Temp\$(ProjectName)</IntDir>
-    <IncludePath>$(SolutionDir)3rd\protobuf-3.0.0\cmake\build\solution\include;$(SolutionDir)3rd\curl-7.60.0\include;$(SolutionDir)3rd\log4cpp\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)3rd\pthread\include;$(SolutionDir)3rd\libevent\WIN32-Code\nmake;$(SolutionDir)3rd\libevent\include;$(SolutionDir)3rd\RakNet\Source;$(SolutionDir)src\common</IncludePath>
+    <IncludePath>$(SolutionDir)3rd\protobuf-3.0.0\cmake\build\release\include;$(SolutionDir)3rd\curl-7.60.0\include;$(SolutionDir)3rd\log4cpp\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)3rd\pthread\include;$(SolutionDir)3rd\libevent\WIN32-Code\nmake;$(SolutionDir)3rd\libevent\include;$(SolutionDir)3rd\RakNet\Source;$(SolutionDir)src\common</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -141,9 +141,12 @@
     <ClInclude Include="..\src\common\DR_SHA1.h" />
     <ClInclude Include="..\src\common\FileReader.h" />
     <ClInclude Include="..\src\common\HttpClient.h" />
-    <ClInclude Include="..\src\common\HttpConnection3.h" />
-    <ClInclude Include="..\src\common\HttpConnection4.h" />
+    <ClInclude Include="..\src\common\httplib.h" />
     <ClInclude Include="..\src\common\HttpListenner.h" />
+    <ClInclude Include="..\src\common\http\httplib.h" />
+    <ClInclude Include="..\src\common\LuaBridge\LuaBridge.h" />
+    <ClInclude Include="..\src\common\LuaBridge\RefCountedObject.h" />
+    <ClInclude Include="..\src\common\LuaBridge\RefCountedPtr.h" />
     <ClInclude Include="..\src\common\LuaEngine.h" />
     <ClInclude Include="..\src\common\json\autolink.h" />
     <ClInclude Include="..\src\common\json\config.h" />
@@ -184,15 +187,6 @@
     <ClInclude Include="..\src\common\MessageQueue.h" />
     <ClInclude Include="..\src\common\NetworkConnection.h" />
     <ClInclude Include="..\src\common\objectpool.h" />
-    <ClInclude Include="..\src\common\ScriptBind\ExportHelp.h" />
-    <ClInclude Include="..\src\common\ScriptBind\Lua\LuaBind.h" />
-    <ClInclude Include="..\src\common\ScriptBind\Lua\LuaFunction.h" />
-    <ClInclude Include="..\src\common\ScriptBind\Lua\LuaHelp.h" />
-    <ClInclude Include="..\src\common\ScriptBind\Lua\LuaObject.h" />
-    <ClInclude Include="..\src\common\ScriptBind\Lua\LuaStackGuard.h" />
-    <ClInclude Include="..\src\common\ScriptBind\Lua\LuaTable.h" />
-    <ClInclude Include="..\src\common\ScriptBind\Lua\template.h" />
-    <ClInclude Include="..\src\common\ScriptBind\Script.h" />
     <ClInclude Include="..\src\common\SocketPool.h" />
     <ClInclude Include="..\src\common\TcpConnection.h" />
     <ClInclude Include="..\src\common\TcpListener.h" />
@@ -216,8 +210,6 @@
     <ClCompile Include="..\src\common\DR_SHA1.cpp" />
     <ClCompile Include="..\src\common\FileReader.cpp" />
     <ClCompile Include="..\src\common\HttpClient.cpp" />
-    <ClCompile Include="..\src\common\HttpConnection3.cpp" />
-    <ClCompile Include="..\src\common\HttpConnection4.cpp" />
     <ClCompile Include="..\src\common\HttpListenner.cpp" />
     <ClCompile Include="..\src\common\json\json_reader.cpp" />
     <ClCompile Include="..\src\common\json\json_value.cpp" />
@@ -261,12 +253,6 @@
     <ClCompile Include="..\src\common\lua\lzio.c" />
     <ClCompile Include="..\src\common\MessageQueue.cpp" />
     <ClCompile Include="..\src\common\NetworkConnection.cpp" />
-    <ClCompile Include="..\src\common\ScriptBind\Lua\LuaBind.cpp" />
-    <ClCompile Include="..\src\common\ScriptBind\Lua\LuaFunction.cpp" />
-    <ClCompile Include="..\src\common\ScriptBind\Lua\LuaHelp.cpp" />
-    <ClCompile Include="..\src\common\ScriptBind\Lua\LuaObject.cpp" />
-    <ClCompile Include="..\src\common\ScriptBind\Lua\LuaTable.cpp" />
-    <ClCompile Include="..\src\common\ScriptBind\Script.cpp" />
     <ClCompile Include="..\src\common\SocketPool.cpp" />
     <ClCompile Include="..\src\common\TcpConnection.cpp" />
     <ClCompile Include="..\src\common\TcpListener.cpp" />

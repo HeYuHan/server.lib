@@ -73,7 +73,7 @@
     <OutDir>$(SolutionDir)exe</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)3rd\curl-7.60.0\include;$(SolutionDir)3rd\log4cpp\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)3rd\pthread\include;$(SolutionDir)3rd\libevent\WIN32-Code\nmake;$(SolutionDir)3rd\libevent\include;$(SolutionDir)3rd\RakNet\Source;$(SolutionDir)src\proto\out;$(SolutionDir)src\common\linux;$(SolutionDir)src\common;$(SolutionDir)3rd\protobuf-3.0.0\cmake\build\solution\include</IncludePath>
+    <IncludePath>$(SolutionDir)3rd\curl-7.60.0\include;$(SolutionDir)3rd\log4cpp\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)3rd\pthread\include;$(SolutionDir)3rd\libevent\WIN32-Code\nmake;$(SolutionDir)3rd\libevent\include;$(SolutionDir)3rd\RakNet\Source;$(SolutionDir)src\proto\out;$(SolutionDir)src\common\linux;$(SolutionDir)src\common;$(SolutionDir)3rd\protobuf-3.0.0\cmake\build\release\include</IncludePath>
     <OutDir>$(SolutionDir)exe</OutDir>
     <IntDir>$(SolutionDir)Temp\$(ProjectName)</IntDir>
     <TargetName>proxyserver</TargetName>
@@ -148,9 +148,6 @@
   <ItemGroup>
     <ProjectReference Include="..\3rd\curl-7.60.0\projects\Windows\VC14\lib\libcurl.vcxproj">
       <Project>{da6f56b4-06a4-441d-ad70-ac5a7d51fadb}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\3rd\protobuf-3.0.0\cmake\build\solution\libprotobuf.vcxproj">
-      <Project>{0e2afb1b-0111-3b3c-8b00-2c3c12dc23b3}</Project>
     </ProjectReference>
     <ProjectReference Include="..\3rd\RakNet\Lib\LibStatic\LibStatic_vc9.vcxproj">
       <Project>{6533bdae-0f0c-45e4-8fe7-add0f37fe063}</Project>
