@@ -56,11 +56,16 @@ void ListenEvent2(evutil_socket_t listener, short event, void *arg)
 }
 bool TcpListener::CreateTcpServer(const char * addr, int max_client)
 {
-	if (!ParseSockAddr(m_ListenAddr, addr, false))return false;
+	if (!ParseSockAddr(m_ListenAddr, addr, false))
+	{
+		log_error("cant parse addr %s", addr);
+		return false;
+	}
 	m_Listener = evconnlistener_new_bind(Timer::GetEventBase(),
 		ListenEvent, this,
 		LEV_OPT_REUSEABLE | LEV_OPT_CLOSE_ON_FREE,
 		-1, (sockaddr*)&m_ListenAddr, sizeof(m_ListenAddr));
+	log_info("create tcp listener %s %d", addr, m_Listener != NULL);
 	return m_Listener != NULL;
 	/*event_base *base = Timer::GetEventBase();
 	
@@ -70,14 +75,15 @@ bool TcpListener::CreateTcpServer(const char * addr, int max_client)
 
 	r = bind(m_Socket, (struct sockaddr*)&m_ListenAddr, sizeof(m_ListenAddr));
 	if (r < 0) return false;
-	r = listen(m_Socket, 65535);
+	r = listen(m_Socket, max_client);
+	log_info("create tcp listener %s %d", addr, 2);
 	if (r < 0) return false;
 	if (evutil_make_socket_nonblocking(m_Socket) < 0)
 	{
 		evutil_closesocket(m_Socket);
 		m_Socket = -1;
 	}
-
+	log_info("create tcp listener %s %d", addr, m_Listener != NULL);
 	m_Listener2 = event_new(base, m_Socket, EV_READ | EV_PERSIST, ListenEvent2,this);
 	event_add(m_Listener2, NULL);
 	return m_Listener2 != NULL;*/

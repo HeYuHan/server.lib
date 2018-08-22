@@ -17,7 +17,8 @@ public:
 	Core::uint uid;
 protected:
 	virtual void OnWrite() = 0;
-	virtual void OnRevcMessage() = 0;
+	virtual void OnRevcMessage(bool parse) = 0;
+	virtual void ParseMessage() = 0;
 	virtual void OnDisconnect() = 0;
 	virtual void OnConnected() = 0;
 	virtual Core::Event* GetEvent() { return NULL; }
@@ -25,7 +26,7 @@ protected:
 	
 };
 class SocketPool;
-class SocketPoolClinet:public NetworkConnection,protected IThreadMessageHadle
+class SocketPoolClinet:public NetworkConnection, protected IThreadMessageHadle
 {
 public:
 	SocketPoolClinet();
@@ -38,7 +39,7 @@ public:
 	ISocketClient *m_Handle;
 	SocketPool *m_Pool;
 public:
-	virtual int SetEvent(struct event_base *base);
+	//virtual int SetEvent(struct event_base *base);
 	virtual void Update(float time);
 	virtual int Read(void* data, int size);
 	virtual int Send(void* data, int size);
@@ -47,7 +48,7 @@ public:
 	virtual void OnDisconnected();
 	virtual void Disconnect();
 	virtual void OnReconnected();
-	virtual void OnMessage();
+	virtual void OnRead();
 	virtual void OnThreadMessage(unsigned int id);
 	virtual int GetSocket() { return m_Socket; }
 public:
@@ -56,7 +57,7 @@ private:
 	event_base *m_ThreadEventBase;
 };
 typedef void(*OnAcceptNewClient)(SocketPoolClinet*,void* user_data);
-class SocketPool
+class SocketPool:public ThreadObject
 {
 public:
 	SocketPool();

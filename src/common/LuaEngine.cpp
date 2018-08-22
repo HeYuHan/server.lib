@@ -112,7 +112,7 @@ void LuaEngine::DestoryScriptHandle(LuaInterface * lua)
 	}
 }
 
-void LuaEngine::LuaSearchPath(char * name, char * value)
+void LuaEngine::LuaSearchPath(const char * name, const char * value)
 {
 	std::string v;
 	int top = lua_gettop(L);

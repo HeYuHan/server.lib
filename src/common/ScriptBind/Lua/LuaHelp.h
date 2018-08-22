@@ -19,12 +19,7 @@ namespace Core
 	R result = Pop<R>(lua_state_, -1); \
 	lua_pop(lua_state_, 1); \
 	return result; 
-
-#ifdef _DEBUG
 	int _lua_call(lua_State* L, int params_num, int result_count, int n);
-#else
-#define _lua_call lua_pcall
-#endif
 
 	int lua_setuserdata_metatable();
 

@@ -54,7 +54,7 @@ public:
 
 	bool CreateScriptHandle(LuaInterface *lua);
 	void DestoryScriptHandle(LuaInterface *lua);
-	void LuaSearchPath(char *name, char *value);
+	void LuaSearchPath(const char *name, const char *value);
 
 	static LuaEngine* GetInstance();
 private:

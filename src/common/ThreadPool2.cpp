@@ -239,11 +239,19 @@ namespace Core
 	}
 	void ThreadObject::Lock()
 	{
+
 		m_Lock.Lock();
+		m_Locked = true;
 	}
 	void ThreadObject::UnLock()
 	{
 		m_Lock.Unlock();
+		m_Locked = false;
+		
+	}
+	bool ThreadObject::IsLocked()
+	{
+		return m_Locked;
 	}
 }
 

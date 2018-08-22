@@ -21,10 +21,6 @@ typedef enum
 {
 	READERROR = 0, WRITEERROR = 1
 }NETERR;
-typedef enum 
-{
-	READ=1<<1,WRITE=1<<2
-}StreamLock;
 class NetworkStream
 {
 public:
@@ -33,7 +29,8 @@ public:
 	virtual void OnMessage()=0;
 	virtual bool ThreadSafe() = 0;
 	void Reset();
-	virtual void OnRevcMessage();
+	void OnRevcMessage(bool parse=true);
+	void ParseMessage();
 public:
 	void WriteBool(bool b);
 	void WriteByte(byte data);
@@ -57,8 +54,6 @@ public:
 	//////////////////////////////////////////////////////////////
 	//read data
 public:
-	void Lock(int type);
-	void UnLock(int type);
 	void ReadByte(byte &data);
 	void ReadByte(char &data);
 	void ReadShort(short &data);
@@ -89,8 +84,8 @@ public:
 	char* read_buff_end;
 private:
 	char* web_frame;
-	MutexLock m_WriteLock;
-	MutexLock m_ReadLock;
+	ThreadObject m_ReadLock;
+	ThreadObject m_WriteLock;
 };
 
 
@@ -99,7 +94,7 @@ class NetworkConnection
 public:
 	NetworkConnection();
 	~NetworkConnection();
-	virtual int SetEvent(struct event_base *) { return -1; }
+	//virtual int SetEvent(struct event_base *) { return -1; }
 	virtual void Update(float time) = 0;
 	virtual int Read(void* data, int size) = 0;
 	virtual int Send(void* data, int size) = 0;

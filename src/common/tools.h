@@ -25,6 +25,7 @@ bool ParseSockAddr(sockaddr_in & addr, const char * str, bool by_name=false);
 bool RunAsDaemon();
 void CaculateSha1(const char* text, char* out);
 float DiffTime(timeval &v1, timeval &v2);
-unsigned int PthreadSelf();
+unsigned long long PthreadSelf();
+bool IsMainThread();
 
 #endif // !__TOOLS_H__

@@ -13,7 +13,7 @@ namespace Core
 		lua_pushvalue(L, -2);
 		return lua_setmetatable(L, -2);
 	}
-
+#ifdef _DEBUG
 	static const char* _lua_pop_string(lua_State* L)
 	{
 		lua_pop(L, 1);
@@ -24,14 +24,14 @@ namespace Core
 	static int _lua_handle_error(lua_State* L)
 	{
 		lua_getglobal(L, "debug");
-		if(!lua_istable(L, -1))
+		if (!lua_istable(L, -1))
 		{
 			lua_pop(L, 1);
 			return 1;
 		}
 
 		lua_getfield(L, -1, "traceback");
-		if(!lua_isfunction(L, -1))
+		if (!lua_isfunction(L, -1))
 		{
 			lua_pop(L, 2);
 			return 1;
@@ -42,28 +42,38 @@ namespace Core
 		lua_call(L, 2, 1);
 		return 1;
 	}
+#endif // _DEBUG
 
-	int _lua_call(lua_State* L, int params_num, int result_count, int /*n*/)
+
+	
+
+	int _lua_call(lua_State* L, int params_num, int result_count, int n)
 	{
+#ifndef _DEBUG
+		return lua_pcall(L, params_num, result_count, n);
+
+#else
 		int size = lua_gettop(L);
 		int handler = lua_gettop(L) - params_num;
 		lua_pushcfunction(L, _lua_handle_error);
 		lua_insert(L, handler);
 
 		int ret = 0;
-		if(lua_pcall(L, params_num, result_count, handler))
+		if (lua_pcall(L, params_num, result_count, handler))
 		{
 			ret = LUA_ERRRUN;
-			LUA_ERROR(L, "%s",_lua_pop_string(L));
-		} 
+			LUA_ERROR(L, "%s", _lua_pop_string(L));
+		}
 		lua_remove(L, handler);
 
-		if(((lua_gettop(L) + (int)params_num + 1 - result_count) != size))
+		if (((lua_gettop(L) + (int)params_num + 1 - result_count) != size))
 		{
 			LUA_ERROR(L, "%s", "Lua error: lua stack size changed!");
 		}
 
 		return ret;
+#endif
+		
 	}
 
 	//////////////////////////////////////////////////////////////////////////

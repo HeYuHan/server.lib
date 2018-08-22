@@ -59,6 +59,7 @@ namespace Core
 	public:
 		void Lock();
 		void UnLock();
+		bool IsLocked();
 	};
 	class EasyMutexLock
 	{

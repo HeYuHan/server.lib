@@ -20,13 +20,15 @@ SocketPool::~SocketPool()
 
 void ReadEvent(bufferevent * bev, void * arg)
 { 
+	//bufferevent_lock(bev);
 	SocketPoolClinet * c = static_cast<SocketPoolClinet*>(arg);
+	
 	if (c)
 	{
 		if (!c->m_HandShake)
 		{
-			c->OnMessage();
-			return;
+			c->OnRead();
+			goto result;
 		}
 		if (!c->m_Handle)
 		{
@@ -35,7 +37,7 @@ void ReadEvent(bufferevent * bev, void * arg)
 			int uid_len = sizeof(uint);
 			if (len < (size_t)uid_len)
 			{
-				return;
+				goto result;
 			}
 			else
 			{
@@ -45,6 +47,7 @@ void ReadEvent(bufferevent * bev, void * arg)
 				if (read_uid > 0)
 				{
 					log_info("reconnect uid %d", read_uid);
+					c->m_Pool->Lock();
 					std::vector<ISocketClient*>::iterator iter = c->m_Pool->m_DisconnectedClients.begin();
 					for (; iter != c->m_Pool->m_DisconnectedClients.end(); iter++)
 					{
@@ -66,9 +69,11 @@ void ReadEvent(bufferevent * bev, void * arg)
 							c->OnReconnected();
 							c->m_Pool->m_DisconnectedClients.erase(iter);
 							//if (len > uid_len)c->m_Handle->OnMessage();
-							return;
+							c->m_Pool->UnLock();
+							goto result;
 						}
 					}
+					c->m_Pool->UnLock();
 				}
 				if (!recon)
 				{
@@ -89,9 +94,12 @@ void ReadEvent(bufferevent * bev, void * arg)
 		}
 		else
 		{
-			c->OnMessage();
+			c->OnRead();
 		}
 	}
+result:
+	//bufferevent_unlock(bev);
+	return;
 }
 
 void WriteEvent(bufferevent * bev, void * arg)
@@ -197,31 +205,31 @@ SocketPoolClinet::SocketPoolClinet():m_Socket(-1),m_BufferEvent(NULL),m_Handle(N
 {
 }
 
-int SocketPoolClinet::SetEvent(event_base * base)
-{
-	if (m_BufferEvent)
-	{
-		event_base* this_base = bufferevent_get_base(m_BufferEvent);
-		if (this_base == base)return 0;
-		do {
-			bufferevent *new_buffer = bufferevent_socket_new(base, m_Socket, 0);
-			if (!new_buffer)break;
-			if (0 != evbuffer_add_buffer(bufferevent_get_output(new_buffer), bufferevent_get_output(m_BufferEvent)))break;
-			if (0 != evbuffer_add_buffer(bufferevent_get_input(new_buffer), bufferevent_get_input(m_BufferEvent)))break;
-			bufferevent_setcb(new_buffer, ReadEvent, WriteEvent, SocketEvent, this);
-			bufferevent_enable(new_buffer, EV_READ | EV_WRITE | EV_PERSIST);
-			bufferevent_disable(m_BufferEvent, EV_READ | EV_WRITE | EV_PERSIST);
-
-			bufferevent_free(m_BufferEvent);
-			m_BufferEvent = new_buffer;
-			return 0;
-		} while (false);
-		
-		return -1;
-		//return bufferevent_base_set(base, m_BufferEvent);
-	}
-	return -1;
-}
+//int SocketPoolClinet::SetEvent(event_base * base)
+//{
+//	if (m_BufferEvent)
+//	{
+//		event_base* this_base = bufferevent_get_base(m_BufferEvent);
+//		if (this_base == base)return 0;
+//		do {
+//			bufferevent *new_buffer = bufferevent_socket_new(base, m_Socket, 0);
+//			if (!new_buffer)break;
+//			if (0 != evbuffer_add_buffer(bufferevent_get_output(new_buffer), bufferevent_get_output(m_BufferEvent)))break;
+//			if (0 != evbuffer_add_buffer(bufferevent_get_input(new_buffer), bufferevent_get_input(m_BufferEvent)))break;
+//			bufferevent_setcb(new_buffer, ReadEvent, WriteEvent, SocketEvent, this);
+//			bufferevent_enable(new_buffer, EV_READ | EV_WRITE | EV_PERSIST);
+//			bufferevent_disable(m_BufferEvent, EV_READ | EV_WRITE | EV_PERSIST);
+//
+//			bufferevent_free(m_BufferEvent);
+//			m_BufferEvent = new_buffer;
+//			return 0;
+//		} while (false);
+//		
+//		return -1;
+//		//return bufferevent_base_set(base, m_BufferEvent);
+//	}
+//	return -1;
+//}
 
 void SocketPoolClinet::Update(float time)
 {
@@ -248,9 +256,20 @@ int SocketPoolClinet::Send(void * data, int size)
 	{
 		//bool lock_buff = NULL != m_ThreadEventBase;
 		//if (lock_buff)bufferevent_lock(m_BufferEvent);
+		/*struct evbuffer * output = bufferevent_get_output(m_BufferEvent);
+		size_t len = evbuffer_get_length(output);
+		if(len >0)log_error("unsend data size:%d", len);*/
 		int ret = bufferevent_write(m_BufferEvent, data, size);
+		
+
 		//if (lock_buff)bufferevent_unlock(m_BufferEvent);
 		return ret == 0 ? size : 0;
+		/*int s = 0;
+		do
+		{
+			s += send(m_Socket, &((char*)data)[s], size - s, 0);
+		} while (s < size);
+		return size;*/
 	}
 	return 0;
 }
@@ -319,22 +338,27 @@ void SocketPoolClinet::OnReconnected()
 	}
 }
 
-void SocketPoolClinet::OnMessage()
+void SocketPoolClinet::OnRead()
 {
+	if (m_Handle)
+	{
+		if (m_Pool->m_UseThread)
+		{
+			m_Handle->OnRevcMessage(false);
+			this->SendMessageToMainThread(1);
+		}
+		else
+		{
+			m_Handle->OnRevcMessage(true);
+		}
+	}
 	
-	if (m_ThreadEventBase && false)
-	{
-		this->SendMessageToMainThread(1);
-	}
-	else
-	{
-		if (m_Handle)m_Handle->OnRevcMessage();
-	}
+	
 }
 
 void SocketPoolClinet::OnThreadMessage(unsigned int id)
 {
-	if (m_Handle )m_Handle->OnRevcMessage();
+	if (m_Handle)m_Handle->ParseMessage();
 }
 
 void SocketPoolClinet::Init(int fd, sockaddr * sock, SocketPool *pool, bool check_uid, bool use_thread)
@@ -349,7 +373,7 @@ void SocketPoolClinet::Init(int fd, sockaddr * sock, SocketPool *pool, bool chec
 	{
 		base = use_thread ? (m_ThreadEventBase = gEventPool.Get()) : Timer::GetEventBase();
 	}
-	m_BufferEvent = bufferevent_socket_new(Timer::GetEventBase(), m_Socket, 0);
+	m_BufferEvent = bufferevent_socket_new(base, m_Socket, 0| BEV_OPT_CLOSE_ON_FREE);
 	bufferevent_setcb(m_BufferEvent, ReadEvent, WriteEvent, SocketEvent, this);
 	bufferevent_enable(m_BufferEvent, EV_READ | EV_WRITE | EV_PERSIST);
 }

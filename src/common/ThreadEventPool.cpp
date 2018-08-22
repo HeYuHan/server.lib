@@ -53,12 +53,10 @@ class EventTask:public ThreadTask
 		if (m_EventBase == NULL)return;
 		m_LoopTimer.Init(60 * 60 * 24, Update, this, true);
 		m_LoopTimer.Begin(m_EventBase);
-#if _DEBUG
 		m_Pool->m_Lock.Lock();
 		m_Pool->m_InitedThredCount++;
 		log_info("init event pool thread %d tid:%lu", m_Pool->m_InitedThredCount, PthreadSelf());
 		m_Pool->m_Lock.Unlock();
-#endif
 		int ret = event_base_dispatch(m_EventBase);
 		/*if (m_EventBase)
 		{
@@ -122,7 +120,7 @@ bool ThreadEventPool::Init(unsigned int size)
 	}
 	while (m_InitedThredCount < m_Size)
 	{
-		//ThreadSleep(1);
+		ThreadSleep(1);
 	}
 	log_info("event pool inited thread count %d", m_InitedThredCount);
 	return ret;

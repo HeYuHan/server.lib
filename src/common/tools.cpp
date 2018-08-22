@@ -127,15 +127,16 @@ bool RunAsDaemon()
 #endif // LINUX
 	return true;
 }
-unsigned int PthreadSelf()
+unsigned long long PthreadSelf()
 {
 #ifdef WIN32
 	return::GetCurrentThreadId();
-#endif
-#ifdef LINUX
+#else
 	 return pthread_self();
 #endif
-#ifdef MACOS
-	return (unsigned long long) pthread_self();
-#endif
+}
+extern unsigned long long MainThreadID;
+bool IsMainThread()
+{
+	return PthreadSelf() == MainThreadID;
 }

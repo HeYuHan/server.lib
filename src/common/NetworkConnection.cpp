@@ -42,21 +42,29 @@ void RotateBuffer(char *data, int size)
 	}
 }
 
-void NetworkStream::OnRevcMessage()
+void NetworkStream::OnRevcMessage(bool parse)
 {
 	if (NULL == connection)return;
+	m_ReadLock.Lock();
+	int empty_size = read_buff_end - read_offset;
+	int revc_size = connection->Read(read_offset, empty_size);
+	read_offset += revc_size;
+	m_ReadLock.UnLock();
+	if (parse&&(revc_size>0))
+	{
+		ParseMessage();
+	}
+	
+	
+}
+
+void NetworkStream::ParseMessage()
+{
+#ifndef DEBUG
 	try
 	{
-		Lock(READ);
-		int empty_size = read_buff_end - read_offset;
-		int revc_size = connection->Read(read_offset, empty_size);
-		if (revc_size == 0)
-		{
-			//log_info("revc_size is zero closed %s", "OnRevcMessage");
-			connection->Disconnect();
-			return;
-		}
-		read_offset += revc_size;
+#endif // DEBUG
+		m_ReadLock.Lock();
 		int size = read_offset - read_position;
 		if (connection->m_Type == TCP_SOCKET)
 		{
@@ -67,9 +75,9 @@ void NetworkStream::OnRevcMessage()
 				if (size - 4 < data_len)break;
 				read_position += 4;
 				read_end = read_position + data_len;
-				
+
 				OnMessage();
-				
+
 				read_position = read_end;
 				size = read_offset - read_position;
 			}
@@ -89,7 +97,7 @@ void NetworkStream::OnRevcMessage()
 				{
 					log_info("websocket closed %s", "WS_PARSE_RESULT_ERROR");
 					connection->Disconnect();
-					return;
+					goto parse_message_end;
 				}
 				else if (ret == WS_PARSE_RESULT_SKIP)
 				{
@@ -102,7 +110,7 @@ void NetworkStream::OnRevcMessage()
 				{
 					log_info("WS_PARSE_RESULT_WAIT_NEXT_DATA=>next size : %d", size);
 					web_frame = NULL;
-					return;
+					goto parse_message_end;
 				}
 				else if (ret == WS_PARSE_RESULT_WAIT_NETX_FRAME)
 				{
@@ -136,13 +144,18 @@ void NetworkStream::OnRevcMessage()
 		}
 		read_offset = read_buff + size;
 		read_position = read_end = read_buff;
-		UnLock(READ);
+parse_message_end:
+		m_ReadLock.UnLock();
+#ifndef DEBUG
+
 	}
 	catch (...)
 	{
 		log_error("%s", "parse message error");
 		if (connection)connection->Disconnect();
 	}
+#endif
+	
 }
 
 void NetworkStream::Reset()
@@ -154,7 +167,8 @@ void NetworkStream::Reset()
 	read_end = read_buff;
 	read_position = read_buff;
 	web_frame = NULL;
-	UnLock(READ|WRITE);
+	m_WriteLock.UnLock();
+	m_ReadLock.UnLock();
 }
 
 
@@ -260,7 +274,7 @@ void NetworkStream::WriteProtoBufferAutoSize(google::protobuf::Message * message
 }
 void NetworkStream::BeginWrite()
 {
-	Lock(WRITE);
+	m_WriteLock.Lock();
 	write_position = write_buff;
 	write_end = write_buff;
 	if (connection)
@@ -281,11 +295,6 @@ void NetworkStream::BeginWrite()
 }
 void NetworkStream::EndWrite()
 {
-	if (!connection)
-	{
-		log_error("endwrite connection is null %p", this);
-		return;
-	}
 	int head_len = connection->m_Type == UDP_SOCKET ? 5 : 4;
 	int data_len = write_end - write_position - head_len;
 	if (connection->m_Type == UDP_SOCKET)
@@ -319,20 +328,7 @@ void NetworkStream::EndWrite()
 	}
 
 	if (connection&&data_len>0)connection->Send(write_position, data_len+head_len);
-	
-	UnLock(WRITE);
-}
-void NetworkStream::Lock(int type)
-{
-	if (!ThreadSafe())return;
-	if (type & StreamLock::READ)m_ReadLock.Lock();
-	if (type & StreamLock::WRITE)m_WriteLock.Lock();
-}
-void NetworkStream::UnLock(int type)
-{
-	if (!ThreadSafe())return;
-	if (type & StreamLock::READ)m_ReadLock.Unlock();
-	if (type & StreamLock::WRITE)m_WriteLock.Unlock();
+	m_WriteLock.UnLock();
 }
 //////////////////////////////////////////////////////////////
 //read data
@@ -391,7 +387,8 @@ int NetworkStream::ReadString(char* str, int size)
 }
 void NetworkStream::ReadData(void* data, int count)
 {
-	if (read_buff == NULL || count < 0 || read_position + count > read_end)
+	int size = read_end - read_position;
+	if (read_buff == NULL || count < 0 || count > size)
 	{
 		throw READERROR;
 	}
