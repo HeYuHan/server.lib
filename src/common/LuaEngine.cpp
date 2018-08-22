@@ -1,7 +1,6 @@
 #include "LuaEngine.h"
 #include <vector>
 #include "log.h"
-#include <ScriptBind/Lua/LuaBind.h>
 using namespace std;
 BEGIN_NS_CORE
 vector<register_lua_model> all_model;
@@ -19,7 +18,7 @@ void LuaEngine::RegisterModel(register_lua_model model)
 
 void LuaEngine::Start(const char* mainLua)
 {
-	L = OpenLua();
+	L = luaL_newstate();
 	luaL_openlibs(L);
 	
 	for (size_t i=0;i<all_model.size();i++)
@@ -41,9 +40,9 @@ bool LuaEngine::DoFile(const char* file_path)
 }
 bool LuaEngine::CreateScriptHandle(LuaInterface *lua)
 {
-	if (lua->m_Table.IsValid())
+	if (lua->m_LuaRef>0)
 	{
-		log_error("handle is create %d", lua->m_Table.lua_ref_);
+		log_error("handle is create %d", lua->m_LuaRef);
 		return false;
 	}
 	int top = lua_gettop(L);
@@ -79,14 +78,16 @@ bool LuaEngine::CreateScriptHandle(LuaInterface *lua)
 	lua_settable(L, -3);
 	
 	lua_setmetatable(L, -2);
-
-	lua->m_Table = LuaTable(L,-1);
 	
-	if (lua->m_Table.IsValid())
+	if (lua_istable(L,-1))
 	{
 		lua->L = L;
-		lua->m_EnterFunction = lua->m_Table.Get<LuaFunction>("OnEnter");
-		if (!lua->m_EnterFunction.IsValid())
+		lua_getfield(L, -1, "OnEnter");
+		if (lua_isfunction(L, -1))
+		{
+			lua->m_LuaRef = luaL_ref(L, LUA_REGISTRYINDEX);
+		}
+		else
 		{
 			log_error("not found enter function %p", lua);
 			Pop(top);
@@ -106,9 +107,10 @@ bool LuaEngine::CreateScriptHandle(LuaInterface *lua)
 
 void LuaEngine::DestoryScriptHandle(LuaInterface * lua)
 {
-	if (lua->m_Table.IsValid())
+	if (lua->m_LuaRef>0)
 	{
-		lua->m_Table.Release();
+		luaL_unref(lua->L, LUA_REGISTRYINDEX, lua->m_LuaRef);
+		lua->m_LuaRef = -1;
 	}
 }
 
@@ -149,12 +151,14 @@ void LuaEngine::Pop(int old_top,const char* msg)
 #endif
 }
 
-LuaInterface::LuaInterface():L(NULL)
+LuaInterface::LuaInterface():L(NULL), m_LuaRef(-1)
 {
+	
 }
 
 LuaInterface::~LuaInterface()
 {
+	LuaEngine::GetInstance()->DestoryScriptHandle(this);
 	L = NULL;
 }
 END_NS_CORE

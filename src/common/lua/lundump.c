@@ -1,5 +1,5 @@
 /*
-** $Id: lundump.c,v 2.22 2012/05/08 13:53:33 roberto Exp $
+** $Id: lundump.c,v 1.71 2011/12/07 10:39:12 lhf Exp $
 ** load precompiled Lua chunks
 ** See Copyright Notice in lua.h
 */
@@ -27,7 +27,7 @@ typedef struct {
  const char* name;
 } LoadState;
 
-static l_noret error(LoadState* S, const char* why)
+static void error(LoadState* S, const char* why)
 {
  luaO_pushfstring(S->L,"%s: %s precompiled chunk",S->name,why);
  luaD_throw(S->L,LUA_ERRSYNTAX);
@@ -39,7 +39,7 @@ static l_noret error(LoadState* S, const char* why)
 #define LoadVector(S,b,n,size)	LoadMem(S,b,n,size)
 
 #if !defined(luai_verifycode)
-#define luai_verifycode(L,b,f)	/* empty */
+#define luai_verifycode(L,b,f)	(f)
 #endif
 
 static void LoadBlock(LoadState* S, void* b, size_t size)
@@ -91,7 +91,7 @@ static void LoadCode(LoadState* S, Proto* f)
  LoadVector(S,f->code,n,sizeof(Instruction));
 }
 
-static void LoadFunction(LoadState* S, Proto* f);
+static Proto* LoadFunction(LoadState* S);
 
 static void LoadConstants(LoadState* S, Proto* f)
 {
@@ -118,18 +118,13 @@ static void LoadConstants(LoadState* S, Proto* f)
    case LUA_TSTRING:
 	setsvalue2n(S->L,o,LoadString(S));
 	break;
-    default: lua_assert(0);
   }
  }
  n=LoadInt(S);
  f->p=luaM_newvector(S->L,n,Proto*);
  f->sizep=n;
  for (i=0; i<n; i++) f->p[i]=NULL;
- for (i=0; i<n; i++)
- {
-  f->p[i]=luaF_newproto(S->L);
-  LoadFunction(S,f->p[i]);
- }
+ for (i=0; i<n; i++) f->p[i]=LoadFunction(S);
 }
 
 static void LoadUpvalues(LoadState* S, Proto* f)
@@ -168,8 +163,10 @@ static void LoadDebug(LoadState* S, Proto* f)
  for (i=0; i<n; i++) f->upvalues[i].name=LoadString(S);
 }
 
-static void LoadFunction(LoadState* S, Proto* f)
+static Proto* LoadFunction(LoadState* S)
 {
+ Proto* f=luaF_newproto(S->L);
+ setptvalue2s(S->L,S->L->top,f); incr_top(S->L);
  f->linedefined=LoadInt(S);
  f->lastlinedefined=LoadInt(S);
  f->numparams=LoadByte(S);
@@ -179,6 +176,8 @@ static void LoadFunction(LoadState* S, Proto* f)
  LoadConstants(S,f);
  LoadUpvalues(S,f);
  LoadDebug(S,f);
+ S->L->top--;
+ return f;
 }
 
 /* the code below must be consistent with the code in luaU_header */
@@ -203,10 +202,9 @@ static void LoadHeader(LoadState* S)
 /*
 ** load precompiled chunk
 */
-Closure* luaU_undump (lua_State* L, ZIO* Z, Mbuffer* buff, const char* name)
+Proto* luaU_undump (lua_State* L, ZIO* Z, Mbuffer* buff, const char* name)
 {
  LoadState S;
- Closure* cl;
  if (*name=='@' || *name=='=')
   S.name=name+1;
  else if (*name==LUA_SIGNATURE[0])
@@ -217,19 +215,7 @@ Closure* luaU_undump (lua_State* L, ZIO* Z, Mbuffer* buff, const char* name)
  S.Z=Z;
  S.b=buff;
  LoadHeader(&S);
- cl=luaF_newLclosure(L,1);
- setclLvalue(L,L->top,cl); incr_top(L);
- cl->l.p=luaF_newproto(L);
- LoadFunction(&S,cl->l.p);
- if (cl->l.p->sizeupvalues != 1)
- {
-  Proto* p=cl->l.p;
-  cl=luaF_newLclosure(L,cl->l.p->sizeupvalues);
-  cl->l.p=p;
-  setclLvalue(L,L->top-1,cl);
- }
- luai_verifycode(L,buff,cl->l.p);
- return cl;
+ return luai_verifycode(L,buff,LoadFunction(&S));
 }
 
 #define MYINT(s)	(s[0]-'0')
