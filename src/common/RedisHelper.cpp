@@ -1,6 +1,6 @@
+
 #include "RedisHelper.h"
 #include "tools.h"
-#include "log.h"
 #include <event.h>
 BEGIN_NS_CORE
 RedisHelper::RedisHelper()

@@ -225,6 +225,9 @@
     <ClInclude Include="..\src\common\http\httplib.h">
       <Filter>http</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\common\RedisHelper.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\common\common.cpp">
@@ -417,6 +420,9 @@
       <Filter>lua</Filter>
     </ClCompile>
     <ClCompile Include="..\src\common\LuaEngine.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\common\RedisHelper.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

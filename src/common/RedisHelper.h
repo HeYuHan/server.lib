@@ -1,6 +1,7 @@
 #pragma once
 #ifndef __REDIS_HELPER_H__
 #define __REDIS_HELPER_H__
+#include "log.h"
 #include <hiredis.h>
 #include <common.h>
 BEGIN_NS_CORE

@@ -86,6 +86,7 @@ bool LuaEngine::CreateScriptHandle(LuaInterface *lua)
 		if (lua_isfunction(L, -1))
 		{
 			lua->m_LuaRef = luaL_ref(L, LUA_REGISTRYINDEX);
+			lua_pop(L, 1);
 		}
 		else
 		{

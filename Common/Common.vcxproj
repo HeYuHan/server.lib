@@ -84,7 +84,7 @@
     <TargetName>libcommon_d</TargetName>
     <OutDir>$(SolutionDir)lib\</OutDir>
     <IntDir>$(SolutionDir)Temp\$(ProjectName)</IntDir>
-    <IncludePath>$(SolutionDir)3rd\protobuf-3.0.0\cmake\build\release\include;$(SolutionDir)3rd\curl-7.60.0\include;$(SolutionDir)3rd\log4cpp\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)3rd\pthread\include;$(SolutionDir)3rd\libevent\WIN32-Code\nmake;$(SolutionDir)3rd\libevent\include;$(SolutionDir)3rd\RakNet\Source;$(SolutionDir)src\common</IncludePath>
+    <IncludePath>$(SolutionDir)3rd\protobuf-3.0.0\cmake\build\release\include;$(SolutionDir)3rd\log4cpp\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)3rd\pthread\include;$(SolutionDir)3rd\libevent\WIN32-Code\nmake;$(SolutionDir)3rd\libevent\include;$(SolutionDir)3rd\RakNet\Source;$(SolutionDir)src\common;$(SolutionDir)3rd\redis-win-3.2.100\deps\hiredis</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -100,7 +100,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;DEBUG;WIN32;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING;DEBUG;WIN32;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -187,6 +187,7 @@
     <ClInclude Include="..\src\common\MessageQueue.h" />
     <ClInclude Include="..\src\common\NetworkConnection.h" />
     <ClInclude Include="..\src\common\objectpool.h" />
+    <ClInclude Include="..\src\common\RedisHelper.h" />
     <ClInclude Include="..\src\common\SocketPool.h" />
     <ClInclude Include="..\src\common\TcpConnection.h" />
     <ClInclude Include="..\src\common\TcpListener.h" />
@@ -253,6 +254,7 @@
     <ClCompile Include="..\src\common\lua\lzio.c" />
     <ClCompile Include="..\src\common\MessageQueue.cpp" />
     <ClCompile Include="..\src\common\NetworkConnection.cpp" />
+    <ClCompile Include="..\src\common\RedisHelper.cpp" />
     <ClCompile Include="..\src\common\SocketPool.cpp" />
     <ClCompile Include="..\src\common\TcpConnection.cpp" />
     <ClCompile Include="..\src\common\TcpListener.cpp" />
@@ -270,6 +272,14 @@
     <None Include="..\src\common\json\json_internalmap.inl" />
     <None Include="..\src\common\json\json_valueiterator.inl" />
     <None Include="..\src\common\lua\Makefile" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\3rd\redis-win-3.2.100\msvs\hiredis\hiredis.vcxproj">
+      <Project>{13e85053-54b3-487b-8ddb-3430b1c1b3bf}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\3rd\redis-win-3.2.100\src\Win32_Interop\Win32_Interop.vcxproj">
+      <Project>{8c07f811-c81c-432c-b334-1ae6faecf951}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
