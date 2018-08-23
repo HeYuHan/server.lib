@@ -277,12 +277,6 @@ int SocketPoolClinet::Send(void * data, int size)
 void SocketPoolClinet::OnWrite()
 {
 	if (m_Handle) {
-#if _DEBUG
-		if (m_ThreadEventBase)
-		{
-			//log_info("client onwrite tid:%lu uid:%d", pthread_self(), uid);
-		}
-#endif
 		m_Handle->OnWrite();
 	}
 }
@@ -290,12 +284,6 @@ void SocketPoolClinet::OnWrite()
 void SocketPoolClinet::OnConnected()
 {
 	if (m_Handle) {
-#if _DEBUG
-		if (m_ThreadEventBase)
-		{
-			//log_info("client onconnected tid:%lu uid:%d", PthreadSelf(),uid);
-		}
-#endif
 		m_Handle->OnConnected();
 	}
 }
@@ -303,12 +291,6 @@ void SocketPoolClinet::OnConnected()
 void SocketPoolClinet::OnDisconnected()
 {
 	if (m_Handle) {
-#if _DEBUG
-		if (m_ThreadEventBase)
-		{
-			//log_info("client disconnected tid:%lu uid:%d", PthreadSelf(), uid);
-		}
-#endif
 		m_Handle->OnDisconnect();
 	}
 }
