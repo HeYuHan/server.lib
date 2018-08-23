@@ -1,6 +1,11 @@
 #pragma once
 //#include <json/json.h>
-#include <event2/event.h>
+//#include <event2/event.h>
+#ifdef _WIN32
+#include <winsock2.h>
+#endif // WIN32
+
+
 #ifndef __TOOLS_H__
 #define __TOOLS_H__
 

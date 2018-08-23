@@ -86,13 +86,5 @@ int gettimeofday(struct timeval *tp, void *tzp);
 
 
 #endif // !__COMMON__H_
-//#include "BaseServer.h"
-//#include "NetworkConnection.h"
-//#include "objectpool.h"
-//#include "TcpConnection.h"
-//#include "ThreadPool.h"
-//#include "Timer.h"
-//#include "UdpConnection.h"
-//#include "UdpListener.h"
 
 

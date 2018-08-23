@@ -19,7 +19,7 @@ bool BaseServer::Init()
 {
 	MainThreadID = PthreadSelf();
 	bool ret = evthread_use_pthreads() == 0;
-	ret = ret && (curl_global_init(CURL_GLOBAL_ALL) == CURLcode::CURLE_OK);
+	//ret = ret && (curl_global_init(CURL_GLOBAL_ALL) == CURLcode::CURLE_OK);
 	return ret;
 }
 
