@@ -5,13 +5,13 @@
 #include <string>
 #include <queue>
 #include <fstream>
-#include<json/json.h>
+//#include<json/json.h>
 #include<ThreadPool2.h>
 #include <common.h>
 BEGIN_NS_CORE
 bool ReadText(std::string &ret,const std::string path);
 bool WriteText(const std::string text,const std::string path);
-bool ReadJson(Json::Value &root, const char* path);
+//bool ReadJson(Json::Value &root, const char* path);
 #define ASYNC_FILE_BUFF_LEN 1024*512
 class AsyncFileWriter
 {

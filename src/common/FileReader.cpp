@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include<json/reader.h>
+//#include<json/reader.h>
 #include <string.h>
 BEGIN_NS_CORE
 using namespace std;
@@ -32,20 +32,20 @@ bool WriteText(const std::string text, const std::string path)
 }
 
 
-bool ReadJson(Json::Value &root, const char* path)
-{
-	ifstream file_in(path,ios::in);
-	bool ret = false;
-	if (!file_in.fail())
-	{
-
-		Json::Reader reader;
-		ret = reader.parse(file_in, root);
-		
-	}
-	file_in.close();
-	return ret;
-}
+//bool ReadJson(Json::Value &root, const char* path)
+//{
+//	ifstream file_in(path,ios::in);
+//	bool ret = false;
+//	if (!file_in.fail())
+//	{
+//
+//		Json::Reader reader;
+//		ret = reader.parse(file_in, root);
+//		
+//	}
+//	file_in.close();
+//	return ret;
+//}
 AsyncFileWriter::AsyncFileWriter():
 	mutex(),
 	m_ContentFull(),
