@@ -12,6 +12,7 @@ debug:
 
 release:
 	$(MAKE) RELEASE=1 -C common
+	$(MAKE) -C proto
 	$(MAKE) RELEASE=1 -C channelserver
 	$(MAKE) RELEASE=1 -C proxyserver
 

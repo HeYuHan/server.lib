@@ -18,7 +18,8 @@ public:
 	virtual uint GetUid();
 	virtual bool ThreadSafe();
 	virtual void OnMessage();
-	virtual void OnRevcMessage();
+	virtual void OnRevcMessage(bool parse) override;
+	virtual void ParseMessage() override;
 	virtual void OnDisconnect();
 	virtual void OnConnected();
 	virtual void OnReconnected(SocketPoolClinet*);
@@ -79,7 +80,7 @@ inline void RpcCall(RPCConection *con,int sig, Proto::Protocol::Header &header,T
 	pack->m_SIG = sig;
 	if(arg)pack->m_InnerArg = *arg;
 	pack->m_RequestHeader.CopyFrom(header);
-	if(pack->m_SIG != RPC_SIG_INNER_PROXY && pack->m_SIG != RPC_SIG_CLIENT_PROXY)
+	if(pack->m_SIG != RPC_SIG_CHANNEL_INNER_PROXY && pack->m_SIG != RPC_SIG_CLIENT_PROXY)
 	{
 		pack->m_RequestHeader.set_methodname(RPC_ALL_REQUEST_INFO[pack->m_SIG].m_MethodName);
 	}

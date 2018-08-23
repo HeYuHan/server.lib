@@ -1,6 +1,11 @@
 #pragma once
-#include <json/json.h>
-#include <event2/event.h>
+//#include <json/json.h>
+//#include <event2/event.h>
+#ifdef _WIN32
+#include <winsock2.h>
+#endif // WIN32
+
+
 #ifndef __TOOLS_H__
 #define __TOOLS_H__
 
@@ -17,10 +22,10 @@
 ** [a, b]
 */
 int RandomRange(int a, int b);
-void ParseJsonValue(Json::Value json, const char* key, int &value);
-void ParseJsonValue(Json::Value json, const char* key, float &value);
-void ParseJsonValue(Json::Value json, const char* key, bool &value);
-void ParseJsonValue(Json::Value json, const char* key, char* str, int len);
+//void ParseJsonValue(Json::Value json, const char* key, int &value);
+//void ParseJsonValue(Json::Value json, const char* key, float &value);
+//void ParseJsonValue(Json::Value json, const char* key, bool &value);
+//void ParseJsonValue(Json::Value json, const char* key, char* str, int len);
 bool ParseSockAddr(sockaddr_in & addr, const char * str, bool by_name=false);
 bool RunAsDaemon();
 void CaculateSha1(const char* text, char* out);

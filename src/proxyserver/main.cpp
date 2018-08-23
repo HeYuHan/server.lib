@@ -5,6 +5,7 @@ enum
 {
 	addr = 0x100,
 	channeladdr,
+	chataddr,
 	infoaddr,
 	flag_daemon,
 	log_name,
@@ -15,6 +16,7 @@ struct option long_options[] =
 {
 	{ "addr",required_argument,0,addr },
 	{ "channeladdr",required_argument,0,channeladdr },
+	{ "chataddr",required_argument,0,chataddr },
 	{ "infoaddr",required_argument,0,infoaddr },
 	{ "daemon",no_argument,0,flag_daemon },
 
@@ -34,6 +36,7 @@ int main(int argc, char **args) {
 	//printf("send token:%llu", m_LongId);
 	memset(gServer.m_Addr, 0, sizeof(gServer.m_Addr));
 	memset(gServer.m_ChannelAddr, 0, sizeof(gServer.m_ChannelAddr));
+	memset(gServer.m_ChatAddr, 0, sizeof(gServer.m_ChatAddr));
 	gServer.m_InfoAddrsLength = 0;
 
 	bool as_daemon = false;
@@ -51,6 +54,9 @@ int main(int argc, char **args) {
 			break;
 		case channeladdr:
 			strcpy(gServer.m_ChannelAddr, optarg);
+			break;
+		case chataddr:
+			strcpy(gServer.m_ChatAddr,optarg);
 			break;
 		case infoaddr:
 			{

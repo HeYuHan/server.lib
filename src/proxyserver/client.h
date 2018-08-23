@@ -17,12 +17,13 @@ public:
 	// Í¨¹ý NetworkStream ¼Ì³Ð
 	virtual void OnMessage() override;
 	virtual bool ThreadSafe() override;
-
+	virtual void OnRevcMessage(bool parse) override;
+	virtual void ParseMessage() override;
 	virtual void OnWrite() override;
-	virtual void OnRevcMessage() override;
 	virtual void OnDisconnect() override;
 	virtual void OnConnected() override;
 	virtual void OnReconnected(SocketPoolClinet *) override;
+	
 public:
 	bool IsOnline();
 	bool IsLogin() { return m_AccountId > 0; }
@@ -37,6 +38,7 @@ private:
 	void RequestLeaveRoom();
 	void RequestStartGame();
 	void RequestChangeEquip();
+	void RequestChatServerInfo();
 	
 public:
 	void ResponseError(ushort error);

@@ -1,6 +1,8 @@
 #include "ConnectHelper.h"
 #include "tools.h"
 #include <log.h>
+#include <event.h>
+
 BEGIN_NS_CORE
 ConnectHelper gConnectHelper;
 ConnectResult::ConnectResult():connected(false),connecting(false)

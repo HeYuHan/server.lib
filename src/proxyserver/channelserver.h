@@ -21,7 +21,8 @@ public:
 
 	// Í¨¹ý ISocketClient ¼Ì³Ð
 	virtual void OnWrite() override;
-	virtual void OnRevcMessage() override;
+	virtual void OnRevcMessage(bool parse) override;
+	virtual void ParseMessage() override;
 	virtual void OnDisconnect() override;
 	virtual void OnConnected() override;
 	virtual void OnReconnected(SocketPoolClinet *) override;

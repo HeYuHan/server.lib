@@ -33,6 +33,7 @@ public:
 public:
 	char m_Addr[65];
 	char m_ChannelAddr[65];
+	char m_ChatAddr[65];
 	char **m_InfoAddrs;
 	int m_InfoAddrsLength;
 public:

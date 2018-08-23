@@ -103,7 +103,6 @@ bool Server::Init()
 			log_error("%s", "cant init game config");
 			break;
 		}
-
 		if (!m_CachedClients.Initialize(gServerConfig.GetMaxClient()))
 		{
 			log_error("%s size:%d", "init client pool failed", gServerConfig.GetMaxClient());
@@ -134,6 +133,11 @@ bool Server::Init()
 			log_error("cant create channel server addr:%s", m_ChannelAddr);
 			break;
 		}
+		if (!m_ChatListener.CreateTcpServer(m_ChatAddr, gServerConfig.GetMaxClient()))
+		{
+			log_error("cant create chat server addr:%s", m_ChatAddr);
+			break;
+		}
 		if (!gSocketPool.Init(gServerConfig.GetMaxClient(), true, OnAcceptPoolClinet, true, this))
 		{
 			log_error("%s", "init socket pool failed");
@@ -144,6 +148,7 @@ bool Server::Init()
 			log_error("%s", "not have info server addrs");
 			break;
 		}
+
 		SetRpcRequest();
 		m_RPCService.Connect(m_InfoAddrsLength, m_InfoAddrs);
 		return true;
@@ -151,6 +156,7 @@ bool Server::Init()
 	gEventPool.Destory();
 	CloseServer();
 	m_ChannelListener.CloseServer();
+	m_ChatListener.CloseServer();
 	Timer::ExitLoop();
 	return false;
 }
@@ -227,6 +233,19 @@ void Server::ClientRpcProxy(Client* c, const char* methodName, int sig, void *re
 	arg.m_UID = c->uid;
 	RPC_PROXY_CALL(RPC_SIG_CLIENT_PROXY, header, request, request_length, &arg);
 }
+
+void Server::ChatClient(Client *c, const char*methodName, int sig, void *request, int request_length)
+{
+	Header header;
+	char name[128];
+	sprintf(name, "c_%s", methodName);
+	header.set_uid(c->m_AccountId);
+	header.set_pid(c->m_PlayerId);
+	RPCInnerArg arg;
+	arg.m_UID = c->uid;
+
+	RPC_PROXY_CALL(RPC_SIG_CHAT_INNER_PROXY, header, request, request_length, &arg);
+}
 void Server::UserLogin(Client * c)
 {
 	Proto::Protocol::Header header;
@@ -253,7 +272,7 @@ void Server::PlayerLogin(Client * c)
 
 void Server::BroadCastRoomChange(Room *room, Core::byte type)
 {
-	for (int i = 0; i < m_CachedClients.Size(); i++)
+	for (Core::uint i = 0; i < m_CachedClients.Size(); i++)
 	{
 		Client *client = m_CachedClients.Begin() + i;
 		if (client->IsOnline())
@@ -279,18 +298,7 @@ void Server::FreeRoom(Room * room)
 	room->Free();
 }
 
-void Server::ChatClient(Client *c, const char*methodName, int sig, void *request, int request_length)
-{
-	Header header;
-	char name[128];
-	sprintf(name, "c_%s", methodName);
-	header.set_uid(c->m_AccountId);
-	header.set_pid(c->m_PlayerId);
-	RPCInnerArg arg;
-	arg.m_UID = c->uid;
-	
-	RPC_PROXY_CALL(RPC_SIG_CHAT_INNER_PROXY, header, request, request_length, &arg);
-}
+
 
 //rpc set
 BEGIN_RPC_CALLBACK(UserLogin)
@@ -349,24 +357,12 @@ BEGIN_PROXY_RPC_CALLBACK(ClientProxy)
 	};
 	short sig = response->m_InnerArg.m_ProxySig;
 	int error_code = response->m_ResponseHeader.code();
-	if (error_code>0)
-	{
-		client->BeginWrite();
-		client->WriteByte(SM_RPC_RESOPONSE);
-		client->WriteShort(sig);
-		client->WriteShort(error_code);
-		client->EndWrite();
-	}
-	else
-	{
-
-		client->BeginWrite();
-		client->WriteByte(SM_RPC_RESOPONSE);
-		client->WriteShort(sig);
-		client->WriteShort(0);
-		client->WriteData(response->m_ResponseProxy, response->m_ResponseProxyLength);
-		client->EndWrite();
-	}
+	client->BeginWrite();
+	client->WriteByte(SM_RPC_RESOPONSE);
+	client->WriteShort(sig);
+	client->WriteShort(error_code);
+	client->WriteData(response->m_ResponseProxy, response->m_ResponseProxyLength);
+	client->EndWrite();
 }
 END_RPC_CALLBACK()
 
@@ -409,13 +405,12 @@ END_RPC_CALLBACK()
 BEGIN_PROXY_RPC_CALLBACK(ChatProxy)
 {
 
-	Chatclient* client = gServer.m_ChatListener.m_ChatCachedClient.Get(response->m_InnerArg.m_UID);
-	if (client == NULL)
+	Chatclient* client = &(gServer.m_ChatListener.m_ChatClient);
+	if (client->connection)
 	{
-		log_error("client not found uid:%d",response->m_InnerArg.m_UID);
+		log_error("%s","chat server not connect");
 		return;
 	}
-	short sig = response->m_InnerArg.m_ProxySig;
 	client->BeginWrite();
 	client->WriteByte(Inner::SM_CHAT_RPC);
 	client->WriteData(response->m_ResponseProxy, response->m_ResponseProxyLength);
@@ -435,7 +430,7 @@ void Server::SetRpcRequest()
 
 	//proxy
 	RPC_ALL_REQUEST_INFO[RPC_SIG_CLIENT_PROXY].m_CallBack = Rpc_ClientProxy_CallBack;
-	RPC_ALL_REQUEST_INFO[RPC_SIG_INNER_PROXY].m_CallBack = Rpc_InnerProxy_CallBack;
+	RPC_ALL_REQUEST_INFO[RPC_SIG_CHANNEL_INNER_PROXY].m_CallBack = Rpc_InnerProxy_CallBack;
 	RPC_ALL_REQUEST_INFO[RPC_SIG_CHAT_INNER_PROXY].m_CallBack = Rpc_ChatProxy_CallBack;
 
 

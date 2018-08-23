@@ -69,6 +69,22 @@ const BattlePacketType BattlePacketType_MIN = POSITION;
 const BattlePacketType BattlePacketType_MAX = LEAVE_GAME;
 const int BattlePacketType_ARRAYSIZE = BattlePacketType_MAX + 1;
 
+enum RpcType {
+  RPC_SIG_NONE = 0,
+  RPC_SIG_USER_LOGIN = 1,
+  RPC_SIG_PLAYER_LOGIN = 2,
+  RPC_SIG_CLIENT_PROXY = 3,
+  RPC_SIG_CHANNEL_INNER_PROXY = 4,
+  RPC_SIG_CHAT_INNER_PROXY = 5,
+  RPC_SIG_COUNT = 6,
+  RpcType_INT_MIN_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32min,
+  RpcType_INT_MAX_SENTINEL_DO_NOT_USE_ = ::google::protobuf::kint32max
+};
+bool RpcType_IsValid(int value);
+const RpcType RpcType_MIN = RPC_SIG_NONE;
+const RpcType RpcType_MAX = RPC_SIG_COUNT;
+const int RpcType_ARRAYSIZE = RpcType_MAX + 1;
+
 // ===================================================================
 
 class Header : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:Proto.Protocol.Header) */ {
@@ -357,6 +373,7 @@ namespace protobuf {
 
 template <> struct is_proto_enum< ::Proto::Protocol::PacketType> : ::google::protobuf::internal::true_type {};
 template <> struct is_proto_enum< ::Proto::Protocol::BattlePacketType> : ::google::protobuf::internal::true_type {};
+template <> struct is_proto_enum< ::Proto::Protocol::RpcType> : ::google::protobuf::internal::true_type {};
 
 }  // namespace protobuf
 }  // namespace google

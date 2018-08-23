@@ -21,9 +21,13 @@ bool RPCClient::ThreadSafe()
 	return true;
 }
 
-void RPCClient::OnRevcMessage()
+void RPCClient::OnRevcMessage(bool parse)
 {
-	NetworkStream::OnRevcMessage();
+	NetworkStream::OnRevcMessage(parse);
+}
+void RPCClient::ParseMessage()
+{
+	NetworkStream::ParseMessage();
 }
 
 uint RPCClient::GetUid()
@@ -194,7 +198,7 @@ void RPCClient::OnMessage()
 	if (!m_CurrentRequest || m_CurrentRequest->m_RequestIndex != (m_ReuqestIndex - 1))
 	{
 		log_error("%s","request is null or request index is error(maybe time out,request removed)");
-		OnWrite();
+		//OnWrite();
 		return;
 	}
 	int head_len = 0;
@@ -401,7 +405,7 @@ void RPCConection::Update(float t)
 		//m_Lock.Unlock();
 	}
 	RPCClient *client = m_CachedClient.Begin();
-	for (int i = 0; i < m_CachedClient.Size(); i++)
+	for (uint i = 0; i < m_CachedClient.Size(); i++)
 	{
 		client = client + i;
 		if (client->IsConnect())
@@ -476,7 +480,7 @@ void RPCConection::AddRequest(RPCRequestPack<google::protobuf::Message, google::
 	m_RequestQueue.push(info);
 	m_Lock.Unlock();
 	RPCClient* client = m_CachedClient.Begin();
-	for (int i = 0; i < m_CachedClient.Size(); i++)
+	for (uint i = 0; i < m_CachedClient.Size(); i++)
 	{
 		RPCClient* temp = client + i;
 		if (temp->IsConnect())

@@ -5,9 +5,10 @@
 #include <CommonTypes.pb.h>
 #include "ClientData.pb.h"
 #include "room.h"
+#include <tools.h>
 using namespace Proto::Protocol::Proxy;
 using namespace Proto::Types;
-Client::Client():m_IsOnline(false),m_AccountId(0),m_PlayerId(0),m_OwnerRoom(NULL)
+Client::Client():m_AccountId(0),m_PlayerId(0),m_OwnerRoom(NULL),m_IsOnline(false)
 {
 
 }
@@ -140,7 +141,7 @@ void Client::RequestRoomList()
 	WriteShort(0);
 	int index = 0;
 	short write_count = 0;
-	for (int i = 0; i < gServer.m_CachedRooms.Size(); i++)
+	for (Core::uint i = 0; i < gServer.m_CachedRooms.Size(); i++)
 	{
 		Room * room = gServer.m_CachedRooms.Begin() + i;
 		if (!room->m_Free)
@@ -170,7 +171,7 @@ void Client::RequestOBRoomList()
 	ReadShort(page);
 	ReadShort(page_count);
 	int all_room_count = 0;
-	for (int i = 0; i < gServer.m_CachedRooms.Size(); i++)
+	for (Core::uint i = 0; i < gServer.m_CachedRooms.Size(); i++)
 	{
 		Room * room = gServer.m_CachedRooms.Begin() + i;
 		if (!room->m_Free && room->m_Channel && room->m_RoomState == RS_PLAY)
@@ -202,7 +203,7 @@ void Client::RequestOBRoomList()
 	WriteShort(0);
 	int index = 0;
 	short write_count = 0;
-	for (int i = 0; i < gServer.m_CachedRooms.Size(); i++)
+	for (Core::uint i = 0; i < gServer.m_CachedRooms.Size(); i++)
 	{
 		Room * room = gServer.m_CachedRooms.Begin() + i;
 		if (!room->m_Free && room->m_Channel && room->m_RoomState == RS_PLAY)
@@ -274,7 +275,7 @@ void Client::RequestLeaveRoom()
 		if (r->RemovePlayer(this))
 		{
 			this->m_State = CS_IN_LOBBY;
-			
+			log_info("client leave room:%d", uid);
 			if(r->m_CurrentPlayerCount>0)gServer.BroadCastRoomChange(r, OFFSET(ROOM_CHANGE_SAMPLE));
 		}
 		else
@@ -344,6 +345,16 @@ void Client::RequestChangeEquip()
 			gServer.BroadCastRoomChange(m_OwnerRoom, OFFSET(ROOM_CHANGE_DETAIL));
 		}
 		
+	}
+}
+void Client::RequestChatServerInfo()
+{
+	if (gServer.m_ChatListener.m_ChatClient.IsValid())
+	{
+		BeginWrite();
+		WriteByte(SM_CHAT_SERVER_INFO);
+		WriteString(gServer.m_ChatListener.m_ChatClient.m_OuterAddr);
+		EndWrite();
 	}
 }
 void Client::ResponseError(ushort error)
@@ -419,6 +430,11 @@ void Client::OnMessage()
 		RequestOBRoomList();
 		break;
 	}
+	case CM_REQUEST_CHAT_SERVER_INFO:
+	{
+		RequestChatServerInfo();
+		break;
+	}
 	default:
 		log_error("cant parse msg : %d uid:%d", cmd,uid);
 		this->connection->Disconnect();
@@ -428,17 +444,22 @@ void Client::OnMessage()
 
 bool Client::ThreadSafe()
 {
-	return true;
+	return false;
+}
+
+void Client::OnRevcMessage(bool parse)
+{
+	NetworkStream::OnRevcMessage(parse);
+}
+
+void Client::ParseMessage()
+{
+	NetworkStream::ParseMessage();
 }
 
 void Client::OnWrite()
 {
 
-}
-
-void Client::OnRevcMessage()
-{
-	NetworkStream::OnRevcMessage();
 }
 
 void Client::OnDisconnect()
@@ -467,6 +488,7 @@ void Client::OnReconnected(SocketPoolClinet *c)
 	this->connection = c;
 	this->uid = c->uid;
 }
+
 
 bool Client::IsOnline()
 {

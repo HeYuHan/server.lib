@@ -28,6 +28,11 @@ protected:
 class SocketPool;
 class SocketPoolClinet:public NetworkConnection, protected IThreadMessageHadle
 {
+private:
+	enum
+	{
+		THREAD_ID_CONNECTED=1, THREAD_ID_RECONNECTED,THREAD_ID_MESSAGE,THREAD_ID_DISCONNECTED
+	};
 public:
 	SocketPoolClinet();
 public:
