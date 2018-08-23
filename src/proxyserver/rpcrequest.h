@@ -5,6 +5,7 @@
 
 #include "RpcProtocol.pb.h"
 #include <Timer.h>
+using namespace Proto::Protocol;
 struct RPCInnerArg
 {
 	unsigned int m_UID;
@@ -18,8 +19,8 @@ class RPCRequestPack
 public:
 	Proto::Protocol::Header m_RequestHeader;
 	Proto::Protocol::Header m_ResponseHeader;
-	void* m_RequsetProxy;
-	void* m_ResponseProxy;
+	char* m_RequsetProxy;
+	char* m_ResponseProxy;
 	int m_RequestProxyLength;
 	int m_ResponseProxyLength;
 	T1* m_Request;
@@ -107,14 +108,4 @@ struct RPCRequestSig
 	const char* m_MethodName;
 	RPCCallbak m_CallBack;
 };
-typedef enum
-{
-	RPC_SIG_NONE,
-	RPC_SIG_USER_LOGIN=1,
-	RPC_SIG_PLAYER_LOGIN,
-	RPC_SIG_CLIENT_PROXY,
-	RPC_SIG_INNER_PROXY,
-	RPC_SIG_CHAT_INNER_PROXY,
-	RPC_SIG_COUNT,
-}RPCSIG;
 #endif

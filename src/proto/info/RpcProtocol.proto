@@ -33,3 +33,13 @@ message Header {
 	uint32 rpcId = 7;
 	uint32 packetId = 8;  // 请求包 ID
 }
+
+enum RpcType{
+	RPC_SIG_NONE=0;
+	RPC_SIG_USER_LOGIN=1;//用户登陆
+	RPC_SIG_PLAYER_LOGIN=2;//角色登陆
+	RPC_SIG_CLIENT_PROXY=3;//客户端代理
+	RPC_SIG_CHANNEL_INNER_PROXY=4;//Channel代理
+	RPC_SIG_CHAT_INNER_PROXY=5;//Chat代理
+	RPC_SIG_COUNT=6;
+}

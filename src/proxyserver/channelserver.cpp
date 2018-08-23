@@ -156,11 +156,14 @@ void ChannelClient::OnWrite()
 {
 }
 
-void ChannelClient::OnRevcMessage()
+void ChannelClient::OnRevcMessage(bool parse)
 {
-	NetworkStream::OnRevcMessage();
+	NetworkStream::OnRevcMessage(parse);
 }
-
+void ChannelClient::ParseMessage()
+{
+	NetworkStream::ParseMessage();
+}
 void ChannelClient::OnDisconnect()
 {
 	Room* r = gServer.m_CachedRooms.Begin();
@@ -238,7 +241,7 @@ void ChannelClient::RpcRequest()
 	RPCInnerArg arg;
 	arg.m_ProxySig = sig;
 	arg.m_UID = this->uid;
-	RPC_PROXY_CALL(RPC_SIG_INNER_PROXY, header, read_position, read_end - read_position, &arg);
+	RPC_PROXY_CALL(RPC_SIG_CHANNEL_INNER_PROXY, header, read_position, read_end - read_position, &arg);
 }
 
 int ChannelClient::GetRate()
