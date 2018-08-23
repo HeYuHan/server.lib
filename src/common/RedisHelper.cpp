@@ -1,8 +1,8 @@
 #include "RedisHelper.h"
+
 #include <log.h>
-
-#include <hiredis\hiredis.h>
-
+#include <tools.h>
+#include <hiredis.h>
 RedisHelper::RedisHelper():m_Context(0)
 {
 
@@ -14,14 +14,25 @@ RedisHelper::~RedisHelper()
 
 bool RedisHelper::Connnect(const char * addr)
 {
-	char address[256];
-	const char * port_start = strchr(addr, ':');
-	if (port_start)
+	sockaddr_in addr_in;
+	if (!ParseSockAddr(addr_in, addr))
 	{
-		memcpy(address, addr, port_start - addr);
-		address[port_start - addr] = 0;
-		int port = atoi(port_start + 1);
-		m_Context =redisConnect(address, port);
+		return false;
+	}
+	int m_Socket = socket(AF_INET, SOCK_STREAM, 0);
+	if (0 == connect(m_Socket, (sockaddr*)&addr_in, sizeof(addr_in)))
+	{
+		m_Context = redisConnectFd(m_Socket);
+		if (m_Context == NULL)
+		{
+#ifdef _WIN32
+			closesocket(m_Socket);
+#else
+			close(m_Socket);
+#endif // _WIN32
+		}
+
+
 		if (m_Context == NULL)
 		{
 			log_error("cant connect redis server : %s", addr);

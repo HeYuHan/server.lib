@@ -1,7 +1,6 @@
 #pragma once
 #ifndef __REDIS_HELPER_H__
 #define __REDIS_HELPER_H__
-#define REDIS_SORT_STRING_TAG "|"
 
 struct redisContext;
 struct redisReply;

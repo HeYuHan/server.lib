@@ -84,7 +84,7 @@
     <TargetName>libcommon_d</TargetName>
     <OutDir>$(SolutionDir)lib\</OutDir>
     <IntDir>$(SolutionDir)Temp\$(ProjectName)</IntDir>
-    <IncludePath>$(SolutionDir)3rd\protobuf-3.0.0\cmake\build\release\include;$(SolutionDir)3rd\log4cpp\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)3rd\pthread\include;$(SolutionDir)3rd\libevent\WIN32-Code\nmake;$(SolutionDir)3rd\libevent\include;$(SolutionDir)3rd\RakNet\Source;$(SolutionDir)src\common;$(SolutionDir)3rd\redis-win-3.2.100\deps\hiredis</IncludePath>
+    <IncludePath>$(SolutionDir)3rd\protobuf-3.0.0\cmake\build\include;$(SolutionDir)3rd\log4cpp\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SolutionDir)3rd\pthread\include;$(SolutionDir)3rd\libevent\WIN32-Code\nmake;$(SolutionDir)3rd\libevent\include;$(SolutionDir)3rd\RakNet\Source;$(SolutionDir)src\common;$(SolutionDir)3rd\hiredis</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -148,15 +148,6 @@
     <ClInclude Include="..\src\common\LuaBridge\RefCountedObject.h" />
     <ClInclude Include="..\src\common\LuaBridge\RefCountedPtr.h" />
     <ClInclude Include="..\src\common\LuaEngine.h" />
-    <ClInclude Include="..\src\common\json\autolink.h" />
-    <ClInclude Include="..\src\common\json\config.h" />
-    <ClInclude Include="..\src\common\json\features.h" />
-    <ClInclude Include="..\src\common\json\forwards.h" />
-    <ClInclude Include="..\src\common\json\json.h" />
-    <ClInclude Include="..\src\common\json\json_batchallocator.h" />
-    <ClInclude Include="..\src\common\json\reader.h" />
-    <ClInclude Include="..\src\common\json\value.h" />
-    <ClInclude Include="..\src\common\json\writer.h" />
     <ClInclude Include="..\src\common\linux\getopt.h" />
     <ClInclude Include="..\src\common\log.h" />
     <ClInclude Include="..\src\common\lua\lapi.h" />
@@ -212,9 +203,6 @@
     <ClCompile Include="..\src\common\FileReader.cpp" />
     <ClCompile Include="..\src\common\HttpClient.cpp" />
     <ClCompile Include="..\src\common\HttpListenner.cpp" />
-    <ClCompile Include="..\src\common\json\json_reader.cpp" />
-    <ClCompile Include="..\src\common\json\json_value.cpp" />
-    <ClCompile Include="..\src\common\json\json_writer.cpp" />
     <ClCompile Include="..\src\common\linux\getopt.cpp" />
     <ClCompile Include="..\src\common\log.cpp" />
     <ClCompile Include="..\src\common\LuaEngine.cpp" />
@@ -268,17 +256,11 @@
     <ClCompile Include="..\src\common\WebSocket.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\src\common\json\json_internalarray.inl" />
-    <None Include="..\src\common\json\json_internalmap.inl" />
-    <None Include="..\src\common\json\json_valueiterator.inl" />
     <None Include="..\src\common\lua\Makefile" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\3rd\redis-win-3.2.100\msvs\hiredis\hiredis.vcxproj">
-      <Project>{13e85053-54b3-487b-8ddb-3430b1c1b3bf}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\3rd\redis-win-3.2.100\src\Win32_Interop\Win32_Interop.vcxproj">
-      <Project>{8c07f811-c81c-432c-b334-1ae6faecf951}</Project>
+    <ProjectReference Include="..\3rd\hiredis\hiredis.vcxproj">
+      <Project>{6316f5ef-6d60-43a3-ba04-4f4e5534d957}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

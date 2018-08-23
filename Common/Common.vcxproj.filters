@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="json">
-      <UniqueIdentifier>{954c7adb-bd1f-4713-946e-2193e44f27e7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="lua">
       <UniqueIdentifier>{4237c5eb-8b25-437c-8609-dffa2721b261}</UniqueIdentifier>
     </Filter>
@@ -62,33 +59,6 @@
     </ClInclude>
     <ClInclude Include="..\src\common\FileReader.h">
       <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\common\json\autolink.h">
-      <Filter>json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\common\json\config.h">
-      <Filter>json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\common\json\features.h">
-      <Filter>json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\common\json\forwards.h">
-      <Filter>json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\common\json\json.h">
-      <Filter>json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\common\json\json_batchallocator.h">
-      <Filter>json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\common\json\reader.h">
-      <Filter>json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\common\json\value.h">
-      <Filter>json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\common\json\writer.h">
-      <Filter>json</Filter>
     </ClInclude>
     <ClInclude Include="..\src\common\tools.h">
       <Filter>头文件</Filter>
@@ -263,15 +233,6 @@
     <ClCompile Include="..\src\common\FileReader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\common\json\json_reader.cpp">
-      <Filter>json</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\common\json\json_value.cpp">
-      <Filter>json</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\common\json\json_writer.cpp">
-      <Filter>json</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\common\tools.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -427,15 +388,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\src\common\json\json_internalarray.inl">
-      <Filter>json</Filter>
-    </None>
-    <None Include="..\src\common\json\json_internalmap.inl">
-      <Filter>json</Filter>
-    </None>
-    <None Include="..\src\common\json\json_valueiterator.inl">
-      <Filter>json</Filter>
-    </None>
     <None Include="..\src\common\lua\Makefile">
       <Filter>lua</Filter>
     </None>
