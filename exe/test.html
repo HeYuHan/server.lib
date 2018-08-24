@@ -1,0 +1,24 @@
+<<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>WebSocket</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+        var ws = new WebSocket("ws://127.0.0.1:9796");
+        ws.onopen = function(){
+            console.log("socket open");
+        }
+        ws.onclose = function(){
+            console.log("socket close")
+        }
+        ws.onmessage = function(event){
+            console.log(event.data)
+        }
+    </script>
+</head>
+<body>
+    
+</body>
+</html>
