@@ -64,7 +64,7 @@ void TcpConnection::InitSocket(evutil_socket_t socket, sockaddr * addr, event_ba
 	m_BufferEvent = bufferevent_socket_new(base, socket, BEV_OPT_CLOSE_ON_FREE);
 	bufferevent_setcb(m_BufferEvent, ReadEvent, WriteEvent, SocketEvent, this);
 	bufferevent_enable(m_BufferEvent, EV_READ | EV_WRITE | EV_PERSIST);
-	OnConnected();
+	if(m_Type != WEB_SOCKET)OnConnected();
 }
 
 bool TcpConnection::Connect(const char * ip, int port, event_base * base)
@@ -124,6 +124,7 @@ bool TcpConnection::Reconnect(event_base * base)
 
 void TcpConnection::Disconnect()
 {
+	if (!m_BufferEvent)return;
 	bufferevent_flush(m_BufferEvent, EV_WRITE, BEV_NORMAL);
 	bufferevent_free(m_BufferEvent);
 	evutil_closesocket(m_Socket);
@@ -185,6 +186,7 @@ void TcpConnection::HandShake()
 	int res_size = response.size();
 	Send((void*)response.c_str(), res_size);
 	this->stream->Reset();
+	OnConnected();
 }
 void TcpConnection::ReadEvent(bufferevent * bev, void * arg)
 {

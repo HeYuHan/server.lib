@@ -2,16 +2,10 @@
 #ifndef __ILUA_SCRIPT_H__
 #define __ILUA_SCRIPT_H__
 
-extern "C"
-{
-#include "lua/lua.h"
-#include "lua/lualib.h" 
-#include "lua/lauxlib.h" 
-}
-
-#include "LuaBridge/LuaBridge.h"
+#include "LuaBridge/LuaFunction.h"
 #include "common.h"
 #include "log.h"
+
 #define REG_GET_SET(__NAME__) METHOD(Get##__NAME__) METHOD(Set##__NAME__)
 BEGIN_NS_CORE
 typedef int(*register_lua_model)(lua_State* L);

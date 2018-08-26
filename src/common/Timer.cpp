@@ -7,7 +7,9 @@ struct event_base* gEventBase=NULL;
 Timer::Timer():
 	m_Stop(true),
 	m_TimerEvent(NULL),
-	m_EventBase(NULL)
+	m_EventBase(NULL),
+	m_CallBack(0)
+
 {
 }
 
@@ -35,7 +37,7 @@ void Timer::Init(float time, TimerCallBack call_back, void * arg, bool loop)
 void Timer::Begin(struct event_base *base)
 {
 	m_EventBase = base ? base : GetEventBase();
-	if (NULL == m_EventBase)return;
+	if (NULL == m_EventBase || !m_CallBack)return;
 
 	m_Run = true;
 	m_Stop = false;

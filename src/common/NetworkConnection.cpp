@@ -95,7 +95,6 @@ void NetworkStream::ParseMessage()
 				int ret = parser.DecodeFrame(web_frame, size, outHead, outSize);
 				if (ret == WS_PARSE_RESULT_ERROR)
 				{
-					log_info("websocket closed %s", "WS_PARSE_RESULT_ERROR");
 					connection->Disconnect();
 					goto parse_message_end;
 				}
@@ -108,7 +107,6 @@ void NetworkStream::ParseMessage()
 				}
 				else if (ret == WS_PARSE_RESULT_WAIT_NEXT_DATA)
 				{
-					log_info("WS_PARSE_RESULT_WAIT_NEXT_DATA=>next size : %d", size);
 					web_frame = NULL;
 					goto parse_message_end;
 				}
