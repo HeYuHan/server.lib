@@ -87,7 +87,7 @@ end
 --@msg:
 --@return 
 function Client:SendMessage(type,msg)
-    self:Send({type,msg})
+    self:Send({type-1,msg})
 end
 function Client:CheckInRoom(msg)
     -- body
@@ -96,7 +96,7 @@ end
 
 function Client:EnterRoom(msg)
     local r = Room.Get(msg.guid)
-    if r==nil then
+    if not(r) then
         local session = GetRoomSession(gServer.db,msg.guid)
         if session then
             print('get room session count:' .. json.encode(session))
@@ -106,8 +106,7 @@ function Client:EnterRoom(msg)
         end
     end
     if r then
-        if r:Enter(self) then
-        else
+        if not(r:Enter(self)) then
             self:Send({
                 error = 'CANT_ENTER_ROOM'
             })
@@ -126,8 +125,7 @@ function Client:LeaveRoom(msg)
 end
 
 function Client:ReadyGame(msg)
-    -- body
-    print('ReadyGame=>'..msg)
+    if self.room then self.room:Ready(self,msg.ready) end
 end
 function Client:ChuPai(msg)
     -- body
@@ -135,15 +133,16 @@ function Client:ChuPai(msg)
 end
 function Client:ResponseChuPai(msg)
     -- body
-    print('ResponseChuPai=>'..msg)
+    --print('ResponseChuPai=>'..msg)
 end
 function Client:HuanPai(msg)
     -- body
     print('HuanPai=>'..msg)
 end
 function Client:MaiZhuang(msg)
-    -- body
-    print('MaiZhuang=>'..msg)
+    if self.room then
+        self.room:MaiZhuang(self,msg)
+    end
 end
 function Client:Broadcast(msg)
     -- body

@@ -1,10 +1,10 @@
 json = require "json"
+require 'config'
 --define
 REDIS_CMD_HASH = 1
 REDIS_CMD_STRING = 2
 REDIS_CMD_SORT_STRING =3
-CLIENT_AUTH_MAX_TIME = 5
-GAME_MAX_PLAYERS = 3
+
 ----------------------------------------------------------
 --db script hash
 local redis_script_get_guid = nil
@@ -57,6 +57,19 @@ function PrintTable(t)
             print(tostring(i) .. ':' .. tostring(v))
         end
     end 
+end
+function bubbleSort(arr,func,length)
+    local len = length or #arr
+    for i=1,len do
+        for j=1,len - i do
+            if func(arr[j],arr[j+1]) > 0 then
+                local temp = arr[j+1]
+                arr[j+1] = arr[j]
+                arr[j] = temp
+            end
+        end
+    end
+    return arr
 end
 --==============================--
 --desc:types
@@ -261,9 +274,169 @@ function GetSystemTable(db)
     end
 end
 
-function RandomInt(min,max)
+function Random(min,max)
     math.randomseed(os.time())
     local x = math.random()*(max - min) + min
     return math.ceil(x);
 end
 
+Array = {tbl=nil,size=0}
+function Array:OnCreate()
+    self.tbl = {}
+    self.size = 0
+end
+function Array:Push(e)
+    self.size = self.size + 1
+    self.tbl[self.size]=e
+end
+function Array:At(index)
+    
+    if (index <= self.size) and (index > 0) then
+        return self.tbl[index]
+    else
+        return nil
+    end
+end
+function Array:IndexOf(e)
+    for i=1,self.size do
+        if self.tbl[i] == e then
+            return i
+        end
+    end
+    return 0
+end
+function Array:Set(index,e)
+    if index <= self.size and index > 0 then
+        self.tbl[index]=e
+        return true
+    else
+        return false
+    end
+end
+function Array:RemoveAt(index)
+    if index <= self.size and index > 0 then
+        local ret = self.tbl[index]
+        self.size = self.size - 1
+        for i=index,self.size do
+            self.tbl[i]=self.tbl[i+1]
+        end
+        return ret
+    else
+        return nil
+    end
+    return nil
+end
+function Array:Remove(e)
+    local index = self:IndexOf(e)
+    if index > 0 then
+        return self:RemoveAt(index) ~= nil
+    else
+        return false
+    end
+end
+
+function Array:Size()
+    return self.size
+end
+function Array:Pop()
+    assert(self.size > 0)
+    self.size = self.size -1
+    return self.tbl[self.size + 1]
+end
+function Array:Last()
+    if self.size > 0 then return self.tbl[self.size] end
+    return nil
+end
+
+function Array:Each(func)
+    for i=1,self.size do
+        func(i,self.tbl[i])
+    end
+end
+function Array:Sort(func)
+    bubbleSort(self.tbl,func,self.size)
+end
+function Array:Data()
+    local data = {}
+    for i=1,self.size do
+        data[i]=self.tbl[i]
+    end
+    return data
+end
+function Array:Print()
+    for i=1,self.size do
+        print('index = '..tostring(i) .. ',value = ' .. tostring(self.tbl[i]))
+    end
+end
+
+--array test
+-- local array = CreateObject(Array)
+-- array:Push(1)
+-- array:Push(2)
+-- array:Push(6)
+-- array:Print()
+-- print('--------------------------------------------')
+
+-- array:Push(4)
+-- array:RemoveAt(3)
+-- array:Print()
+-- print('--------------------------------------------')
+-- print('array size = ' .. tostring(array:Size()))
+-- print('index of 4 = ' .. tostring(array:IndexOf(4)))
+
+
+--------------------------------------------------------------------------------------
+RandomInt={min=0,max=0,allowrepeat=false,recoders=nil}
+function RandomInt:OnCreate()
+    self.recoders = CreateObject(Array)
+end
+function RandomInt:Init(min,max,allowrepeat)
+    self.min = min
+    self.max = max
+    self.allowrepeat = allowrepeat
+    if not(allowrepeat) then
+        for i=min,max do
+            self.recoders:Push(i)
+        end
+        if not(DEFINE_RANDOM_TEST) then
+            local len = max - min
+            if (len > 1) then
+                for i = 1,len-1 do
+                    local value = self.recoders:At(i)
+                    local rand_index = (Random(min,max) % (len-i)) + 1
+                    self.recoders:Set(i,self.recoders:At(rand_index))
+                    self.recoders:Set(rand_index,value)
+                end
+            end
+        end
+    end
+end
+function RandomInt:Print()
+    self.recoders:Print()
+end
+function RandomInt:Get()
+    if self.allowrepeat then
+        local range=self.max-self.min;
+        return math.floor(math.random()*range)+self.min;
+    else
+        return self.recoders:Pop()
+    end
+end
+function RandomInt:PopValue(value)
+    self.recoders:Remove(value)
+end
+function RandomInt:Size()
+    return self.recoders:Size()
+end
+--test randomint
+-- local r = CreateObject(RandomInt)
+-- r:Init(1,10)
+-- r:Print()
+-------------------------------------------------------------------
+--test sort
+-- local arr={11,5,28,4,6,7}
+-- bubbleSort(arr,function (a,b)
+--     return a-b
+-- end)
+-- PrintTable(arr)
+-------------------------------------------------------------------

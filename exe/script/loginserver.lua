@@ -62,8 +62,8 @@ end
 
 function Client:TestUserInfo(msg)
     local test = CopyTable(UserInfo)
-    test.nick = 'test' .. tostring(RandomInt(100000,999999))
-    test.unionid = 'unionid' .. tostring(RandomInt(100000,999999))
+    test.nick = 'test' .. tostring(Random(100000,999999))
+    test.unionid = 'unionid' .. tostring(Random(100000,999999))
     test.guid = GetUserGuid(gServer.db)
     gServer:SaveUserInfo(test)
     print('test:' .. json.encode(test))
@@ -85,7 +85,7 @@ function Client:CreateRoomCard(msg)
             local cost = currency[tostring(msg.count)]
             if cost then
                 local user_money = user[msg.currency]
-                if user_money < cost then
+                if not(user_money) or (user_money < cost) then
                     err = 'MONEY_NOT_FULL'
                 else
                     local card = CopyTable(RoomCard)
@@ -97,7 +97,7 @@ function Client:CreateRoomCard(msg)
                     local limit = tonumber(msg.limit)
                     if limit>0 then card.limit=limit end
                     if msg.includexi then card.xi = true end
-                    card.pay = PayType[msg.payType]
+                    card.pay = PayType[msg.payType] - 1
                     card.currency = msg.currency
                     if (SaveRoomCard(gServer.db,card)) then
                         user[msg.currency] = user_money - cost
