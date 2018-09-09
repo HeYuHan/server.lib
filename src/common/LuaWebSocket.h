@@ -48,4 +48,5 @@ private:
 private:
 	Core::ObjectPool<LuaWebSocketClient> m_CachedClient;
 	Core::LuaFunction m_AcceptFunc;
+	Core::LuaObject m_Sender;
 };

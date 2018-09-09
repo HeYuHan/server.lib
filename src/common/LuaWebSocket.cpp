@@ -65,6 +65,7 @@ int LuaWebSocketListenner::RegisterCallBack(lua_State * L)
 		{
 			log_error("%s", "cant find accept function");
 		}
+		m_Sender.Init(L);
 	}
 	else
 	{
@@ -76,7 +77,7 @@ int LuaWebSocketListenner::RegisterCallBack(lua_State * L)
 
 void LuaWebSocketListenner::CallbackAccept(LuaWebSocketClient * c)
 {
-	if(m_AcceptFunc.IsValid())m_AcceptFunc(c);
+	if(m_AcceptFunc.IsValid())m_AcceptFunc(c,&m_Sender);
 }
 
 LuaWebSocketClient::LuaWebSocketClient():m_Listenner(NULL)
