@@ -368,6 +368,12 @@ function Array:Print()
         print('index = '..tostring(i) .. ',value = ' .. tostring(self.tbl[i]))
     end
 end
+function Array:Clone()
+    return CreateObject(Array,{tbl=self:Data(),size=self.size})
+end
+function Array:Clear()
+    self.size = 0
+end
 
 --array test
 -- local array = CreateObject(Array)

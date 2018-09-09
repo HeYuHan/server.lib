@@ -63,6 +63,7 @@ TYPE_RATE_JIAOPAI = 5
 Pai = {value = nil,type = TYPE_PAI_NONE,num = nil}
 Pai_All = {}
 PaiDetail = {pai=nil,is_jiang=false,is_laojiang=false,equal_jiang_value=0}
+
 function CreatePai(number)
     if Pai_All[number] then
         return Pai_All[number]
@@ -114,6 +115,23 @@ function PaiValueToNumber(type,value)
     if(type==TYPE_PAI_TONG) then return value+80 end
     if(type==TYPE_PAI_XI)   then return 121 end
     return ret
+end
+function SortPaiNumber(a,b)
+    local p1=CreatePai(a)
+    local p2=CreatePai(b)
+    if(p1.type==p2.type) then
+    
+        if(p1.value==p2.value) then
+        
+            return p1.num-p2.num
+        
+        else
+            return p1.value-p2.value
+        end
+    
+    else
+        return p1.type-p2.type
+    end
 end
 
 PuKe = {}
@@ -244,6 +262,290 @@ function PuKe.GetHuPaiRate(jiang_pai_type,pai_detail,type)
         end
     end
     return hu
+end
+
+
+function PuKe:CaculateDiHu(shou_pai,di_pai,an_gang,jiao_pai)
+
+    local ming_ke_array = CreateObject(Array)
+    local an_ke_array = CreateObject(Array)
+    local ming_gang_array = CreateObject(Array)
+    local an_gang_array = CreateObject(Array)
+    local xi_pai_array = CreateObject(Array)
+    local sun_zi_array = CreateObject(Array)
+    local dui_zi_array = CreateObject(Array)
+    local jiao_pai_array = CreateObject(Array)
+    local temp_array = CreateObject(Array)
+
+    --判断三花聚会
+    local san_hua=0;
+    local have_san_hua=false
+    --手牌(计算暗刻,重新排序)
+    local shou_pai2=shou_pai:Clone()
+    shou_pai:Sort(SortPaiNumber)
+    shou_pai2:Each(function ( k,v )
+        local detail = self:GetDetail(v)
+        if(detail.pai.type == TYPE_PAI_XI)then
+            xi_pai_array:Push(detail)
+            return
+        end
+        if(detail.is_laojiang) then
+        
+            if(detail.pai.type==TYPE_PAI_HONG) then san_hua = bit_left(1,1) 
+            elseif(detail.pai.type==TYPE_PAI_BAI) then san_hua = bit_left(1,2)
+            elseif(detail.pai.type==TYPE_PAI_QIAN) then san_hua = bit_left(1,3) 
+            end
+        end
+        temp_array:Push(detail)
+        --类型不同跳过第一张
+        if(temp_array:Size()>1 and temp_array:At(1).pai.type ~= temp_array:At(2).pai.type) then
+        
+            temp_array:RemoveAt(1)
+            return
+        end
+        if(temp_array:Size()<2) then return end
+        if(true) then
+    
+
+            if(temp_array:Size()<3)then return end
+            if(temp_array:At(3).pai.type ~= temp_array:At(1).pai.type) then
+            
+                local t1 = temp_array:At(2)
+                local t2 = temp_array:At(3)
+                temp_array:Clear()
+                temp_array:Push(t1)
+                temp_array:Push(t2)
+                return
+            end
+            --暗刻
+            if(temp_array:At(1).pai.value == temp_array:At(2).pai.value and temp_array:At(1).pai.value == temp_array:At(2).pai.value) then
+            
+                if(jiao_pai:indexOf(temp_array:At(1).pai.num)<0) then an_ke_array:Push(temp_array:At(1)) end
+                temp_array:Clear()
+                return
+            else
+                local t1 = temp_array:At(2)
+                local t2 = temp_array:At(3)
+                temp_array:Clear()
+                temp_array:Push(t1)
+                temp_array:Push(t2)
+                return
+            end
+        end
+    end)
+    --//计算顺子,和对子
+    temp_array:Clear()
+    for k = 1,shou_pai:Size() do
+        while true do
+            local detail = self:GetDetail(shou_pai:At(k))
+            if(detail.pai.type == TYPE_PAI_XI) then break end
+            temp_array:Push(detail)
+            --类型不同跳过第一张
+            if(temp_array:Size()>1 and temp_array:At(1).pai.type ~= temp_array:At(2).pai.type) then
+            
+                local t = temp_array:At(2)
+                temp_array:Clear()
+                temp_array:Push(t)
+                break
+            end
+            if (temp_array:Size()<2) then break end
+            if(temp_array:At(1).pai.value == temp_array:At(2).pai.value) then
+                --取出下一张
+                if(k<shou_pai:Size()) then
+                    local detail2 = self:GetDetail(shou_pai:At(k+1))
+                    if PaiEqual(temp_array:At(1).pai,detail2.pai) then
+                        --暗刻,剔除叫牌
+                        temp_array:Clear()
+                        k = k + 1
+                        break
+                    --对子
+                    else
+                        dui_zi_array.Push(temp_array:At(1))
+                        temp_array:Clear()
+                        break
+                    end
+                --对子
+                else
+                    dui_zi_array:Push(temp_array:At(1))
+                    temp_array:Clear()
+                    break
+                end
+            else
+                --取出下一张
+                if(K<shou_pai:Size()) then
+                
+                    local detail2 = self:GetDetail(shou_pai:At(k+1))
+                    --顺子
+                    if((temp_array:At(1).pai.value == detail2.pai.value-2) and detail2.pai.type == temp_array:At(1).pai.type)then
+                        sun_zi_array:Push(temp_array:At(1))
+                        temp_array:Clear()
+                        k = k +1
+                        break
+                    
+                    else
+                        local t = temp_array:At(1)
+                        temp_array:Clear()
+                        temp_array:Push(t)
+                        break
+                    end
+                
+                else
+                    local t = temp_array:At(1)
+                    temp_array:Clear()
+                    temp_array:Push(t)
+                    break
+                end
+            end
+            
+        end
+            break
+        end
+        
+
+        
+    --底牌,明刻,明杠,暗杠
+    temp_array:Clear()
+    if di_pai then
+        for k = 1,di_pai:Size() do
+            while true do
+                local detail=self:GetDetail(di_pai:At(k))
+                if(detail.pai.type == TYPE_PAI_XI)then
+                    xi_pai_array:Push(detail)
+                    break
+                end
+                if(detail.is_laojiang) then
+                    if(detail.pai.type==TYPE_PAI_HONG) then san_hua = bit_left(1,1) 
+                    elseif(detail.pai.type==TYPE_PAI_BAI) then san_hua = bit_left(1,2)
+                    elseif(detail.pai.type==TYPE_PAI_QIAN) then san_hua = bit_left(1,3) 
+                    end
+                end
+                temp_array:Push(detail)
+                --类型不同跳过第一张
+                if(temp_array:Size()>1 and temp_array:At(1).pai.type ~= temp_array:At(2).pai.type) then
+                    
+                    local t = temp_array:At(2)
+                    temp_array:Clear()
+                    temp_array:Push(t)
+                    break
+                end
+                --类型不同跳过第二张
+                if(temp_array:Size()>2 and temp_array:At(1).pai.type ~= temp_array:At(3).pai.type) then
+                    
+                    local t = temp_array:At(3)
+                    temp_array:Clear()
+                    temp_array:Push(t)
+                    break
+                end
+                if(temp_array:Size()<3)then break end
+                if(temp_array:At(1).pai.value == temp_array:At(2).pai.value and temp_array:At(1).pai.value == temp_array:At(3).pai.value) then
+                
+                    if(k<di_pai:Size()) then
+                    
+                        local detail2 = self:GetDetail(di_pai:At(k+1))
+                        if( PaiEqual(temp_array:At(1).pai,detail2.pai)) then
+                            local is_an_gang=false
+                            for m=1,an_gan:Size() do
+                                if(Pai.Equal2(an_gang[m],temp_array:At(1).pai)) then
+                                
+                                    an_gang_array:Push(temp_array:At(1))
+                                    is_an_gang=true
+                                    break
+                                end
+                            end
+                            
+                            if not(is_an_gang) then ming_gang_array:Push(temp_array:At(1)) 
+                                temp_array:Clear()
+                                k = k + 1
+                                break
+                            end
+                        --明刻,剔除叫牌
+                        else
+                        
+                            if(jiao_pai:IndexOf(temp_array:At(1))==0)then ming_ke_array:Push(temp_array:At(1))end
+                            temp_array:Clear()
+                        end
+                    
+                    else
+                    
+                        if(jiao_pai:IndexOf(temp_array:At(1))==0)then ming_ke_array:Push(temp_array:At(1))end
+                            temp_array:Clear()
+                    end
+                
+                else
+                
+                    temp_array:Clear()
+                end
+                break
+            end
+        end
+    end
+    local di_hu=0
+    local ming_ke_hu=0
+    local an_ke_hu = 0
+    local ming_gang_hu =0
+    local an_gang_hu =0
+    local jiao_hu=0
+
+    have_san_hua = ((bit_and(san_hua,bit_left(1,1)))>0) and ((bit_and(san_hua,bit_left(1,2)))>0) and ((bit_and(san_hua,bit_left(1,3)))>0)
+
+    --将手牌上含有明刻的放到明杠
+    sun_zi_array:Each(function ( k,v )
+        for k=1,3 do
+            local detail2 = self:GetDetail(v.pai.num+k-1);
+            local index=ming_ke_array:IndexOf(detail2);
+            if(index>0)then
+                ming_ke_array:RemoveAt(index)
+                ming_gang_array:Push(detail2)
+            end
+        end
+    end)
+    --明刻
+    ming_ke_array:Each(function ( k,v )
+        local detail = ming_ke_array[i];
+        local hu = PuKe.GetHuPaiRate(self.jiang_pai_type,v,TYPE_RATE_MINGKE)
+        ming_ke_hu = hu+ming_ke_hu
+        if(detail.is_laojiang and detail.pai.type ~= TYPE_PAI_TIAO and have_san_hua)then ming_ke_hu=hu+ming_ke_hu end
+    end)
+    --暗刻
+    an_ke_array:Each(function ( k,detail )
+        local hu = PuKe.GetHuPaiRate(self.jiang_pai_type,detail,TYPE_RATE_ANKE)
+        an_ke_hu = an_ke_hu + hu
+        if(detail.is_laojiang and detail.pai.type ~= TYPE_PAI_TIAO and have_san_hua)then an_ke_hu=hu+an_ke_hu end
+    end)
+    --明杠
+    ming_gang_array:Each(function ( k, detail)
+        local hu = PuKe.GetHuPaiRate(self.jiang_pai_type,detail,TYPE_RATE_MINGGANG)
+        ming_gang_hu = hu+ming_gang_hu
+        if(detail.is_laojiang and detail.pai.type ~= TYPE_PAI_TIAO and have_san_hua)then ming_gang_hu=hu+ming_gang_hu end
+    end)
+    --按杠
+    an_gang_array:Each(function ( k, detail)
+        local hu = PuKe.GetHuPaiRate(self.jiang_pai_type,detail,TYPE_RATE_ANGANG)
+        an_gang_hu = hu+an_gang_hu
+        if(detail.is_laojiang and detail.pai.type ~= TYPE_PAI_TIAO and have_san_hua)then an_gang_hu=hu+an_gang_hu end
+    end)
+    --叫牌
+    jiao_pai:Each(function ( k,v )
+        local detail = self:GetDetail(v)
+        local hu = PuKe.GetHuPaiRate(self.jiang_pai_type,detail,TYPE_RATE_JIAOPAI)
+        jiao_hu = hu+jiao_hu
+        if(detail.is_laojiang and detail.pai.type ~= TYPE_PAI_TIAO and have_san_hua)then jiao_hu=hu+jiao_hu end
+    end)
+
+    --LogInfo("ming ke:"+ming_ke_hu+" an ke:"+an_ke_hu+" ming gang:"+ming_gang_hu+" an gang:"+an_gang_hu+" jiao hu:"+jiao_hu);
+    local di_hu = ming_ke_hu+an_ke_hu+ming_gang_hu+an_gang_hu+jiao_hu
+    local ret_info = CreateObject(HuPaiInfo)
+    ret_info.ming_ke_array=ming_ke_array
+    ret_info.an_ke_array=an_ke_array
+    ret_info.ming_gang_array=ming_gang_array
+    ret_info.an_gang_array=an_gang_array
+    ret_info.sun_zi_array=sun_zi_array
+    ret_info.dui_zi_array=dui_zi_array
+    ret_info.jiao_pai_array=jiao_pai_array
+    ret_info.di_hu_score=di_hu
+    ret_info.xi_array=xi_pai_array
+    return ret_info
+
 end
 
 PaiNode = {}
@@ -526,6 +828,146 @@ function CheckPaiNode:GetResult(tag)
         end
         if(#win_info2 > 0) then table.insert( self.win_node,win_info2) end
     end
+end
+
+HuPaiInfo = {}
+
+function HuPaiInfo:OnCreate()
+    self.hu_type = TYPE_HU_NONE
+    self.hu_pai_type = TYPE_HU_NONE
+    self.ming_ke_array = CreateObject(Array)
+    self.an_ke_array = CreateObject(Array)
+    self.ming_gang_array = CreateObject(Array)
+    self.an_gang_array = CreateObject(Array)
+    self.xi_array = CreateObject(Array)
+    self.sun_zi_array = CreateObject(Array)
+    self.dui_zi_array = CreateObject(Array)
+    self.jiao_pai_array = CreateObject(Array)
+    self.hu_pai_array = CreateObject(Array)
+    self.di_hu_score = 0
+    self.totle_socre = 0
+    self.wen_qiang_score = 0
+    self.xi_pai_score = 0
+    self.san_long_ju_hu_score = 0
+end
+function HuPaiInfo.SortInfo(a,b)
+    return a.totle_socre - b.totle_socre
+end
+function HuPaiInfo:CaculateTotleScore(hu_pai,includ_xipai)
+    local qiong_xi = false
+    local xi_len = self.xi_array:Size()
+    if xi_len == 0 then
+        qiong_xi = true
+        self.xi_pai_score = 0
+    elseif xi_len == 1 then
+        self.xi_pai_score = 10
+    elseif xi_len == 2 then
+        self.xi_pai_score = 30
+    elseif xi_len == 3 then
+        self.xi_pai_score = 50
+    elseif xi_len == 4 then
+        self.xi_pai_score = 100
+    elseif xi_len == 5 then
+        self.xi_pai_score = 200
+    end
+
+    if not(hu_pai) then
+        self.totle_socre=self.di_hu_score + self.san_long_ju_hu_score + self.xi_pai_score
+        self.totle_socre=math.ceil(self.totle_socre/10)*10
+        return
+    end
+    if hu_pai then
+        local wen_qiang_count=0
+        local temp_hu_pai_type=TYPE_HU_NONE
+        --单吊
+        self.dui_zi_array:Each(function ( k,v )
+            if(v.pai.value == hu_pai.pai.value and d.pai.type == hu_pai.pai.type) then
+                temp_hu_pai_type = bit_or(TYPE_HU_DANGDIAO,temp_hu_pai_type)
+            end
+        end)
+        --边张
+        local have_bian_zhang=false
+        self.sun_zi_array:Each(function ( k,d)
+            if(d.pai.type == hu_pai.pai.type and ((d.pai.value == 1 and hu_pai.pai.value == 3) or (hu_pai.pai.value == 7 and d.pai.value == 7))) then
+            
+                have_bian_zhang = true
+            end
+            if(d.pai.value==1 and d.pai.type == TYPE_PAI_TONG)then
+                wen_qiang_count = wen_qiang_count + 1
+            end
+            --丫子
+            if(temp_hu_pai_type == TYPE_HU_NONE and (d.pai.value == hu_pai.pai.value - 1) and d.pai.type == hu_pai.pai.type) then
+
+                temp_hu_pai_type = bit_or(temp_hu_pai_type,TYPE_HU_YAZI)
+                
+            end
+        end)
+
+        if(temp_hu_pai_type == TYPE_HU_NONE and have_bian_zhang) then
+            temp_hu_pai_type = bit_or(temp_hu_pai_type,TYPE_HU_BAINZHANG)
+        end
+        self.hu_pai_type = bit_or(self.hu_pai_type,temp_hu_pai_type)
+        if wen_qiang_count > 0 then
+            self.hu_pai_type = bit_or(self.hu_pai_type,TYPE_HU_WENQIAN)
+            if wen_qiang_count == 1 then
+                self.wen_qiang_score = 20
+            elseif wen_qiang_count == 2 then
+                self.wen_qiang_score = 50
+            elseif wen_qiang_count == 3 then
+                self.wen_qiang_score = 100
+            elseif wen_qiang_count == 4 then
+                self.wen_qiang_score = 200
+            end
+        end
+            
+        self.totle_socre=self.di_hu_score + self.san_long_ju_hu_score + self.wen_qiang_score + self.xi_pai_score;
+        if(bit_and(self.hu_pai_type,TYPE_HU_DANGDIAO)>0) then
+        
+            this.totle_socre = 10 + this.totle_socre
+        end
+        if(bit_and(self.hu_pai_type,TYPE_HU_YAZI)>0) then
+        
+            this.totle_socre = 10 + this.totle_socre
+        end
+        if(bit_and(this.hu_pai_type,TYPE_HU_BAINZHANG)>0) then
+        
+            this.totle_socre = 10 + this.totle_socre
+        end
+        if(bit_and(this.hu_pai_type,TYPE_HU_ZIMO)>0) then
+        
+            this.totle_socre = 10 + this.totle_socre
+        end
+        --天胡
+        local  socre_rate=1;
+        if(bit_and(this.hu_pai_type,TYPE_HU_TIANHU)>0) then
+            socre_rate = 4
+        elseif(bit_and(this.hu_pai_type,TYPE_HU_TIANTING)>0) then
+            socre_rate = 2
+        elseif(bit_and(this.hu_pai_type,TYPE_HU_QIONGXI)>0) then
+            socre_rate = 2
+        end
+        --全是对子或者文钱
+        if(self.sun_zi_array:Size() == 0  or (wen_qiang_count==self.sun_zi_array:Size()))then
+            self.hu_type = TYPE_HU_PIAO
+            self.totle_socre = 50 +self.totle_socre
+            socre_rate = 2 *socre_rate
+        --清胡,7个顺子
+        elseif(this.sun_zi_array.length==7) then
+            self.hu_type = TYPE_HU_QING
+            self.totle_socre = 100+self.totle_socre
+        
+        --塔子湖
+        else
+            self.hu_type=TYPE_HU_TAZI
+            self.totle_socre =20+ self.totle_socre
+        end
+        if(qiong_xi and includ_xipai) then
+            socre_rate=2*socre_rate
+            self.hu_pai_type =bit_or(TYPE_HU_QIONGXI,self.hu_pai_type)
+        end
+        self.totle_socre=math.ceil(self.totle_socre/10)*10*socre_rate
+    end
+
 end
 
 
