@@ -8,8 +8,8 @@ CLIENT_MSG = EnumTable({
     'CM_START_GAME',
     'CM_GET_ROOM_INFO',
     'CM_CHU_PAI',
-    'CM_RESPON_CHU_PAI',
-    'CM_HUAN_PAI',
+    --'CM_RESPON_CHU_PAI',
+    'CM_TEST_PAI',
     'CM_MAI_ZHUANG',
     'CM_BROADCAST',
     'CM_DISMISS_GAME'
@@ -22,7 +22,8 @@ SERVER_MSG = EnumTable({
     'SM_START_GAME',
     'SM_MO_PAI',
     'SM_CHU_PAI',
-    'SM_HUAN_PAI',--//换牌
+    'SM_TEST_PAI',
+    -- 'SM_HUAN_PAI',--//换牌
     'SM_PENG_PAI',--//碰牌
     'SM_GANG_PAI',--//杠牌
     'SM_HU_PAI',--//胡牌
@@ -74,8 +75,7 @@ function Client:RegisterMessageHandle()
     messageHandle[CLIENT_MSG.CM_LEAVE_ROOM]=self.LeaveRoom;
     messageHandle[CLIENT_MSG.CM_READY_GAME]=self.ReadyGame;
     messageHandle[CLIENT_MSG.CM_CHU_PAI]=self.ChuPai;
-    messageHandle[CLIENT_MSG.CM_RESPON_CHU_PAI]=self.ResponseChuPai;
-    messageHandle[CLIENT_MSG.CM_HUAN_PAI]=self.HuanPai;
+    messageHandle[CLIENT_MSG.CM_TEST_PAI]=self.TestPai;
     messageHandle[CLIENT_MSG.CM_MAI_ZHUANG]=self.MaiZhuang;
     messageHandle[CLIENT_MSG.CM_BROADCAST]=self.Broadcast;
     messageHandle[CLIENT_MSG.CM_DISMISS_GAME]=self.GameLeave;
@@ -129,15 +129,11 @@ function Client:ReadyGame(msg)
 end
 function Client:ChuPai(msg)
     -- body
-    print('ChuPai=>'..msg)
+    if self.room then self.room:ChuPai(self,msg) end
 end
-function Client:ResponseChuPai(msg)
+function Client:TestPai(msg)
     -- body
-    --print('ResponseChuPai=>'..msg)
-end
-function Client:HuanPai(msg)
-    -- body
-    print('HuanPai=>'..msg)
+    if self.room then self.room:Test(self,msg) end
 end
 function Client:MaiZhuang(msg)
     if self.room then

@@ -6,16 +6,32 @@
     <title>WebSocket</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script>
-        var ws = new WebSocket("ws://127.0.0.1:9796");
+        function A(){}
+        var ws = new WebSocket("ws://127.0.0.1:9800");
         ws.onopen = function(){
             console.log("socket open");
+            // ws.send(JSON.stringify({
+            //     guid:'100013',
+            //     unionid:'oUQtWxNbxtl6WrywgcMSGzBpezRo'
+            // }))
+            // ws.send(JSON.stringify([1,{guid:1}]))
+
+
+            ws.send(JSON.stringify({
+                path:'TestUserInfo',
+                data:{
+                    guid:100013,
+                    currency:'diamond',
+                    count:3
+                }
+            }))
         }
         ws.onclose = function(){
             console.log("socket close")
         }
         ws.onmessage = function(event){
             console.log(event.data)
-            ws.send("xxxxx")
+            //ws.send("xxxxx")
         }
     </script>
 </head>

@@ -285,17 +285,17 @@ function Array:OnCreate()
     self.tbl = {}
     self.size = 0
 end
+function Array:SetTable(t)
+    self.size = #t
+    self.tbl = t
+end
 function Array:Push(e)
     self.size = self.size + 1
     self.tbl[self.size]=e
 end
 function Array:At(index)
-    
-    if (index <= self.size) and (index > 0) then
-        return self.tbl[index]
-    else
-        return nil
-    end
+    return self.tbl[index]
+    -- 5
 end
 function Array:IndexOf(e)
     for i=1,self.size do
@@ -325,6 +325,14 @@ function Array:RemoveAt(index)
         return nil
     end
     return nil
+end
+function Array:Splice(index,count)
+    count = count or 1
+    if (index + count) > self.size then return false end
+    for i=1,count do
+        self:RemoveAt(index)
+    end
+    return true
 end
 function Array:Remove(e)
     local index = self:IndexOf(e)
