@@ -1303,13 +1303,13 @@ function Room:MoPai()
         self.next_mopai_palyer.client:SendMessage(SERVER_MSG.SM_TEST_PAI,self.next_mopai_palyer.test)
         self.current_test_info = {
             type = TYPE_TEST_HU,
-            player = self.test_hu_players:At(1)
+            player = self.next_mopai_palyer
         }
     elseif next_mopai_palyer:TestAnGang() then
         self.next_mopai_palyer.client:SendMessage(SERVER_MSG.SM_TEST_PAI,self.next_mopai_palyer.test)
         self.current_test_info = {
-            type = TYPE_TEST_GANG,
-            player = self.test_hu_players:At(1)
+            type = TYPE_TEST_ANGANG,
+            player = self.next_mopai_palyer
         }
     else
         self.next_chupai_palyer = self.next_mopai_palyer
