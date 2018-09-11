@@ -128,7 +128,13 @@ function RoomPlayers:TestHu(pai,puke)
     end
     return ret
 end
+function RoomPlayers:GetTestSampleInfo()
+    if self.test then
+        return {type = self.test.type,value = self.test.value}
+    end
+end
 function RoomPlayers:ApplyTest()
+
     -- body
 end
 function RoomPlayers:CaculateScore(puke)
@@ -1300,13 +1306,13 @@ function Room:MoPai()
         end
     end)
     if self.next_mopai_palyer:TestHu() then
-        self.next_mopai_palyer.client:SendMessage(SERVER_MSG.SM_TEST_PAI,self.next_mopai_palyer.test)
+        self.next_mopai_palyer.client:SendMessage(SERVER_MSG.SM_TEST_PAI,self.next_mopai_palyer:GetTestSampleInfo())
         self.current_test_info = {
             type = TYPE_TEST_HU,
             player = self.next_mopai_palyer
         }
     elseif next_mopai_palyer:TestAnGang() then
-        self.next_mopai_palyer.client:SendMessage(SERVER_MSG.SM_TEST_PAI,self.next_mopai_palyer.test)
+        self.next_mopai_palyer.client:SendMessage(SERVER_MSG.SM_TEST_PAI,self.next_mopai_palyer:GetTestSampleInfo())
         self.current_test_info = {
             type = TYPE_TEST_ANGANG,
             player = self.next_mopai_palyer
@@ -1349,7 +1355,7 @@ function Room:BeginTest()
             player = self.test_hu_players:At(1)
         }
         self.test_hu_players:RemoveAt(1)
-        self.current_test_info.player.client:SendMessage(SERVER_MSG.SM_TEST_PAI,self.current_test_info.player.test)
+        self.current_test_info.player.client:SendMessage(SERVER_MSG.SM_TEST_PAI,self.current_test_info.player:GetTestSampleInfo())
         return true
     end
     if self.test_gan_players:Size() > 0 then
@@ -1358,7 +1364,7 @@ function Room:BeginTest()
             player = self.test_gan_players:At(1)
         }
         self.test_gan_players:Clear()
-        self.current_test_info.player.client:SendMessage(SERVER_MSG.SM_TEST_PAI,self.current_test_info.player.test)
+        self.current_test_info.player.client:SendMessage(SERVER_MSG.SM_TEST_PAI,self.current_test_info.player:GetTestSampleInfo())
         return true
     end
     if self.test_peng_players:Size() > 0 then
@@ -1367,7 +1373,7 @@ function Room:BeginTest()
             player = self.test_peng_players:At(1)
         }
         self.test_peng_players:Clear()
-        self.current_test_info.player.client:SendMessage(SERVER_MSG.SM_TEST_PAI,self.current_test_info.player.test)
+        self.current_test_info.player.client:SendMessage(SERVER_MSG.SM_TEST_PAI,self.current_test_info.player:GetTestSampleInfo())
         return true
     end
     return false
@@ -1384,7 +1390,6 @@ end
 
 function Room:ChuPai(client,msg)
     if client.player ~= self.next_chupai_palyer then return end
-    local index = self.next_chupai_palyer.shou_pai:IndexOf(msg.pai)
     if not(self.next_chupai_palyer:ChuPai(msg.pai)) then 
         log_error('client not have pai : ' .. tostring(msg.pai))
         return 
