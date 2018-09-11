@@ -1409,11 +1409,11 @@ function Room:ChuPai(client,msg)
 end
 function Room:Test(client,msg)
     msg = msg or {test = false}
-    if(self.current_test_info.player ~= client.player) then return end
+    if(not(self.current_test_info) or self.current_test_info.player ~= client.player) then return end
     if(self.current_test_info.type == TYPE_TEST_HU) then
         if msg.test then
             --胡牌，结束游戏
-            return
+            self.BroadCastMessage(SERVER_MSG.SM_HU_PAI,{guid=client.info.guid})
         elseif not(self:BeginTest()) then
             self:MoPai()
         end
