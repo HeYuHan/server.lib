@@ -1377,6 +1377,9 @@ function Room:EndTest()
     self.test_peng_players:Clear()
     self.test_gan_players:Clear()
     self.test_hu_players:Clear()
+    self.players.Each(function ( k,v )
+        v.test = nil
+    end)
 end
 
 function Room:ChuPai(client,msg)
@@ -1413,7 +1416,7 @@ function Room:Test(client,msg)
     if(self.current_test_info.type == TYPE_TEST_HU) then
         if msg.test then
             --胡牌，结束游戏
-            self.BroadCastMessage(SERVER_MSG.SM_HU_PAI,{guid=client.info.guid})
+            self.BroadCastMessage(SERVER_MSG.SM_HU_PAI,{type = TYPE_TEST_HU,guid=client.info.guid})
         elseif not(self:BeginTest()) then
             self:MoPai()
         end
@@ -1422,7 +1425,7 @@ function Room:Test(client,msg)
             local pai = client.player.test.value
             client.player:ApplyTest()
             self.next_mopai_palyer = client.player
-            self.BroadCastMessage(SERVER_MSG.SM_GANG_PAI,{guid=client.info.guid,pai=pai,di = client.player.di_pai:Data()})
+            self.BroadCastMessage(SERVER_MSG.SM_GANG_PAI,{type = TYPE_TEST_ANGANG,guid=client.info.guid,pai=pai,di = client.player.di_pai:Data()})
             self:MoPai()
         elseif not(self:BeginTest()) then
             self:MoPai()
@@ -1432,7 +1435,7 @@ function Room:Test(client,msg)
             local pai = client.player.test.value
             client.player:ApplyTest()
             self.next_mopai_palyer = client.player
-            self.BroadCastMessage(SERVER_MSG.SM_GANG_PAI,{guid=client.info.guid,pai=pai,di = client.player.di_pai:Data()})
+            self.BroadCastMessage(SERVER_MSG.SM_GANG_PAI,{type = TYPE_TEST_GANG,guid=client.info.guid,pai=pai,di = client.player.di_pai:Data()})
             self:MoPai()
         elseif not(self:BeginTest()) then
             self:MoPai()
@@ -1442,7 +1445,8 @@ function Room:Test(client,msg)
             local pai = client.player.test.value
             client.player:ApplyTest()
             self.next_chupai_palyer = client.player
-            self.BroadCastMessage(SERVER_MSG.SM_PENG_PAI,{guid=client.info.guid,pai=pai,di = client.player.di_pai:Data()})
+            self.BroadCastMessage(SERVER_MSG.SM_PENG_PAI,{type = TYPE_TEST_PENG,guid=client.info.guid,pai=pai,di = client.player.di_pai:Data(),size1=self.next_mopai_palyer.shou_pai:Size(),
+            size2=self.puke:GetSize()})
             
         elseif not(self:BeginTest()) then
             self:MoPai()
