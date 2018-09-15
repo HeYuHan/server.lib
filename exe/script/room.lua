@@ -10,6 +10,7 @@ TYPE_TEST_PENG = 1
 TYPE_TEST_GANG = 2
 TYPE_TEST_ANGANG = 3
 TYPE_TEST_HU = 4
+TYPE_TEST_ZIMO = 5
 
 function RoomPlayers:OnCreate()
     self.shou_pai = CreateObject(Array)
@@ -23,7 +24,7 @@ function RoomPlayers:OnCreate()
 end
 function RoomPlayers:ChuPai(pai)
     if self.shou_pai:Remove(pai) then 
-        self.qi_pai_array:Push(pai)
+        --self.qi_pai_array:Push(pai)
         return true
     else
         return false
@@ -128,24 +129,30 @@ function RoomPlayers:TestHu(pai,puke)
     end
     return ret
 end
-function RoomPlayers:GetTestSampleInfo()
-    if self.test then
-        return {type = self.test.type,value = self.test.value}
+function RoomPlayers:ApplyTest(test)
+    self.test = test
+    if self.test.type == TYPE_TEST_ANGANG then
+        self.shou_pai = self.test.shou
+        self.an_gang_array:Push(self.test.value)
+        self.di_pai:PushRange(self.test.data)
+    elseif self.test.type == TYPE_TEST_ANGANG then
+        self.shou_pai:SetTable(self.test.shou)
+        self.di_pai:PushRange(self.test.data)
+    elseif self.test.type == TYPE_TEST_PENG then
+        self.shou_pai:SetTable(self.test.shou)
+        self.di_pai:PushRange(self.test.data)
     end
 end
-function RoomPlayers:ApplyTest()
-
-    -- body
-end
 function RoomPlayers:CaculateScore(puke)
-    if self.test and self.test.type == TYPE_TEST_HU then
+    if self.test and (self.test.type == TYPE_TEST_HU or self.test.type == TYPE_TEST_ZIMO)then
         local di_info_array = {}
         self.di_pai:Sort(SortPaiNumber)
-        for k,v in paris(test.data) do
+        for k,v in pairs(self.test.data) do
             local shou = DetailToNumberArray(v)
             local info = puke:CaculateDiHu(shou,self.di_pai,self.an_gang_array,self.jiao_pai_array)
             info.hu_pai_array = shou
-            info:CaculateTotleScore(puke.xi)
+            info.hu_pai_type = bit_or(info.hu_pai_type,TYPE_HU_ZIMO)
+            info:CaculateTotleScore(true,puke.xi)
             table.insert( di_info_array,info)
         end
         self.hu_pai_info = di_info_array[1]
@@ -156,7 +163,7 @@ function RoomPlayers:CaculateScore(puke)
         end
     else
         self.score_info = puke:CaculateDiHu(self.shou_pai,self.di_pai,self.an_gang_array,self.jiao_pai_array)
-        self.score_info:CaculateTotleScore(puke.xi)
+        self.score_info:CaculateTotleScore(false,puke.xi)
     end
 end
 ---------------------------------------------------------------------------
@@ -231,12 +238,12 @@ function CreatePai(number)
 end 
 function DetailToNumberArray(details)
     local ret =CreateObject(Array)
-    for k,v in paris(details) do
+    for k,v in pairs(details) do
         ret:Push(v.pai.num)
     end
     return ret
 end
-function PaiEqual(p1,p2)
+function  PaiEqual(p1,p2)
     if type(p1) == 'table' then
         return (p1.value == p2.value) and (p1.type == p2.type)
     else
@@ -293,6 +300,7 @@ function PuKe:Init(xi)
     self.xi = xi
     self.jiang_pai[1]=math.floor(math.random()*120)+1
     self.jiang_pai[2]=math.floor(math.random()*120)+1
+    
     if xi then
         self.pais:Init(1,125)
     else
@@ -332,18 +340,17 @@ function PuKe:CaculateJiangPaiType()
 
 end
 function PuKe:GetDetail(num)
-    local this = self
-    local ret = this.pai_detail_array[num];
+    local ret = self.pai_detail_array[num];
     if not(ret) then
         ret = CreateObject(PaiDetail)
         ret.pai=CreatePai(num)
         ret.is_jiang=self:IsJiangPai(num)
         ret.is_laojiang=IsLaoJiang(ret.pai)
-        local j1=CreatePai(this.jiang_pai[0])
-        local j2=CreatePai(this.jiang_pai[1])
+        local j1=CreatePai(self.jiang_pai[1])
+        local j2=CreatePai(self.jiang_pai[2])
         if(j1.value==ret.pai.value)then ret.equal_jiang_value=1 + ret.equal_jiang_value end
         if(j2.value==ret.pai.value)then ret.equal_jiang_value=1 + ret.equal_jiang_value end
-        this.pai_detail_array[num]=ret
+        self.pai_detail_array[num]=ret
     end
     return ret
 end
@@ -747,6 +754,8 @@ function CheckPaiNode.SortNode(p1,p2)
 end
 
 function CheckPaiNode:CheckWin()
+    --print('begin check win list size : ' .. tostring(self.pai_list:Size()))
+
     local this = self
     if(this.pai_list:Size()==2) then
         if(PaiEqual(this.pai_list:At(1).detail.pai,this.pai_list:At(2).detail.pai)) then
@@ -760,13 +769,15 @@ function CheckPaiNode:CheckWin()
     this.win_node={}
     this.pai_list:Sort(CheckPaiNode.SortNode)
     local type = 0
-    local num = 0;
-    self.pai_list:Each(function ( k,v )
+    local num = 0
+    self.pai_list:Each(function ( i,v )
+        --print(i,v.type,v.detail.pai.num,v.value)
         local p = v;
         if(p.type ~= type or p.value ~= num) then
             type = p.type
             num = p.value
             for j=i+1,i+3 do
+                --print(tostring(i),'j:'..tostring(j))
                 if(j>this.pai_list:Size()) then break end
                 local p2 = this.pai_list:At(j)
                 if(p2.type == p.type and p2.value==p.value) then
@@ -786,9 +797,11 @@ function CheckPaiNode:CheckWin()
 
         end
     end)
+    --print('cehck win end size:',#self.win_node)
     return this.win_node
 end
 function CheckPaiNode:Check(p)
+    --print('check',p.detail.pai.num,p.type,p.value,p.check)
     local this = self
     this:ClearBrother(p)
     if p.check == 1 then
@@ -800,14 +813,15 @@ function CheckPaiNode:Check(p)
     else
         this:CheckLast(p)
     end
+    
 end
 function CheckPaiNode:ClearBrother(p)
-
-    for k,v in paris(p.brother) do
-        if v then
-            v.check = 1
+    for i=1,3 do
+        local b = p.brother[i]
+        if b then
+            b.check = 1
         end
-        p.brother[k] = nil
+        p.brother[i] = nil
     end
 end
 function CheckPaiNode:Check1(p) 
@@ -869,21 +883,20 @@ function CheckPaiNode:CheckBrother(p,index)
     if index == 1 then
         for i=1,self.pai_list:Size() do
             local v = self.pai_list:At(i)
-            if (v.check == 1) then
-                if v.type == p.type and v.value == p.value + 1 then
-                    p.brother[1] = v
-                    p.brother[1].check = bit_left(1,4)
-                    for j = i+1,i+3 do
-                        if j >= self.pai_list:Size() then break end
-                        local p2 = self.pai_list:At(j)
-                        if p2.check == 1 then
-                            if (p2.type == p.type and p2.value == p.value + 2)then
-                                p.brother[2] = p2
-                                p.brother[2].check = bit_left(1,4)
-                            end
-                        end
+            if v.check == 1 and v.type == p.type and v.value == p.value + 1 then
+                p.brother[1] = v
+                p.brother[1].check = bit_left(1,4)
+                for j = i+1,i+3 do
+                    if j > self.pai_list:Size() then break end
+                    local p2 = self.pai_list:At(j)
+                    if (p2.check == 1 and p2.type == p.type and p2.value == p.value + 2)then
+                        p.brother[2] = p2
+                        p.brother[2].check = bit_left(1,4)
+                        --print('num',p2.detail.pai.num)
+                        break
                     end
                 end
+                break
             end
         end
     elseif index == 2 then
@@ -898,7 +911,7 @@ function CheckPaiNode:CheckBrother(p,index)
                             
                         p.brother[1] = v
                         p.brother[1].check = bit_left(1,4)
-                        p.brother[2] = v
+                        p.brother[2] = p2
                         p.brother[2].check = bit_left(1,4)
                         break
                     end
@@ -928,7 +941,14 @@ function CheckPaiNode:CheckBrother(p,index)
             end
         end
     end
-    
+    -- for i=1,3 do
+    --     if(p.brother[i]) then
+    --         print('p'..tostring(i),p.brother[i].detail.pai.num,p.brother[i].type,p.brother[i].value,p.brother[i].check)
+    --     end
+
+    -- end
+    -- print('brother',p.detail.pai.num,p.type,p.value,p.check)
+    -- print('---------------------------------------------------------------------')
 end
 function CheckPaiNode:CheckLast(p)
     local this = self
@@ -957,18 +977,20 @@ function CheckPaiNode:GetResult(tag)
             if p.brother[1] then
                 local temp = {}
                 table.insert(temp,p.detail)
-                for j=1,#p.brother.length do
+                for j=1,#p.brother do
                     if p.brother[j] then
+                        --print('insert table')
                         table.insert(temp,p.brother[j].detail)
                     end
                 end
+                --print('insert table')
                 table.insert(win_info,temp)
             end
         end
         bubbleSort(win_info,CheckPaiNode.SortArray)
         local win_info2={}
-        for k,v in paris(win_info) do
-            for k2,v2 in paris(v) do
+        for k,v in pairs(win_info) do
+            for k2,v2 in pairs(v) do
                 table.insert(win_info2,v2)
             end
         end
@@ -1000,6 +1022,7 @@ function HuPaiInfo.SortInfo(a,b)
     return a.totle_socre - b.totle_socre
 end
 function HuPaiInfo:CaculateTotleScore(hu_pai,includ_xipai)
+    local this = self
     local qiong_xi = false
     local xi_len = self.xi_array:Size()
     if xi_len == 0 then
@@ -1098,7 +1121,7 @@ function HuPaiInfo:CaculateTotleScore(hu_pai,includ_xipai)
             self.totle_socre = 50 +self.totle_socre
             socre_rate = 2 *socre_rate
         --清胡,7个顺子
-        elseif(this.sun_zi_array.length==7) then
+        elseif(self.sun_zi_array:Size()==7) then
             self.hu_type = TYPE_HU_QING
             self.totle_socre = 100+self.totle_socre
         
@@ -1191,6 +1214,8 @@ function Room:SwapPlayer()
             self.players:Set(i-1,temp)
         end
         self.players:Set(len,first)
+    elseif len > 0 then
+        self.players:At(1).index = 1
     end
 end
 
@@ -1271,8 +1296,30 @@ function Room:Ready(client,ready)
         log_error('client not in this room : ' .. tostring(self.guid))
     end
 end
-
+function Room:RefreshPlayer(player)
+    local di = player.di_pai:Data()
+    local shou = player.shou_pai:Data()
+    local qi = player.qi_pai_array:Data()
+    self.players:Each(function ( k,v )
+        if not(v.client) then return end
+        if v.info.guid == player.info.guid then
+            v.client:SendMessage(SERVER_MSG.SM_REFRESH_PAI,{
+                guid=self.player.info.guid,
+                di = di,
+                shou = shou,
+                qi = qi
+            })
+        else
+            v.client:SendMessage(SERVER_MSG.SM_REFRESH_PAI,{
+                guid=self.player.info.guid,
+                di = di,
+                qi = qi
+            })
+        end
+    end)
+end
 function Room:MoPai()
+    --self:RefreshPlayer(self.next_chupai_palyer)
     self:EndTest()
     local number = self.puke:Get()
     local pai = CreatePai(number)
@@ -1283,7 +1330,21 @@ function Room:MoPai()
         number = self.puke:Get()
         pai = CreatePai(number)
     end
-    self.next_mopai_palyer:DiPai(number)
+    self.test_palyers=CreateObject(Array)
+
+
+    if self.next_mopai_palyer:TestHu(number,self.puke) then
+        self.test_hu_players = CreateObject(Array)
+        self.test_hu_players:Push({player = self.next_mopai_palyer,test = self.next_mopai_palyer.test,type = TYPE_TEST_ZIMO})
+        log_info('begin test zi mo:' .. self.next_mopai_palyer.info.nick)
+    end
+    self.next_mopai_palyer:MoPai(number)
+    if self.next_mopai_palyer:TestAnGang() then
+        self.test_gan_players = CreateObject(Array)
+        self.test_gan_players:Push({player = self.next_mopai_palyer,test = self.next_mopai_palyer.test,type = TYPE_TEST_ANGANG})
+        log_info('begin test angang:' .. self.next_mopai_palyer.info.nick)
+    end
+
     local di = nil
     if refresh_dipai then di=self.next_mopai_palyer.di_pai:Data() end
     self.players:Each(function ( k,v )
@@ -1305,22 +1366,15 @@ function Room:MoPai()
             })
         end
     end)
-    if self.next_mopai_palyer:TestHu() then
-        self.next_mopai_palyer.client:SendMessage(SERVER_MSG.SM_TEST_PAI,self.next_mopai_palyer:GetTestSampleInfo())
-        self.current_test_info = {
-            type = TYPE_TEST_HU,
-            player = self.next_mopai_palyer
-        }
-    elseif next_mopai_palyer:TestAnGang() then
-        self.next_mopai_palyer.client:SendMessage(SERVER_MSG.SM_TEST_PAI,self.next_mopai_palyer:GetTestSampleInfo())
-        self.current_test_info = {
-            type = TYPE_TEST_ANGANG,
-            player = self.next_mopai_palyer
-        }
-    else
+
+
+    if not(self:BeginTest()) then
         self.next_chupai_palyer = self.next_mopai_palyer
         self.next_mopai_palyer = self.players:At((self.next_chupai_palyer.index % GAME_MAX_PLAYERS) + 1)
     end
+        
+    
+   
     
 
 end
@@ -1350,43 +1404,34 @@ end
 
 function Room:BeginTest()
     if self.test_hu_players:Size() > 0 then
-        self.current_test_info = {
-            type = TYPE_TEST_HU,
-            player = self.test_hu_players:At(1)
-        }
+        self.current_test_info = self.test_hu_players:At(1)
         self.test_hu_players:RemoveAt(1)
-        self.current_test_info.player.client:SendMessage(SERVER_MSG.SM_TEST_PAI,self.current_test_info.player:GetTestSampleInfo())
+        self.current_test_info.player.client:SendMessage(SERVER_MSG.SM_TEST_PAI,{type = self.current_test_info.type,value = self.current_test_info.test.value})
         return true
     end
     if self.test_gan_players:Size() > 0 then
-        self.current_test_info = {
-            type = TYPE_TEST_GANG,
-            player = self.test_gan_players:At(1)
-        }
+        local player = self.test_gan_players:At(1)
+        self.current_test_info = self.test_gan_players:At(1)
         self.test_gan_players:Clear()
-        self.current_test_info.player.client:SendMessage(SERVER_MSG.SM_TEST_PAI,self.current_test_info.player:GetTestSampleInfo())
+        self.current_test_info.player.client:SendMessage(SERVER_MSG.SM_TEST_PAI,{type = self.current_test_info.type,value = self.current_test_info.test.value})
         return true
     end
     if self.test_peng_players:Size() > 0 then
-        self.current_test_info = {
-            type = TYPE_TEST_PENG,
-            player = self.test_peng_players:At(1)
-        }
+        local player = self.test_peng_players:At(1)
+        self.current_test_info = self.test_peng_players:At(1)
         self.test_peng_players:Clear()
-        self.current_test_info.player.client:SendMessage(SERVER_MSG.SM_TEST_PAI,self.current_test_info.player:GetTestSampleInfo())
+        self.current_test_info.player.client:SendMessage(SERVER_MSG.SM_TEST_PAI,{type = self.current_test_info.type,value = self.current_test_info.test.value})
         return true
     end
     return false
 end
 function Room:EndTest()
     self.current_test_info = nil
-    self.test_peng_players:Clear()
-    self.test_gan_players:Clear()
-    self.test_hu_players:Clear()
-    self.players.Each(function ( k,v )
-        v.test = nil
-    end)
+    if self.test_gan_players then self.test_peng_players:Clear() end
+    if self.test_gan_players then self.test_gan_players:Clear() end
+    if self.test_hu_players then self.test_hu_players:Clear() end
 end
+
 
 function Room:ChuPai(client,msg)
     if client.player ~= self.next_chupai_palyer then return end
@@ -1400,14 +1445,17 @@ function Room:ChuPai(client,msg)
     self.test_gan_players = CreateObject(Array)
     self.test_peng_players = CreateObject(Array)
     for i=1,2 do
-        if(self.test_palyers:At(i):TestHu(msg.pai)) then
-            self.test_hu_players:Push(self.test_palyers:At(i))
+        if(self.test_palyers:At(i):TestHu(msg.pai,self.puke)) then
+            local p = self.test_palyers:At(i);
+            self.test_hu_players:Push({player = p,test = p.test,type = TYPE_TEST_HU})
         end
         if(self.test_gan_players:Size() == 0 and self.test_palyers:At(i):TestGang(msg.pai)) then
-            self.test_gan_players:Push(self.test_palyers:At(i))
+            local p = self.test_palyers:At(i);
+            self.test_gan_players:Push({player = p,test = p.test,type = TYPE_TEST_GANG})
         end
         if(self.test_peng_players:Size() == 0 and self.test_palyers:At(i):TestPeng(msg.pai)) then
-            self.test_peng_players:Push(self.test_palyers:At(i))
+            local p = self.test_palyers:At(i);
+            self.test_peng_players:Push({player = p,test = p.test,type = TYPE_TEST_PENG})
         end
     end
     if self:BeginTest() then
@@ -1418,45 +1466,93 @@ end
 function Room:Test(client,msg)
     msg = msg or {test = false}
     if(not(self.current_test_info) or self.current_test_info.player ~= client.player) then return end
-    if(self.current_test_info.type == TYPE_TEST_HU) then
+    local current_test = self.current_test_info.test;
+    if(self.current_test_info.type == TYPE_TEST_ZIMO) then
         if msg.test then
             --胡牌，结束游戏
-            self.BroadCastMessage(SERVER_MSG.SM_HU_PAI,{type = TYPE_TEST_HU,guid=client.info.guid})
+            client.player:ApplyTest(current_test)
+            self:BroadCastMessage(nil,SERVER_MSG.SM_HU_PAI,{type = TYPE_TEST_ZIMO,guid=client.info.guid})
+            print('zimo',client.info.nick)
+            self:Balance()
         elseif not(self:BeginTest()) then
+            self.next_chupai_palyer = self.next_mopai_palyer
+            self.next_mopai_palyer = self.players:At((self.next_chupai_palyer.index % GAME_MAX_PLAYERS) + 1)
+        end
+
+    elseif(self.current_test_info.type == TYPE_TEST_HU) then
+        if msg.test then
+            --胡牌，结束游戏
+            client.player:ApplyTest(current_test)
+            self:BroadCastMessage(nil,SERVER_MSG.SM_HU_PAI,{type = TYPE_TEST_HU,guid=client.info.guid})
+            print('hu',client.info.nick)
+            self:Balance()
+        elseif not(self:BeginTest()) then
+            --没人要，为出牌玩家添加弃牌
+            self.next_chupai_palyer.qi_pai_array:Push(client.player.test.value)
             self:MoPai()
         end
     elseif (self.current_test_info.type == TYPE_TEST_ANGANG) then
         if msg.test then
             local pai = client.player.test.value
-            client.player:ApplyTest()
+            client.player:ApplyTest(current_test)
             self.next_mopai_palyer = client.player
-            self.BroadCastMessage(SERVER_MSG.SM_GANG_PAI,{type = TYPE_TEST_ANGANG,guid=client.info.guid,pai=pai,di = client.player.di_pai:Data()})
+            self:BroadCastMessage(nil,SERVER_MSG.SM_GANG_PAI,{type = TYPE_TEST_ANGANG,guid=client.info.guid,pai=pai,di = client.player.di_pai:Data()})
+            print('angan',client.info.nick)
             self:MoPai()
         elseif not(self:BeginTest()) then
-            self:MoPai()
+            self.next_chupai_palyer = self.next_mopai_palyer
+            self.next_mopai_palyer = self.players:At((self.next_chupai_palyer.index % GAME_MAX_PLAYERS) + 1)
         end
     elseif (self.current_test_info.type == TYPE_TEST_GANG) then
         if msg.test then
             local pai = client.player.test.value
-            client.player:ApplyTest()
+            client.player:ApplyTest(current_test)
             self.next_mopai_palyer = client.player
-            self.BroadCastMessage(SERVER_MSG.SM_GANG_PAI,{type = TYPE_TEST_GANG,guid=client.info.guid,pai=pai,di = client.player.di_pai:Data()})
+            self:BroadCastMessage(nil,SERVER_MSG.SM_GANG_PAI,{type = TYPE_TEST_GANG,guid=client.info.guid,pai=pai,di = client.player.di_pai:Data()})
+            print('gang',client.info.nick)
             self:MoPai()
         elseif not(self:BeginTest()) then
+            --没人要，为出牌玩家添加弃牌
+            self.next_chupai_palyer.qi_pai_array:Push(client.player.test.value)
             self:MoPai()
         end
     elseif (self.current_test_info.type == TYPE_TEST_PENG) then
         if msg.test then
             local pai = client.player.test.value
-            client.player:ApplyTest()
+            client.player:ApplyTest(current_test)
             self.next_chupai_palyer = client.player
-            self.BroadCastMessage(SERVER_MSG.SM_PENG_PAI,{type = TYPE_TEST_PENG,guid=client.info.guid,pai=pai,di = client.player.di_pai:Data(),size1=self.next_mopai_palyer.shou_pai:Size(),
+            self:BroadCastMessage(nil,SERVER_MSG.SM_PENG_PAI,{type = TYPE_TEST_PENG,guid=client.info.guid,pai=pai,di = client.player.di_pai:Data(),size1=self.next_mopai_palyer.shou_pai:Size(),
             size2=self.puke:GetSize()})
+            print('peng',client.info.nick)
             
         elseif not(self:BeginTest()) then
+            --没人要，为出牌玩家添加弃牌
+            self.next_chupai_palyer.qi_pai_array:Push(client.player.test.value)
             self:MoPai()
         end
-    else
-        self:MoPai()
+    -- else
+    --     --没人要，为出牌玩家添加弃牌
+    --     self.next_chupai_palyer.qi_pai_array:Push(client.player.test.value)
+    --     self:MoPai()
     end
+end
+function Room:Balance()
+    self.state = ROOM_STATE_BALANCE
+    local blance_msg = CreateObject(Array)
+    self.players:Each(function ( k,v )
+        v:CaculateScore(self.puke)
+        local msg = {}
+        msg.guid = v.info.guid
+        msg.hu = v.hu_pai_info.totle_socre
+        msg.type1 = v.hu_pai_info.hu_pai_type
+        msg.type2 = v.hu_pai_info.hu_type
+        msg.shou = v.shou_pai:Data()
+        msg.di = v.di_pai:Data()
+
+        blance_msg:Push(msg)
+        print(v.info.nick,'score',v.hu_pai_info.totle_socre)
+    end)
+    local winner_guid = nil
+    if self.current_test_info.player then winner_guid = self.current_test_info.player.info.guid end
+    self:BroadCastMessage(nil,SERVER_MSG.SM_GAME_BALANCE,{winner=winner_guid,balance = blance_msg.tbl})
 end

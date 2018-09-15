@@ -21,7 +21,8 @@ SERVER_MSG = EnumTable({
     'SM_READY_GAME',
     'SM_START_GAME',
     'SM_MO_PAI',
-    'SM_CHU_PAI',
+    --'SM_CHU_PAI',
+    'SM_REFRESH_PAI',
     'SM_TEST_PAI',
     -- 'SM_HUAN_PAI',--//换牌
     'SM_PENG_PAI',--//碰牌
@@ -141,8 +142,13 @@ function Client:MaiZhuang(msg)
     end
 end
 function Client:Broadcast(msg)
-    -- body
-    print('Broadcast=>'..msg)
+    if self.room then
+        self.room.playrs:Each(function ( k,v )
+            if v.client then
+                v.client:SendMessage(SERVER_MSG.SM_BROADCAST,{guid=self.info.guid,msg=msg})
+            end
+        end)
+    end
 end
 function Client:GameLeave(msg)
     -- body
@@ -167,7 +173,7 @@ function Client:Auth(msg)
     self:Disconnect()
 end
 function Client:OnHandle(msg)
-    ok= xpcall(self.messageHandle[msg[1]+1],function(err) log_error(err) end,self,msg[2])
+    ok= xpcall(self.messageHandle[msg[1]+1],function(err) log_error(err) log_error(debug.traceback())  end,self,msg[2])
     if ok == false then
         log_error('cant handle message : ' .. EnumToString(CLIENT_MSG,msg[1]+1))
         self:Disconnect()

@@ -49,12 +49,17 @@ function CopyTable(class)
     end 
     return o
 end
-function PrintTable(t)
+function PrintTable(t,key)
     for i, v in pairs(t) do 
         if type(v) == 'table' then
-            PrintTable(v)
+            PrintTable(v,i)
         else
-            print(tostring(i) .. ':' .. tostring(v))
+            if key then
+                print(tostring(key) .. ':' ..tostring(i) .. ':' .. tostring(v))
+            else
+                print(tostring(i) .. ':' .. tostring(v))
+            end
+            
         end
     end 
 end
@@ -311,6 +316,12 @@ function Array:Set(index,e)
         return true
     else
         return false
+    end
+end
+function Array:PushRange(es,len)
+    local length = len or #es
+    for i=i,length do
+        self:Push(es[i])
     end
 end
 function Array:RemoveAt(index)
