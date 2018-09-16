@@ -9,6 +9,7 @@
 #include "MessageQueue.h"
 #include <thread>
 #include "HttpClient.h"
+#include "FileReader.h"
 using namespace luabridge;
 using namespace Core;
 
@@ -306,6 +307,20 @@ int RegLuaWebSocket(lua_State * L)
 		.endClass();
 	return 0;
 }
+int RegFieWriter(lua_State* L)
+{
+	luabridge::getGlobalNamespace(L)
+		.beginClass<AsyncFileWriter>("AsyncFileWriter")
+		.addConstructor<void(*) (void)>()
+		.addFunction("Create", &AsyncFileWriter::Create)
+		.addFunction("Write", &AsyncFileWriter::Write)
+		.addFunction("PushContent", &AsyncFileWriter::PushContent)
+		.addFunction("PushContentLine", &AsyncFileWriter::PushContentLine)
+		.addFunction("Close", &AsyncFileWriter::Close)
+		.endClass();
+	return 0;
+	return 0;
+}
 int len(const char* str)
 {
 	return strlen(str);
@@ -338,6 +353,12 @@ int bit_or(int value1, int value2)
 {
 	return value1 | value2;
 }
+extern "C"
+{
+	int luaopen_cjson(lua_State *l);
+	int luaopen_cjson_safe(lua_State *l);
+}
+
 int RegAllNative(lua_State * L)
 {
 	/////////////////////////////////////////////////////////////
@@ -362,5 +383,7 @@ int RegAllNative(lua_State * L)
 	RegLuaWebSocket(L);
 	RegRedis(L);
 	RegHttp(L);
+	RegFieWriter(L);
+	luaopen_cjson(L);
 	return 0;
 }

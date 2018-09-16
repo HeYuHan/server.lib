@@ -18,8 +18,9 @@ class AsyncFileWriter
 public:
 	AsyncFileWriter();
 	~AsyncFileWriter();
-	bool Create(const std::string &path);
+	bool Create(const char *path);
 	int PushContent(const char* content);
+	int PushContentLine(const char* content);
 	
 	void Write();
 	void Close();

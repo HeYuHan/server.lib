@@ -63,11 +63,11 @@ AsyncFileWriter::~AsyncFileWriter()
 	Close();
 }
 
-bool AsyncFileWriter::Create(const std::string & path)
+bool AsyncFileWriter::Create(const char *path)
 {
 	m_File.clear();
 	//m_File.open(path.c_str(), ios::out| ios::app);
-	m_File.open(path.c_str(), ios::out);
+	m_File.open(path, ios::out);
 	if (m_File.good())
 	{
 		m_CreateStream = true;
@@ -95,6 +95,24 @@ int AsyncFileWriter::PushContent(const char* content)
 	}
 	strcpy(&m_ContentQueue[m_WritePosition], content);
 	m_WritePosition += len;
+	m_ContentQueue[m_WritePosition] = 0;
+	m_HaveContent.Notify();
+	return len;
+}
+
+int AsyncFileWriter::PushContentLine(const char * content)
+{
+	EasyMutexLock lock(mutex);
+	int len = strlen(content);
+	len = MIN(len, ASYNC_FILE_BUFF_LEN-2);
+	while ((ASYNC_FILE_BUFF_LEN - m_WritePosition)<len)
+	{
+		m_ContentFull.Wait();
+	}
+	strcpy(&m_ContentQueue[m_WritePosition], content);
+	m_WritePosition += len+2;
+	m_ContentQueue[m_WritePosition-1] = '\n';
+	m_ContentQueue[m_WritePosition - 2] = '\r';
 	m_ContentQueue[m_WritePosition] = 0;
 	m_HaveContent.Notify();
 	return len;
