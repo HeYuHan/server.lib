@@ -27,7 +27,7 @@ function Client:OnRequest(msg)
         self:Disconnect()
         return
     end
-    ok,ret = xpcall(Client[msg.path],function(err) log_error(err) end,self,msg.data)
+    ok,ret = xpcall(Client['Public_'..msg.path],function(err) log_error(err) end,self,msg.data)
     if ok == false then
         log_error('cant call path : ' .. msg.path)
         self:Disconnect()
@@ -50,17 +50,17 @@ function Client:OnMessage(msg)
     end
 end
 function Client:OnConnected()
-    print('client connected uid:' .. tostring(self.uid))
+    --print('client connected uid:' .. tostring(self.uid))
     --self:Send(json.encode({key1="1234",key2=234,key3=true}))
 end
 function Client:OnDisconnected()
     self.socket = nil
     self.uid = 0
-    print('client disconnected uid:' .. tostring(self.uid))
-    collectgarbage("collect")
+    --print('client disconnected uid:' .. tostring(self.uid))
+    --collectgarbage("collect")
 end
 
-function Client:TestUserInfo(msg)
+function Client:Public_TestUserInfo(msg)
     local test = CopyTable(UserInfo)
     test.nick = 'test' .. tostring(Random(100000,999999))
     test.unionid = 'unionid' .. tostring(Random(100000,999999))
@@ -69,7 +69,7 @@ function Client:TestUserInfo(msg)
     print('test:' .. json.encode(test))
     return test
 end
-function Client:CreateRoomCard(msg)
+function Client:Public_CreateRoomCard(msg)
     local err = ''
     local user = nil
     if(msg.unionid) then
@@ -99,9 +99,10 @@ function Client:CreateRoomCard(msg)
                     if msg.includexi then card.xi = true end
                     card.pay = PayType[msg.payType] - 1
                     card.currency = msg.currency
+                    card.cost = cost
                     if (SaveRoomCard(gServer.db,card)) then
-                        user[msg.currency] = user_money - cost
-                        SaveUser(gServer.db,user)
+                        -- user[msg.currency] = user_money - cost
+                        -- SaveUser(gServer.db,user)
                         card.gold = user.gold
                         card.diamond = user.diamond
                         return card
@@ -126,7 +127,7 @@ function Client:CreateRoomCard(msg)
     }
 end
 
-function Client:GetUserInfo(msg)
+function Client:Public_GetUserInfo(msg)
     if (msg.code) then
         http = Http()
         local ret = http:Get(string.format('%s?appid=%s&secret=%s&code=%s&grant_type=authorization_code',WX_TOKEN_PATH,WX_APPID,WX_KEY,msg.code))

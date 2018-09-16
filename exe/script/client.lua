@@ -21,7 +21,7 @@ SERVER_MSG = EnumTable({
     'SM_READY_GAME',
     'SM_START_GAME',
     'SM_MO_PAI',
-    --'SM_CHU_PAI',
+    'SM_CHU_PAI',
     'SM_REFRESH_PAI',
     'SM_TEST_PAI',
     -- 'SM_HUAN_PAI',--//换牌
@@ -50,6 +50,7 @@ function Client:new(o)
     o.player = nil
     o.info = nil
     o.room = nil
+    self.recoder_writer = nil
     return o
 end
 function Client:OnUpdate(frame)
@@ -60,13 +61,15 @@ function Client:OnConnected()
     --self:Send(json.encode({key1="1234",key2=234,key3=true}))
 end
 function Client:OnDisconnected()
+    self:LeaveRoom()
     self.room = nil
     self.socket = nil
     if self.player then self.player.client = nil end
     self.player = nil
     self.info = nil
-    print('client disconnected uid:' .. tostring(self.uid))
-    collectgarbage("collect")
+    self.recoder_writer = nil
+    --print('client disconnected uid:' .. tostring(self.uid))
+    --collectgarbage("collect")
 end
 
 function Client:RegisterMessageHandle()
@@ -121,8 +124,8 @@ function Client:EnterRoom(msg)
 end
 
 function Client:LeaveRoom(msg)
-    -- body
-    print('LeaveRoom=>'..msg)
+    if not(self.room) then return end
+    self.room:Leave(self)
 end
 
 function Client:ReadyGame(msg)
@@ -199,8 +202,9 @@ end
 function Client:Send(msg)
     if self.socket then
         if type(msg) == 'table' then
-            self.socket:Send(json.encode(msg))
+            self:Send(json.encode(msg))
         else
+            if self.recoder_writer then self.recoder_writer:PushContentLine(msg) end
             self.socket:Send(msg)
         end
     end

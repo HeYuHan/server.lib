@@ -21,6 +21,19 @@ function RoomPlayers:OnCreate()
     self.hu_pai_info = nil
     self.maizhuang = 0
     self.test = nil
+    self.ready = false
+    
+end
+function RoomPlayers:Reset()
+    self.shou_pai:Clear()
+    self.di_pai:Clear()
+    self.an_gang_array:Clear()
+    self.jiao_pai_array:Clear()
+    self.qi_pai_array:Clear()
+    self.hu_pai_info = nil
+    self.maizhuang = 0
+    self.test = nil
+    self.ready = false
 end
 function RoomPlayers:ChuPai(pai)
     if self.shou_pai:Remove(pai) then 
@@ -51,6 +64,7 @@ function RoomPlayers:TestPeng(value)
         end
     end
     if #temp_di > 1 then
+        table.insert( temp_di,value)
         self.test = {
             type = TYPE_TEST_PENG,
             data = temp_di,
@@ -75,6 +89,7 @@ function RoomPlayers:TestGang(value)
         end
     end
     if #temp_di > 2 then
+        table.insert( temp_di,value)
         self.test = {
             type = TYPE_TEST_GANG,
             data = temp_di,
@@ -131,8 +146,8 @@ function RoomPlayers:TestHu(pai,puke)
 end
 function RoomPlayers:ApplyTest(test)
     self.test = test
-    if self.test.type == TYPE_TEST_ANGANG then
-        self.shou_pai = self.test.shou
+    if self.test.type == TYPE_TEST_GANG then
+        self.shou_pai:SetTable(self.test.shou)
         self.an_gang_array:Push(self.test.value)
         self.di_pai:PushRange(self.test.data)
     elseif self.test.type == TYPE_TEST_ANGANG then
@@ -151,7 +166,7 @@ function RoomPlayers:CaculateScore(puke)
             local shou = DetailToNumberArray(v)
             local info = puke:CaculateDiHu(shou,self.di_pai,self.an_gang_array,self.jiao_pai_array)
             info.hu_pai_array = shou
-            info.hu_pai_type = bit_or(info.hu_pai_type,TYPE_HU_ZIMO)
+            if self.test.type == TYPE_TEST_ZIMO then info.hu_pai_type = bit_or(info.hu_pai_type,TYPE_HU_ZIMO) end
             info:CaculateTotleScore(true,puke.xi)
             table.insert( di_info_array,info)
         end
@@ -162,8 +177,8 @@ function RoomPlayers:CaculateScore(puke)
             end
         end
     else
-        self.score_info = puke:CaculateDiHu(self.shou_pai,self.di_pai,self.an_gang_array,self.jiao_pai_array)
-        self.score_info:CaculateTotleScore(false,puke.xi)
+        self.hu_pai_info = puke:CaculateDiHu(self.shou_pai,self.di_pai,self.an_gang_array,self.jiao_pai_array)
+        self.hu_pai_info:CaculateTotleScore(false,puke.xi)
     end
 end
 ---------------------------------------------------------------------------
@@ -300,7 +315,7 @@ function PuKe:Init(xi)
     self.xi = xi
     self.jiang_pai[1]=math.floor(math.random()*120)+1
     self.jiang_pai[2]=math.floor(math.random()*120)+1
-    
+    self.pai_detail_array = {}
     if xi then
         self.pais:Init(1,125)
     else
@@ -597,8 +612,8 @@ function PuKe:CaculateDiHu(shou_pai,di_pai,an_gang,jiao_pai)
                         local detail2 = self:GetDetail(di_pai:At(k+1))
                         if( PaiEqual(temp_array:At(1).pai,detail2.pai)) then
                             local is_an_gang=false
-                            for m=1,an_gan:Size() do
-                                if(Pai.Equal2(an_gang[m],temp_array:At(1).pai)) then
+                            for m=1,an_gang:Size() do
+                                if(PaiEqual(an_gang:At(m),temp_array:At(1).pai)) then
                                 
                                     an_gang_array:Push(temp_array:At(1))
                                     is_an_gang=true
@@ -653,9 +668,8 @@ function PuKe:CaculateDiHu(shou_pai,di_pai,an_gang,jiao_pai)
         end
     end)
     --明刻
-    ming_ke_array:Each(function ( k,v )
-        local detail = ming_ke_array[i];
-        local hu = PuKe.GetHuPaiRate(self.jiang_pai_type,v,TYPE_RATE_MINGKE)
+    ming_ke_array:Each(function ( k,detail )
+        local hu = PuKe.GetHuPaiRate(self.jiang_pai_type,detail,TYPE_RATE_MINGKE)
         ming_ke_hu = hu+ming_ke_hu
         if(detail.is_laojiang and detail.pai.type ~= TYPE_PAI_TIAO and have_san_hua)then ming_ke_hu=hu+ming_ke_hu end
     end)
@@ -1144,6 +1158,7 @@ end
 ROOM_STATE_WAIT = 1
 ROOM_STATE_PLAY = 2
 ROOM_STATE_BALANCE = 3
+ROOM_STATE_FREE = 4
 function Room.Create(guid)
     local r = CreateObject(Room,{guid=guid})
     allRoom[guid] = r
@@ -1153,8 +1168,22 @@ function Room.Get(guid)
     return allRoom[guid]
 end
 function Room:Free()
+    self.state = ROOM_STATE_FREE
+    self.players:Each(function (k,v)
+        if v.client then 
+            v.client.player = nil
+            v.client.room = nil
+          
+            v.client.recoder_writer = nil
+            v.client = nil
+        end
+        
+    end)
     allRoom[self.guid] = nil
     self.players = nil
+    if self.recoder_writer then 
+        self.recoder_writer:Close()
+    end
 
 end
 function Room:OnCreate()
@@ -1169,14 +1198,17 @@ function Room:RefreshRoomEnter()
     self.players:Each(function (k,v)
         local p = {}
         --掉线设置为未准备好
-        p.ready = v.ready and v.client
+        if v.ready==true and v.client ~=nil then
+            p.ready = true
+        else
+            p.ready = false
+        end
         p.guid = v.info.guid
         p.headimgurl = v.info.headimgurl
         p.nick = v.info.nick
         room_players[k] = p
     end)
-    
-    self:BroadCastMessage(nil,SERVER_MSG.SM_ENTER_ROOM,{card=self.card,players=room_players})
+    self:BroadCastMessage(nil,SERVER_MSG.SM_ENTER_ROOM,{card = self.card,players = room_players})
     room_players = nil
 end
 
@@ -1184,7 +1216,7 @@ function Room:BroadCastMessage(sender,type,msg,other)
     self.players:Each(function (k,v)
         
         if other then
-            if v.client and v.client.guid ~= sender.client.guid then v.client:SendMessage(type,msg) end
+            if v.client and v.client.info.guid ~= sender.client.info.guid then v.client:SendMessage(type,msg) end
         else
             if (v.client) then v.client:SendMessage(type,msg) end
         end
@@ -1194,7 +1226,7 @@ end
 
 function Room:BroadCastDiffMessage(sender,type,msg1,msg2)
     self.players:Each(function (k,v)
-        if v.client and v.client.guid ~= sender.client.guid then 
+        if v.client and v.client.info.guid == sender.client.info.guid then 
             v.client:SendMessage(type,msg1) 
         elseif v.client then
             v.client:SendMessage(type,msg2) 
@@ -1222,13 +1254,31 @@ end
 function Room:Check(client)
     return client.room and client.room.guid == self.guid
 end
+function Room:SaveRecoderFile()
+    if (WRITE_RECODER) and self.recoder_writer == nil then 
+        local res = RedisResponse()
+        local session_time = 7*24*60*60
+        local file_name = string.format('%s_%s',tostring(self.guid),tostring(os.time()))
+        self.recoder_writer = AsyncFileWriter()
+        self.recoder_writer:Create(RECODER_PATH .. file_name)
+        self.players:Each(function (k,v)
+            v.client.recoder_writer = self.recoder_writer
+            SaveSession(gServer.db,res,'recoder',string.format('%s_%s',tostring(v.info.guid),file_name),file_name,7*24*60*60)
+        end)
+        
+    end
+    
+end
 function Room:Start()
     if self.state == ROOM_STATE_PLAY then return false end
     if self.players:Size() < GAME_MAX_PLAYERS then return false end
+    local all_ready = true
     self.players:Each(function (k,v)
-        if not(v.ready) then return false end
+        if not(v.ready) then all_ready = false end
     end)
+    if not(all_ready) then return false end
     self.state = ROOM_STATE_PLAY
+    self:SaveRecoderFile()
 --游戏开始
     self.maizhuang_count=0
     self.card.used = self.card.used + 1
@@ -1260,7 +1310,7 @@ function Room:Start()
 end
 function Room:Enter(client)
     local len = self.players:Size()
-    if len > GAME_MAX_PLAYERS then return false end
+    if len > GAME_MAX_PLAYERS or self:Check(client) then return false end
     local player  = CreateObject(RoomPlayers)
     player.info = client.info
     player.client = client
@@ -1273,14 +1323,22 @@ function Room:Enter(client)
 end
 function Room:Leave(client)
     if self:Check(client) then
-        self:Each(function (c)
-            if(c.client and c.client.guid ~= client.guid) then
-                c.client:SendMessage(SERVER_MSG.SM_LEAVE_ROOM,{guid = client.guid})
+        local free = true
+        self.players:Each(function ( k,v )
+            if(v.client and v.info.guid ~= client.info.guid) then
+                free = false
+                v.client:SendMessage(SERVER_MSG.SM_LEAVE_ROOM,{guid = client.guid})
             end
         end)
         client.room = nil
         client.player.client = nil
         client.player = nil
+        client.recoder_writer=nil
+        if(free) then 
+            if self.state ~= ROOM_STATE_FREE then 
+                self:Balance(true)
+            end
+        end
     end
 end
 function Room:Ready(client,ready)
@@ -1296,7 +1354,11 @@ function Room:Ready(client,ready)
         log_error('client not in this room : ' .. tostring(self.guid))
     end
 end
-function Room:RefreshPlayer(player)
+
+TYPE_REFRESH_MOPAI = 1
+TYPE_REFRESH_CHUPAI = 2
+
+function Room:RefreshPlayer(player,type,pai)
     local di = player.di_pai:Data()
     local shou = player.shou_pai:Data()
     local qi = player.qi_pai_array:Data()
@@ -1304,22 +1366,30 @@ function Room:RefreshPlayer(player)
         if not(v.client) then return end
         if v.info.guid == player.info.guid then
             v.client:SendMessage(SERVER_MSG.SM_REFRESH_PAI,{
-                guid=self.player.info.guid,
+                guid=player.info.guid,
                 di = di,
                 shou = shou,
-                qi = qi
+                qi = qi,
+                type= type,
+                pai = pai,
+                size1 = player.shou_pai:Size(),
+                size2=self.puke:GetSize()
             })
         else
             v.client:SendMessage(SERVER_MSG.SM_REFRESH_PAI,{
-                guid=self.player.info.guid,
+                guid=player.info.guid,
                 di = di,
-                qi = qi
+                qi = qi,
+                pai = pai,
+                type= type,
+                size1 = player.shou_pai:Size(),
+                size2=self.puke:GetSize()
             })
         end
     end)
 end
 function Room:MoPai()
-    --self:RefreshPlayer(self.next_chupai_palyer)
+    if self.next_chupai_palyer then self:RefreshPlayer(self.next_chupai_palyer,TYPE_REFRESH_CHUPAI,self.next_chupai_palyer.qi_pai_array:Last()) end
     self:EndTest()
     local number = self.puke:Get()
     local pai = CreatePai(number)
@@ -1345,27 +1415,30 @@ function Room:MoPai()
         log_info('begin test angang:' .. self.next_mopai_palyer.info.nick)
     end
 
-    local di = nil
-    if refresh_dipai then di=self.next_mopai_palyer.di_pai:Data() end
-    self.players:Each(function ( k,v )
-        if not(v.client) then return end
-        if v.info.guid == self.next_mopai_palyer.info.guid then
-            v.client:SendMessage(SERVER_MSG.SM_MO_PAI,{
-                guid=self.next_mopai_palyer.info.guid,
-                pai=number,
-                di = di,
-                size1=self.next_mopai_palyer.shou_pai:Size(),
-                size2=self.puke:GetSize()
-            })
-        else
-            v.client:SendMessage(SERVER_MSG.SM_MO_PAI,{
-                guid=self.next_mopai_palyer.info.guid,
-                di = di,
-                size1=self.next_mopai_palyer.shou_pai:Size(),
-                size2=self.puke:GetSize()
-            })
-        end
-    end)
+
+    self:RefreshPlayer(self.next_mopai_palyer,TYPE_REFRESH_MOPAI,number)
+
+    -- local di = nil
+    -- if refresh_dipai then di=self.next_mopai_palyer.di_pai:Data() end
+    -- self.players:Each(function ( k,v )
+    --     if not(v.client) then return end
+    --     if v.info.guid == self.next_mopai_palyer.info.guid then
+    --         v.client:SendMessage(SERVER_MSG.SM_MO_PAI,{
+    --             guid=self.next_mopai_palyer.info.guid,
+    --             pai=number,
+    --             di = di,
+    --             size1=self.next_mopai_palyer.shou_pai:Size(),
+    --             size2=self.puke:GetSize()
+    --         })
+    --     else
+    --         v.client:SendMessage(SERVER_MSG.SM_MO_PAI,{
+    --             guid=self.next_mopai_palyer.info.guid,
+    --             di = di,
+    --             size1=self.next_mopai_palyer.shou_pai:Size(),
+    --             size2=self.puke:GetSize()
+    --         })
+    --     end
+    -- end)
 
 
     if not(self:BeginTest()) then
@@ -1397,30 +1470,34 @@ function Room:MaiZhuang(client,msg)
 end
 function Room:CreateTestPlayers()
     self.test_palyers=CreateObject(Array)
-    for i=0,1 do
+    local len = self.players:Size() - 1
+    for i=0,len do
         self.test_palyers:Push(self.players:At(((self.next_chupai_palyer.index+i) % GAME_MAX_PLAYERS) + 1))
     end
 end
 
 function Room:BeginTest()
-    if self.test_hu_players:Size() > 0 then
+    if self.test_hu_players and self.test_hu_players:Size() > 0 then
         self.current_test_info = self.test_hu_players:At(1)
         self.test_hu_players:RemoveAt(1)
         self.current_test_info.player.client:SendMessage(SERVER_MSG.SM_TEST_PAI,{type = self.current_test_info.type,value = self.current_test_info.test.value})
+        log_info('begin test hu')
         return true
     end
-    if self.test_gan_players:Size() > 0 then
+    if self.test_gan_players and self.test_gan_players:Size() > 0 then
         local player = self.test_gan_players:At(1)
         self.current_test_info = self.test_gan_players:At(1)
         self.test_gan_players:Clear()
         self.current_test_info.player.client:SendMessage(SERVER_MSG.SM_TEST_PAI,{type = self.current_test_info.type,value = self.current_test_info.test.value})
+        log_info('begin test gang')
         return true
     end
-    if self.test_peng_players:Size() > 0 then
+    if self.test_peng_players and self.test_peng_players:Size() > 0 then
         local player = self.test_peng_players:At(1)
         self.current_test_info = self.test_peng_players:At(1)
         self.test_peng_players:Clear()
         self.current_test_info.player.client:SendMessage(SERVER_MSG.SM_TEST_PAI,{type = self.current_test_info.type,value = self.current_test_info.test.value})
+        log_info('begin test peng')
         return true
     end
     return false
@@ -1439,6 +1516,7 @@ function Room:ChuPai(client,msg)
         log_error('client not have pai : ' .. tostring(msg.pai))
         return 
     end
+    self:BroadCastMessage(nil,SERVER_MSG.SM_CHU_PAI,{guid = client.info.guid,pai = msg.pai})
     --判断其余两家是否要这张牌
     self:CreateTestPlayers()
     self.test_hu_players = CreateObject(Array)
@@ -1460,6 +1538,7 @@ function Room:ChuPai(client,msg)
     end
     if self:BeginTest() then
     else
+        self.next_chupai_palyer.qi_pai_array:Push(msg.pai)
         self:MoPai()
     end
 end
@@ -1488,15 +1567,19 @@ function Room:Test(client,msg)
             self:Balance()
         elseif not(self:BeginTest()) then
             --没人要，为出牌玩家添加弃牌
-            self.next_chupai_palyer.qi_pai_array:Push(client.player.test.value)
+            self.next_chupai_palyer.qi_pai_array:Push(current_test.value)
             self:MoPai()
         end
     elseif (self.current_test_info.type == TYPE_TEST_ANGANG) then
         if msg.test then
-            local pai = client.player.test.value
+            local pai = current_test.value
             client.player:ApplyTest(current_test)
             self.next_mopai_palyer = client.player
-            self:BroadCastMessage(nil,SERVER_MSG.SM_GANG_PAI,{type = TYPE_TEST_ANGANG,guid=client.info.guid,pai=pai,di = client.player.di_pai:Data()})
+            self:BroadCastDiffMessage(client.player,SERVER_MSG.SM_GANG_PAI,
+            {type = TYPE_TEST_ANGANG,guid=client.info.guid,pai=pai,shou = client.player.shou_pai:Data(),di = client.player.di_pai:Data(),size1=self.next_mopai_palyer.shou_pai:Size(),
+            size2=self.puke:GetSize()},
+            {type = TYPE_TEST_ANGANG,guid=client.info.guid,pai=pai,di = client.player.di_pai:Data(),size1=self.next_mopai_palyer.shou_pai:Size(),
+            size2=self.puke:GetSize()})
             print('angan',client.info.nick)
             self:MoPai()
         elseif not(self:BeginTest()) then
@@ -1505,29 +1588,37 @@ function Room:Test(client,msg)
         end
     elseif (self.current_test_info.type == TYPE_TEST_GANG) then
         if msg.test then
-            local pai = client.player.test.value
+            local pai = current_test.value
             client.player:ApplyTest(current_test)
             self.next_mopai_palyer = client.player
-            self:BroadCastMessage(nil,SERVER_MSG.SM_GANG_PAI,{type = TYPE_TEST_GANG,guid=client.info.guid,pai=pai,di = client.player.di_pai:Data()})
+            self:BroadCastDiffMessage(client.player,SERVER_MSG.SM_GANG_PAI,
+            {type = TYPE_TEST_GANG,guid=client.info.guid,pai=pai,shou = client.player.shou_pai:Data(),di = client.player.di_pai:Data(),size1=self.next_mopai_palyer.shou_pai:Size(),
+            size2=self.puke:GetSize()},
+            {type = TYPE_TEST_GANG,guid=client.info.guid,pai=pai,di = client.player.di_pai:Data(),size1=self.next_mopai_palyer.shou_pai:Size(),
+            size2=self.puke:GetSize()})
             print('gang',client.info.nick)
             self:MoPai()
         elseif not(self:BeginTest()) then
             --没人要，为出牌玩家添加弃牌
-            self.next_chupai_palyer.qi_pai_array:Push(client.player.test.value)
+            self.next_chupai_palyer.qi_pai_array:Push(current_test.value)
             self:MoPai()
         end
     elseif (self.current_test_info.type == TYPE_TEST_PENG) then
         if msg.test then
-            local pai = client.player.test.value
+            local pai = current_test.value
             client.player:ApplyTest(current_test)
             self.next_chupai_palyer = client.player
-            self:BroadCastMessage(nil,SERVER_MSG.SM_PENG_PAI,{type = TYPE_TEST_PENG,guid=client.info.guid,pai=pai,di = client.player.di_pai:Data(),size1=self.next_mopai_palyer.shou_pai:Size(),
+            self.next_mopai_palyer = self.players:At((self.next_chupai_palyer.index % GAME_MAX_PLAYERS) + 1)
+            self:BroadCastDiffMessage(client.player,SERVER_MSG.SM_PENG_PAI,
+            {type = TYPE_TEST_PENG,guid=client.info.guid,pai=pai,shou = client.player.shou_pai:Data(),di = client.player.di_pai:Data(),size1=self.next_mopai_palyer.shou_pai:Size(),
+            size2=self.puke:GetSize()},
+            {type = TYPE_TEST_PENG,guid=client.info.guid,pai=pai,di = client.player.di_pai:Data(),size1=self.next_mopai_palyer.shou_pai:Size(),
             size2=self.puke:GetSize()})
             print('peng',client.info.nick)
             
         elseif not(self:BeginTest()) then
             --没人要，为出牌玩家添加弃牌
-            self.next_chupai_palyer.qi_pai_array:Push(client.player.test.value)
+            self.next_chupai_palyer.qi_pai_array:Push(current_test.value)
             self:MoPai()
         end
     -- else
@@ -1536,23 +1627,159 @@ function Room:Test(client,msg)
     --     self:MoPai()
     end
 end
-function Room:Balance()
+function Room:Balance(payOnly)
     self.state = ROOM_STATE_BALANCE
     local blance_msg = CreateObject(Array)
-    self.players:Each(function ( k,v )
-        v:CaculateScore(self.puke)
-        local msg = {}
-        msg.guid = v.info.guid
-        msg.hu = v.hu_pai_info.totle_socre
-        msg.type1 = v.hu_pai_info.hu_pai_type
-        msg.type2 = v.hu_pai_info.hu_type
-        msg.shou = v.shou_pai:Data()
-        msg.di = v.di_pai:Data()
+    
+    --self.score_recoder = self.score_recoder or CreateObject(Array)
+    self.player_score_map = self.player_score_map or {}
+    local current_score = {}
+    if not(payOnly) then 
+        local recoder = CreateObject(Array)
+        self.players:Each(function ( k,v )
+            v:CaculateScore(self.puke)
+            local msg = {}
+            msg.guid = v.info.guid
+            msg.hu = v.hu_pai_info.totle_socre
+            if self.card.limit > 0 then 
+                msg.hu = math.min(self.card.limit,msg.hu)
+            end
+            msg.type1 = v.hu_pai_info.hu_pai_type
+            msg.type2 = v.hu_pai_info.hu_type
+            msg.shou = v.shou_pai:Data()
+            msg.di = v.di_pai:Data()
 
-        blance_msg:Push(msg)
-        print(v.info.nick,'score',v.hu_pai_info.totle_socre)
-    end)
+            blance_msg:Push(msg)
+            print(v.info.nick,'score',msg.hu)
+            --记录小局结算数据
+            recoder:Push({
+                guid = v.info.guid,
+                hu = msg.hu,
+                maizhuang = v:MaiZhuang()
+            })
+
+
+        end)
+
+        
+        recoder:Each(function ( j,v )
+            local p1 = v
+            local p2 = recoder:At((j % recoder:Size())+1)
+            local p3 = recoder:At(((j+1) % recoder:Size())+1)
+            local s1 = Room.CaculateScore(p1,p2,self.card.rate)
+            local s2 = Room.CaculateScore(p1,p3,self.card.rate)
+            local list = self.player_score_map[p1.guid]
+            if not(list) then
+                list = {
+                }
+                self.player_score_map[p1.guid] = list
+            end
+            table.insert(current_score,{guid= p1.guid,score= s1+s2})
+            table.insert( list,s1+s2)
+        end)
+    end
+    
+
+
+
+
     local winner_guid = nil
-    if self.current_test_info.player then winner_guid = self.current_test_info.player.info.guid end
-    self:BroadCastMessage(nil,SERVER_MSG.SM_GAME_BALANCE,{winner=winner_guid,balance = blance_msg.tbl})
+    local loser_guid = nil
+    if self.current_test_info and self.current_test_info.player then winner_guid = self.current_test_info.player.info.guid end
+    if self.next_chupai_palyer then loser_guid = self.next_chupai_palyer.info.guid end
+    
+    self.card.maxUseCount = 2
+    
+    if self.card.maxUseCount > self.card.used and not(payOnly) then
+        self:BroadCastMessage(nil,SERVER_MSG.SM_GAME_BALANCE,{score=current_score,loser = loser_guid,winner=winner_guid,balance = blance_msg.tbl})
+        self:Clean()
+    else
+        --大结算
+        -- local player_score_map = {}
+        -- self.score_recoder:Each(function ( i,v )
+        --     local scores = v
+        --     scores:Each(function ( j,v )
+        --         local p1 = v
+        --         local p2 = scores:At((j % scores:Size())+1)
+        --         local p3 = scores:At(((j+1) % scores:Size())+1)
+        --         local s1 = Room.CaculateScore(p1,p2,self.card.rate)
+        --         local list = player_score_map[p1.guid]
+        --         if not(list) then
+        --             list = {
+        --                 score={}
+        --             }
+        --             player_score_map[p1.guid] = list
+        --         end
+        --         table.insert( list.score,s1+s2)
+        --     end)
+        -- end)
+        local winnerguid=nil
+        local winnerScore=-1
+        local final_score={}
+        local total = {}
+        for key,list in pairs(self.player_score_map) do
+            table.insert( total,{guid=key,score=list})
+            local sum = 0
+            for k,v in pairs(list) do
+                sum = sum + v
+            end 
+            table.insert( final_score,{guid = key,socre= sum})
+            if sum > winnerScore then
+                winnerScore = sum
+                winnerguid = key
+            end
+        end
+        if self.card.pay == PayType.Host or winnerScore <= 0 or winnerguid == nil then
+            local user = GetUserByUnionid(gServer.db,self.card.owner)
+            if user then
+                user[self.card.currency] = user[self.card.currency] - self.card.cost
+                SaveUser(gServer.db,user)
+            end
+           
+        elseif self.card.pay == PayType.AA then
+            local d = math.ceil(self.card.cost /self.players:Size())
+            self.players:Each(function ( k,v )
+                
+                local user = GetUserByGuid(gServer.db,v.info.guid)
+                if user then
+                    user[self.card.currency] = user[self.card.currency] - d
+                    SaveUser(gServer.db,user)
+                end
+            end)
+        elseif self.card.pay == PayType.Winer then
+            local user = GetUserByGuid(gServer.db,winnerguid)
+            if user then
+                user[self.card.currency] = user[self.card.currency] - self.card.cost
+                SaveUser(gServer.db,user)
+            end
+        end
+
+       print(winner_guid,winnerScore)
+       print(json.encode(final_score))
+        self:BroadCastMessage(nil,SERVER_MSG.SM_GAME_BALANCE,{score=current_score,loser = loser_guid,winner=winner_guid,balance = blance_msg.tbl,total=total})
+        --self:BroadCastMessage(nil,SERVER_MSG.SM_GAME_BALANCE,{loser = loser_guid,winner=winner_guid,balance = blance_msg.tbl,score=self.player_score_map})
+        
+        
+        
+        self:Free()
+    end
+end
+
+function Room.CaculateScore(p1,p2,rate)
+    local d=p1.hu-p2.hu
+    local scale=rate[1]
+    if(p1.maizhuang and p2.maizhuang) then
+        scale=rate[3]
+    elseif(p1.maizhuang or p2.maizhuang) then
+        scale=rate[2]
+    end
+    return d*scale
+end
+
+function Room:Clean()
+    self.state= ROOM_STATE_WAIT
+    self.maizhuang_count = 0
+    self.players:Each(function (k,v)
+        v:Reset()
+    end)
 end

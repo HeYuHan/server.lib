@@ -1,5 +1,7 @@
-json = require "json"
+
+
 require 'config'
+json =  cjson or require 'json'
 --define
 REDIS_CMD_HASH = 1
 REDIS_CMD_STRING = 2
@@ -87,8 +89,7 @@ UserInfo = {
     unionid = '',
     headimgurl = '',
     diamond = INIT_DIAMOND_COUNT,
-    gold = INIT_GOLD_COUNT,
-    isProxy = false
+    gold = INIT_GOLD_COUNT
 
 }
 PayType = EnumTable({
@@ -103,7 +104,8 @@ RoomCard = {
     rate = {1,1,1},
     limit = 0,
     xi = false,
-    pay = PayType.Winer
+    pay = PayType.Winer,
+    cost = 0
 }
 --==============================--
 function InitRedisScript(o)
@@ -199,9 +201,7 @@ end
 function GetGuid(db,res,map,start)
     db:ScriptEval(res,'EVALSHA',redis_script_get_guid,1,string.format('guid:%s %d',map,start))
 end
-function SaveRecoderFile(db,res,name)
-    SaveSession(db,res,'recoder',name,tostring(os.time()),7*24*60*60)
-end
+
 
 function SaveSession(db,res,map,key,value,time)
     db:ScriptEval(res,'EVALSHA',redis_script_set_session,1,string.format('session:%s:%s %s %d',map,key,value,time))
@@ -279,6 +279,56 @@ function GetSystemTable(db)
     end
 end
 
+function GetAdminInfo(db)
+    local res = RedisResponse()
+    db:GetValue(REDIS_CMD_STRING,res,'admin','root')
+    if res:Valid() then
+        return res:String()
+    else
+        return nil
+    end
+end
+
+function UpdateRootPassword(db,password)
+    local res = RedisResponse()
+    db:SaveValue(REDIS_CMD_STRING,res,'admin','root',tostring(password))
+    if res:Valid() then
+        return res:String()
+    else
+        return nil
+    end
+end
+
+function GetProxyInfo(db,guid)
+    local res = RedisResponse()
+    db:GetValue(REDIS_CMD_STRING,res,'admin:proxy',tostring(guid))
+    if res:Valid() then
+        return res:String()
+    else
+        return nil
+    end
+end
+
+function DeleteProxyInfo(db,guid)
+    local res = RedisResponse()
+    db:DelKey(REDIS_CMD_STRING,res,'admin:proxy',tostring(guid))
+    if res:Valid() then
+        return true
+    else
+        return nil
+    end
+end
+function UpdateOrSaveProxyInfo(db,guid,pwd)
+    local res = RedisResponse()
+    db:SaveValue(REDIS_CMD_STRING,res,'admin:proxy',tostring(guid),tostring(pwd))
+    if res:Valid() then
+        return true
+    else
+        return false
+    end
+end
+
+
 function Random(min,max)
     math.randomseed(os.time())
     local x = math.random()*(max - min) + min
@@ -320,7 +370,7 @@ function Array:Set(index,e)
 end
 function Array:PushRange(es,len)
     local length = len or #es
-    for i=i,length do
+    for i=1,length do
         self:Push(es[i])
     end
 end
@@ -412,13 +462,11 @@ end
 
 --------------------------------------------------------------------------------------
 RandomInt={min=0,max=0,allowrepeat=false,recoders=nil}
-function RandomInt:OnCreate()
-    self.recoders = CreateObject(Array)
-end
 function RandomInt:Init(min,max,allowrepeat)
     self.min = min
     self.max = max
     self.allowrepeat = allowrepeat
+    self.recoders = CreateObject(Array)
     if not(allowrepeat) then
         for i=min,max do
             self.recoders:Push(i)
