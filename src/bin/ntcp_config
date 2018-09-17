@@ -1,0 +1,9 @@
+
+#####################################################################################
+#执行 export LD_LIBRARY_PATH=/opt/software/glibc-2.14/lib:$LD_LIBRARY_PATH
+#1.script
+#3.log name
+#4.log path
+luaserver ../script/loginserver.lua ntcp ./log/loginserver.log
+luaserver ../script/gameserver.lua ntcp ./log/gameserver.log
+luaserver ../script/adminserver.lua ntcp ./log/adminserver.log

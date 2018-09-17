@@ -6,22 +6,16 @@
 #gcc --version
 debug:
 	$(MAKE) -C common
-	$(MAKE) -C proto
-	$(MAKE) -C channelserver
-	$(MAKE) -C proxyserver
+	$(MAKE) -C luaserver
 
 release:
 	$(MAKE) RELEASE=1 -C common
-	$(MAKE) -C proto
-	$(MAKE) RELEASE=1 -C channelserver
-	$(MAKE) RELEASE=1 -C proxyserver
+	$(MAKE) RELEASE=1 -C luaserver
 
 clean:
 	$(MAKE) clean -C common
-	$(MAKE) clean -C proto
-	$(MAKE) clean -C channelserver
-	$(MAKE) clean -C proxyserver
-	rm -rf srs.server*
+	$(MAKE) clean -C luaserver
+	rm -rf ntcp.server*
 
 deps:
 	$(MAKE) deps -C common
