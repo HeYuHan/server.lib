@@ -3,7 +3,9 @@
 #include "log.h"
 #include "WebSocket.h"
 #include "tools.h"
+#ifdef PROTO_BUFF
 #include <google/protobuf/message.h>
+#endif
 BEGIN_NS_CORE
 #define FLOAT_RATE 100.0f
 NetworkStream::NetworkStream(int send_buff_size, int read_buff_size):connection(NULL),web_frame(NULL)
@@ -254,6 +256,7 @@ void NetworkStream::WriteShortQuaternion(Quaternion & rot)
 	WriteShort(z);
 	WriteShort(w);
 }
+#ifdef PROTO_BUFF
 void NetworkStream::WriteProtoBufferAutoSize(google::protobuf::Message * message)
 {
 	int size = message->ByteSize();
@@ -270,6 +273,9 @@ void NetworkStream::WriteProtoBufferAutoSize(google::protobuf::Message * message
 		write_end += size;
 	}
 }
+#endif // PROTO_BUFF
+
+
 void NetworkStream::BeginWrite()
 {
 	m_WriteLock.Lock();
@@ -413,6 +419,7 @@ void NetworkStream::ReadShortQuaternion(Quaternion & rot)
 	ReadShort(w);
 	rot = Quaternion(x / 1000.0f, y / 1000.0f, z / 1000.0f, w / 1000.0f);
 }
+#ifdef PROTO_BUFF
 void NetworkStream::WriteProtoBuffer(google::protobuf::Message *message)
 {
 	int size = message->ByteSize();
@@ -429,8 +436,7 @@ void NetworkStream::WriteProtoBuffer(google::protobuf::Message *message)
 		write_end += size;
 	}
 }
-
-bool NetworkStream::ReadProtoBuffer(google::protobuf::Message * message,int size)
+bool NetworkStream::ReadProtoBuffer(google::protobuf::Message * message, int size)
 {
 	bool ret = message->ParseFromArray(read_position, size);
 	read_position += size;
@@ -441,8 +447,13 @@ bool NetworkStream::ReadProtoBufferAutoSize(google::protobuf::Message * message)
 {
 	int size = 0;
 	ReadInt(size);
-	return ReadProtoBuffer(message,size);
+	return ReadProtoBuffer(message, size);
 }
+#endif // PROTO_BUFF
+
+
+
+
 
 
 

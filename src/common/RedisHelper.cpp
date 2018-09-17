@@ -46,8 +46,12 @@ bool RedisHelper::AsyncConnect(const char * addr, RedisAsyncCallback * callback)
 		if (m_AsyncContext)
 		{
 			int ret = redisLibeventAttach(m_AsyncContext, Timer::GetEventBase());
-			m_AsyncContext->data = this;
-			SetAsyncCallback(callback);
+			if (ret == REDIS_OK)
+			{
+				m_AsyncContext->data = this;
+				SetAsyncCallback(callback);
+			}
+			
 		}
 
 		return m_AsyncContext != NULL;
@@ -345,7 +349,7 @@ void RedisHelper::AsyncCommand(RedisAsyncCallback * callback, const char * forma
 	callback->m_Helper = this;
 	va_list ap;
 	va_start(ap, format);
-	int ret = redisvAsyncCommand(m_AsyncContext, RedisAsyncCallback::OnRedisMessage, callback, format, ap);
+	redisvAsyncCommand(m_AsyncContext, RedisAsyncCallback::OnRedisMessage, callback, format, ap);
 	va_end(ap);
 }
 
@@ -395,7 +399,7 @@ redis_int RedisResponse::ElementsCount()
 
 bool RedisResponse::Element(RedisResponse & res, int index)
 {
-	if (Valid() && index >= 0 && index < m_Reply->elements)
+	if (Valid() && index >= 0 && index < (int)m_Reply->elements)
 	{
 		res.m_Reply = m_Reply->element[index];
 		res.isChild = true;

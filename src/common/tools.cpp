@@ -6,8 +6,7 @@
 #include "common.h"
 #ifndef WIN32
 #include <unistd.h>
-#include <arpa/inet.h>
-#include <sys/signal.h>
+
 #endif // LINUX
 #include "DR_SHA1.h"
 #include "ThreadPool2.h"

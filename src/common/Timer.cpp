@@ -6,9 +6,9 @@ struct event_base* gEventBase=NULL;
 
 Timer::Timer():
 	m_Stop(true),
+	m_CallBack(0),
 	m_TimerEvent(NULL),
-	m_EventBase(NULL),
-	m_CallBack(0)
+	m_EventBase(NULL)
 
 {
 }

@@ -152,7 +152,7 @@ void LuaEngine::Pop(int old_top,const char* msg)
 #endif
 }
 
-LuaInterface::LuaInterface():L(NULL), m_LuaRef(-1)
+LuaInterface::LuaInterface():m_LuaRef(-1), L(NULL)
 {
 	
 }

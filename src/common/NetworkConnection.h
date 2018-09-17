@@ -46,8 +46,12 @@ public:
 	void WriteData(const void* data, int count);
 	void WriteVector3(Vector3 &v3);
 	void WriteShortQuaternion(Quaternion &rot);
+#ifdef PROTO_BUFF
+
 	void WriteProtoBufferAutoSize(google::protobuf::Message *message);
 	void WriteProtoBuffer(google::protobuf::Message *message);
+#endif // PROTO_BUFF
+
 	
 	void BeginWrite();
 	void EndWrite();
@@ -67,8 +71,10 @@ public:
 	void ReadData(void* data, int count);
 	void ReadVector3(Vector3 &v3);
 	void ReadShortQuaternion(Quaternion &rot);
+#ifdef PROTO_BUFF
 	bool ReadProtoBuffer(google::protobuf::Message *message,int size);
 	bool ReadProtoBufferAutoSize(google::protobuf::Message *message);
+#endif
 public:
 	NetworkConnection* connection;
 public:

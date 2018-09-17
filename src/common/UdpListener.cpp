@@ -1,3 +1,4 @@
+#ifdef RAKNET
 #include "UdpListener.h"
 #include "common.h"
 #include "log.h"
@@ -132,3 +133,4 @@ void UdpListener::CloseClient(SystemAddress & address)
 {
 	m_Socket->CloseConnection(address, true, HIGH_PRIORITY);
 }
+#endif

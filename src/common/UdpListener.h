@@ -1,4 +1,5 @@
 #pragma once
+#ifdef RAKNET
 #ifndef __UDPLISTENER_H__
 #define __UDPLISTENER_H__
 #include <MessageIdentifiers.h>
@@ -30,3 +31,4 @@ public:
 
 
 #endif // !__UDPLISTENER_H__
+#endif

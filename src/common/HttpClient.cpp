@@ -1,6 +1,5 @@
 #include "HttpClient.h"
 #include <event2/http.h>
-#include <RakString.h>
 #include "Timer.h"
 #include "log.h"
 #include <string.h>

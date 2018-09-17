@@ -3,6 +3,10 @@
 //#include <event2/event.h>
 #ifdef _WIN32
 #include <winsock2.h>
+#else
+#include <arpa/inet.h>
+#include <sys/signal.h>
+#include <netdb.h>
 #endif // WIN32
 
 

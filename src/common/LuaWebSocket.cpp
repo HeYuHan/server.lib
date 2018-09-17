@@ -1,5 +1,5 @@
 #include "LuaWebSocket.h"
-#include <LuaBridge\LuaBridge.h>
+#include <LuaBridge/LuaBridge.h>
 #include <Timer.h>
 using namespace luabridge;
 

@@ -1,4 +1,8 @@
 #include "UdpConnection.h"
+#ifdef RAKNET
+
+
+
 BEGIN_NS_CORE
 static unsigned char GetPacketIdentifier(RakNet::Packet *p)
 {
@@ -200,3 +204,4 @@ void UdpConnection::KeepAlive()
 	m_Socket->Send(&msg, 1, HIGH_PRIORITY, UNRELIABLE, 0, m_IsServer ? m_SystemAddress : RakNet::UNASSIGNED_SYSTEM_ADDRESS, false);
 }
 END_NS_CORE
+#endif // RAKNET

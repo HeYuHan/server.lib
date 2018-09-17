@@ -1,4 +1,8 @@
 #pragma once
+#ifdef RAKNET
+
+
+
 #ifndef __UDPCONNECTION_H__
 #define __UDPCONNECTION_H__
 #include "NetworkConnection.h"
@@ -36,3 +40,4 @@ public:
 END_NS_CORE
 
 #endif // !__UDPCONNECTION_H__
+#endif // RAKNET
