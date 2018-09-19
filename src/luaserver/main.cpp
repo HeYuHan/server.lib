@@ -68,6 +68,7 @@ int main(int argc, char **args)
 	LuaEngine::GetInstance()->Start();
 	LuaEngine::GetInstance()->LuaSearchPath("path", "./?.lua");
 	LuaEngine::GetInstance()->LuaSearchPath("path", "../?.lua");
+	LuaEngine::GetInstance()->LuaSearchPath("path", "../src/?.lua");
 	LuaEngine::GetInstance()->DoFile(script_name);
 	return 1;
 }

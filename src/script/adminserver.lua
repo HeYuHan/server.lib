@@ -7,7 +7,6 @@ sysTable = {}
 TYPE_ACCOUNT_ROOT = 1
 TYPE_ACCOUNT_PROXY = 2
 function Client:OnCreate()
-    print('login client oncreate')
     self.socket:RegisterCallBack(self)
     self.uid = self.socket.uid
     self.auth = false
@@ -158,7 +157,7 @@ end
 --获取用户信息
 
 function Client:Public_GetUserInfo(msg)
-    local user = GetUserByGuid(gServer.db,msg.guid)
+    local user = GetUserByGuid(gServer.db,msg.guid,true)
     if user then
         return user
     else
@@ -214,7 +213,6 @@ end
 
 
 function Server:OnAccept(socket)
-    print('accept client uid' .. tostring(socket.uid))
     local client = CreateObject(Client,{socket = socket})
 end
 function Server:OnUpdate(frame)

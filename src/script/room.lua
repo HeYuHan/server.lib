@@ -1159,6 +1159,29 @@ ROOM_STATE_WAIT = 1
 ROOM_STATE_PLAY = 2
 ROOM_STATE_BALANCE = 3
 ROOM_STATE_FREE = 4
+
+allClientRoom = {}
+
+function Room.CheckInRoom(client)
+    local room_guid = allClientRoom[client.info.guid]
+    if room_guid then
+        local r = Room.Get(room_guid)
+        if r then
+            for i=1,r.players:Size() do
+                local p = r.players:At(i)
+                if p.info.guid == client.info.guid then
+                    p.client = client
+                    client.player = p
+                    
+                    return r
+                end
+            end
+        end
+        
+    end
+    return nil
+end
+
 function Room.Create(guid)
     local r = CreateObject(Room,{guid=guid})
     allRoom[guid] = r
@@ -1170,6 +1193,8 @@ end
 function Room:Free()
     self.state = ROOM_STATE_FREE
     self.players:Each(function (k,v)
+        
+        allClientRoom[v.info.guid]=nil
         if v.client then 
             v.client.player = nil
             v.client.room = nil
@@ -1256,16 +1281,22 @@ function Room:Check(client)
 end
 function Room:SaveRecoderFile()
     if (WRITE_RECODER) and self.recoder_writer == nil then 
-        local res = RedisResponse()
-        local session_time = 7*24*60*60
+        
+       
         local file_name = string.format('%s_%s',tostring(self.guid),tostring(os.time()))
         self.recoder_writer = AsyncFileWriter()
         self.recoder_writer:Create(RECODER_PATH .. file_name)
+        self.recoder_file_name = file_name
+        local write_info = {}
         self.players:Each(function (k,v)
             v.client.recoder_writer = self.recoder_writer
-            SaveSession(gServer.db,res,'recoder',string.format('%s_%s',tostring(v.info.guid),file_name),file_name,7*24*60*60)
+            table.insert( write_info,v.info)
+            
         end)
-        
+
+        self.recoder_writer:PushContentLine(json.encode(write_info))
+
+        write_info = nil
     end
     
 end
@@ -1274,7 +1305,12 @@ function Room:Start()
     if self.players:Size() < GAME_MAX_PLAYERS then return false end
     local all_ready = true
     self.players:Each(function (k,v)
-        if not(v.ready) then all_ready = false end
+        if not(v.ready) then 
+            all_ready = false
+            if(self.card.used == 0) then allClientRoom[v.info.guid] = nil end
+        else
+            allClientRoom[v.info.guid] = self.guid
+        end
     end)
     if not(all_ready) then return false end
     self.state = ROOM_STATE_PLAY
@@ -1290,6 +1326,7 @@ function Room:Start()
 --摸牌
     
     self.players:Each(function (k,v)
+        
         for i=1,22 do
             local number = self.puke:Get()
             local pai = CreatePai(number)
@@ -1312,6 +1349,7 @@ function Room:Enter(client)
     local len = self.players:Size()
     if len > GAME_MAX_PLAYERS or self:Check(client) then return false end
     local player  = CreateObject(RoomPlayers)
+    
     player.info = client.info
     player.client = client
     player.ready = false
@@ -1327,7 +1365,7 @@ function Room:Leave(client)
         self.players:Each(function ( k,v )
             if(v.client and v.info.guid ~= client.info.guid) then
                 free = false
-                v.client:SendMessage(SERVER_MSG.SM_LEAVE_ROOM,{guid = client.guid})
+                v.client:SendMessage(SERVER_MSG.SM_LEAVE_ROOM,{guid = client.info.guid})
             end
         end)
         client.room = nil
@@ -1470,7 +1508,7 @@ function Room:MaiZhuang(client,msg)
 end
 function Room:CreateTestPlayers()
     self.test_palyers=CreateObject(Array)
-    local len = self.players:Size() - 1
+    local len = self.players:Size() - 2
     for i=0,len do
         self.test_palyers:Push(self.players:At(((self.next_chupai_palyer.index+i) % GAME_MAX_PLAYERS) + 1))
     end
@@ -1522,7 +1560,7 @@ function Room:ChuPai(client,msg)
     self.test_hu_players = CreateObject(Array)
     self.test_gan_players = CreateObject(Array)
     self.test_peng_players = CreateObject(Array)
-    for i=1,2 do
+    for i=1,self.test_palyers:Size() do
         if(self.test_palyers:At(i):TestHu(msg.pai,self.puke)) then
             local p = self.test_palyers:At(i);
             self.test_hu_players:Push({player = p,test = p.test,type = TYPE_TEST_HU})
@@ -1627,6 +1665,53 @@ function Room:Test(client,msg)
     --     self:MoPai()
     end
 end
+
+
+function Room:Reconnect(client)
+    local all_sync_message = {}
+    if self.current_test_info then all_sync_message.test = {guid =self.current_test_info.player.info.guid, type = self.current_test_info.type,value = self.current_test_info.test.value} end
+    if self.next_mopai_palyer then all_sync_message.current = self.next_mopai_palyer.info.guid end
+    all_sync_message.size2=self.puke:GetSize()
+    all_sync_message.card = self.card
+    all_sync_message.jiangpai = self.puke.jiang_pai
+    all_sync_message.players = {}
+
+    self.players:Each(function ( k,v )
+        if not(v.client) then return end
+        local di = v.di_pai:Data()
+        local shou = v.shou_pai:Data()
+        local qi = v.qi_pai_array:Data()
+        if v.info.guid == client.player.info.guid then
+            table.insert( all_sync_message.players, {
+                guid = v.info.guid,
+                nick = v.info.nick,
+                headimgurl =v.info.headimgurl,
+                di = di,
+                shou = shou,
+                qi = qi,
+                size1 = v.shou_pai:Size(),
+                maizhuag=v:MaiZhuang()
+                
+            })
+        else
+            table.insert( all_sync_message.players, {
+                guid = v.info.guid,
+                nick = v.info.nick,
+                headimgurl =v.info.headimgurl,
+                di = di,
+                qi = qi,
+                size1 = v.shou_pai:Size(),
+                maizhuag=v:MaiZhuang()
+            })
+            v.client:SendMessage(SERVER_MSG.SM_RECONNECT,{guid = client.info.guid})
+        end
+    end)
+
+    client:SendMessage(SERVER_MSG.SM_SYNC_ROOM_STATE,all_sync_message)
+
+end
+
+
 function Room:Balance(payOnly)
     self.state = ROOM_STATE_BALANCE
     local blance_msg = CreateObject(Array)
@@ -1729,6 +1814,16 @@ function Room:Balance(payOnly)
                 winnerguid = key
             end
         end
+        if self.recoder_writer then
+            local res = RedisResponse()
+            local json_score = json.encode(final_score)
+            self.players:Each(function ( k,v )
+                SaveSession(gServer.db,res,'record',string.format('%s_%s',tostring(v.info.guid),self.recoder_file_name),json_score,7*24*60*60)
+            end)
+            
+        end
+        
+
         if self.card.pay == PayType.Host or winnerScore <= 0 or winnerguid == nil then
             local user = GetUserByUnionid(gServer.db,self.card.owner)
             if user then

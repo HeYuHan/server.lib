@@ -328,6 +328,12 @@ bool RedisHelper::ExpireKey(int cmd, const char * mapName, const char * key, int
 	return res.Valid() && res.Integer() > 0;
 }
 
+bool RedisHelper::Keys(RedisResponse *res, const char * mapName, const char * key)
+{
+	Command(res, "keys %s:%s", mapName, key);
+	return res->Valid();
+}
+
 
 void RedisHelper::Command(RedisResponse *res, const char *format, ...)
 {
@@ -391,18 +397,18 @@ const char * RedisResponse::String()
 	return NULL;
 }
 
-redis_int RedisResponse::ElementsCount()
+int RedisResponse::ElementsCount()
 {
-	if (Valid())return m_Reply->elements;
+	if (Valid())return (int)m_Reply->elements;
 	return 0;
 }
 
-bool RedisResponse::Element(RedisResponse & res, int index)
+bool RedisResponse::Element(RedisResponse * res, int index)
 {
 	if (Valid() && index >= 0 && index < (int)m_Reply->elements)
 	{
-		res.m_Reply = m_Reply->element[index];
-		res.isChild = true;
+		res->m_Reply = m_Reply->element[index];
+		res->isChild = true;
 		return true;
 	}
 	return false;

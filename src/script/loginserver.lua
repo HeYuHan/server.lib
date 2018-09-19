@@ -5,7 +5,6 @@ Server = {}
 sysTable = {}
 
 function Client:OnCreate()
-    print('login client oncreate')
     self.socket:RegisterCallBack(self)
     self.uid = self.socket.uid
 end
@@ -58,6 +57,11 @@ function Client:OnDisconnected()
     self.uid = 0
     --print('client disconnected uid:' .. tostring(self.uid))
     --collectgarbage("collect")
+end
+
+function Client:Public_GetGameRecord(msg)
+    local ret  = FindKeys(gServer.db,'session',string.format('record:%s*',msg.guid))
+    return ret or {}
 end
 
 function Client:Public_TestUserInfo(msg)
@@ -205,7 +209,6 @@ end
 
 
 function Server:OnAccept(socket)
-    print('accept client uid' .. tostring(socket.uid))
     local client = CreateObject(Client,{socket = socket})
 end
 function Server:OnUpdate(frame)

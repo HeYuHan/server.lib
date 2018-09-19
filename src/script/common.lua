@@ -14,6 +14,7 @@ local redis_script_set_session = nil
 local redis_script_get_user_by_guid = nil
 local redis_script_save_user_by_guid_and_unionid = nil
 local redis_script_save_room_card = nil
+
 -------------------------------------------------------
 ------------------------------------------------
 --tools
@@ -267,6 +268,27 @@ function GetUserByUnionid(db,unionid,parse)
     else
         return nil
     end
+end
+
+function FindKeys(db,map,key)
+    local res = RedisResponse()
+    local res2 = RedisResponse()
+    db:Keys(res,map,key)
+    local ret = {}
+    if res:Valid() then
+        for i=0,res:ElementsCount() do
+            local next = RedisResponse()
+            res:Element(next,i)
+
+            if next:Valid() then 
+                db:GetValue(REDIS_CMD_STRING,res2,'session',string.sub( next:String(),9))
+                if (res2:Valid()) then table.insert( ret, {key = next:String(),value = res2:String()}) end
+
+            end
+            
+        end
+    end
+    return ret
 end
 
 function GetSystemTable(db)

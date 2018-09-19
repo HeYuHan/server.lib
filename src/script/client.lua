@@ -33,7 +33,8 @@ SERVER_MSG = EnumTable({
     'SM_MAI_ZHUANG',--//买庄
     'SM_BROADCAST',
     'SM_DISMISS_GAME',
-    'SM_DISMISS_GAME_RESULT'
+    'SM_DISMISS_GAME_RESULT',
+    'SM_RECONNECT'--短线重来
 })
 allOnlineClients = {}
 Client = {socket = nil,uid=0}
@@ -99,7 +100,19 @@ function Client:CheckInRoom(msg)
 end
 
 function Client:EnterRoom(msg)
-    local r = Room.Get(msg.guid)
+
+    local r = Room.CheckInRoom(self)
+    if r then
+        self.room = r
+        r:Reconnect(self)
+        return
+    end
+
+
+
+
+
+    r = Room.Get(msg.guid)
     if not(r) then
         local session = GetRoomSession(gServer.db,msg.guid)
         if session then
@@ -146,7 +159,7 @@ function Client:MaiZhuang(msg)
 end
 function Client:Broadcast(msg)
     if self.room then
-        self.room.playrs:Each(function ( k,v )
+        self.room.players:Each(function ( k,v )
             if v.client then
                 v.client:SendMessage(SERVER_MSG.SM_BROADCAST,{guid=self.info.guid,msg=msg})
             end

@@ -21,8 +21,8 @@ public:
 	int Length();
 	int Integer();
 	const char* String();
-	redis_int ElementsCount();
-	bool Element(RedisResponse &res, int index);
+	int ElementsCount();
+	bool Element(RedisResponse *res, int index);
 private:
 	void Free();
 private:
@@ -78,6 +78,7 @@ public:
 	bool GetSortValue(RedisResponse *res, const char* mapName, redis_int start, redis_int end);
 	int CountSortValue(const char* mapName, redis_int start, redis_int end);
 	bool ExpireKey(int cmd, const char* mapName, const char* key, int s);
+	bool Keys(RedisResponse *res, const char* mapName, const char* key);
 
 private:
 	void Command(RedisResponse *res, const char *format, ...);

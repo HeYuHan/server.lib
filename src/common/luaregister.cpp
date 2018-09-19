@@ -249,6 +249,7 @@ void RegRedis(lua_State *L)
 		.addFunction("GetSortValue", &RedisHelper::GetSortValue)
 		.addFunction("CountSortValue", &RedisHelper::CountSortValue)
 		.addFunction("ExpireKey", &RedisHelper::ExpireKey)
+		.addFunction("Keys", &RedisHelper::Keys)
 		.addFunction("ScriptEval",&RedisHelper::ScriptEval)
 		.addFunction("ScriptCmd", &RedisHelper::ScriptCmd)
 
