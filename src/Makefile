@@ -24,15 +24,14 @@ clean_deps:
 	$(MAKE) clean_deps -C common
 
 package:
-	rm -rf srs.server*
-	mkdir -p srs.server.build/script
-	mkdir -p srs.server.build/log
-	cp bin/channelserver srs.server.build/
-	cp bin/proxyserver srs.server.build/
-	cp -r script/* srs.server.build/script/
-	cp bin/srs_* srs.server.build/
-	cp bin/keep_process srs.server.build/
-	chmod -R 777 srs.server.build/
-	tar -zcvf srs.server.build.$(shell date +%Y%m%d%H%M%S).tar.gz srs.server.build
-	rm -rf srs.server.build
+	rm -rf ntcp.server*
+	mkdir -p ntcp.server.build/script
+	mkdir -p ntcp.server.build/log
+	cp bin/luaserver ntcp.server.build/
+	cp -r script/* ntcp.server.build/script/
+	cp bin/ntcp_* ntcp.server.build/
+	cp bin/keep_process ntcp.server.build/
+	chmod -R 777 ntcp.server.build/
+	tar -zcvf ntcp.server.build.$(shell date +%Y%m%d%H%M%S).tar.gz ntcp.server.build
+	rm -rf ntcp.server.build
 
