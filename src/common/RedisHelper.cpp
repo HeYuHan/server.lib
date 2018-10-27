@@ -243,7 +243,7 @@ bool RedisHelper::DelKey(int cmd, const char * mapName, const char * key)
 	}
 	else if (cmd == REDIS_CMD_STRING)
 	{
-		Command(&res, "	DEL %s:%s", mapName, key);
+		Command(&res, "DEL %s:%s", mapName, key);
 	}
 	return res.Valid() && res.Integer() > 0;
 }

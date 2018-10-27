@@ -168,7 +168,7 @@ function Client:Broadcast(msg)
 end
 function Client:GameLeave(msg)
     -- body
-    print('GameLeave=>'..msg)
+    --print('GameLeave=>'..msg)
 end
 --==============================--
 

@@ -90,7 +90,8 @@ UserInfo = {
     unionid = '',
     headimgurl = '',
     diamond = INIT_DIAMOND_COUNT,
-    gold = INIT_GOLD_COUNT
+    gold = INIT_GOLD_COUNT,
+    proxy = false
 
 }
 PayType = EnumTable({
@@ -332,9 +333,8 @@ function GetProxyInfo(db,guid)
 end
 
 function DeleteProxyInfo(db,guid)
-    local res = RedisResponse()
-    db:DelKey(REDIS_CMD_STRING,res,'admin:proxy',tostring(guid))
-    if res:Valid() then
+    local ok = db:DelKey(REDIS_CMD_STRING,'admin:proxy',tostring(guid))
+    if ok then
         return true
     else
         return nil

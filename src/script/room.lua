@@ -1773,7 +1773,7 @@ function Room:Balance(payOnly)
     if self.current_test_info and self.current_test_info.player then winner_guid = self.current_test_info.player.info.guid end
     if self.next_chupai_palyer then loser_guid = self.next_chupai_palyer.info.guid end
     
-    self.card.maxUseCount = 2
+    --self.card.maxUseCount = 2
     
     if self.card.maxUseCount > self.card.used and not(payOnly) then
         self:BroadCastMessage(nil,SERVER_MSG.SM_GAME_BALANCE,{score=current_score,loser = loser_guid,winner=winner_guid,balance = blance_msg.tbl})

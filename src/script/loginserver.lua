@@ -164,6 +164,7 @@ function Client:Public_GetUserInfo(msg)
             user.unionid = wx1.unionid
             user.headimgurl = wx2.headimgurl
             user.guid = GetUserGuid(gServer.db)
+            user.proxy = false
             gServer:SaveUserInfo(user)
             return user
         end
